@@ -1,0 +1,17 @@
+{
+  "name": "tscc",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "local-install": "lerna exec -- eval \"yarn global add file:\\$PWD\""
+  },
+  "devDependencies": {
+    "lerna": "^3.14.1",
+    "typescript": "^3.5.1"
+  },
+  "dependencies": {}
+}

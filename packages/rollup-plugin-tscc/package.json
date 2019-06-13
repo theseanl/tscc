@@ -1,0 +1,17 @@
+{
+  "name": "@tscc/rollup-plugin-tscc",
+  "author": "theseanl",
+  "description": "A rollup plugin to use tscc module specification",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {},
+  "devDependencies": {
+    "rollup": "^1.12.3"
+  },
+  "dependencies": {
+    "@tscc/tscc-spec": "^0.0.0"
+  },
+  "gitHead": "c3c69f30ea30891b7b6e411255d5a6d247136767"
+}

@@ -1,0 +1,32 @@
+{
+	"name": "@tscc/tscc",
+	"author": "theseanl",
+	"description": "A typescript transpiler and bundler that wires up tsickle and closure compiler seamlessly",
+	"version": "0.0.0",
+	"main": "dist/tscc.js",
+	"types": "dist/tscc.d.ts",
+	"bin": {
+		"tscc": "./dist/main.js"
+	},
+	"license": "MIT",
+	"scripts": {},
+	"devDependencies": {
+		"@types/fs-extra": "^7.0.0",
+		"typescript": "^3.4.5"
+	},
+	"dependencies": {
+		"@tscc/tscc-spec": "^0.0.0",
+		"chalk": "^2.4.2",
+		"esprima": "^4.0.1",
+		"estraverse": "^4.2.0",
+		"fs-extra": "^8.0.1",
+		"global": "^4.3.2",
+		"google-closure-compiler-java": "^20190513.0.0",
+		"google-closure-library": "^20190528.0.0",
+		"minimist": "^1.2.0",
+		"ora": "^3.4.0",
+		"rimraf": "^2.6.3",
+		"tsickle": "^0.35.0"
+	},
+	"gitHead": "c3c69f30ea30891b7b6e411255d5a6d247136767"
+}

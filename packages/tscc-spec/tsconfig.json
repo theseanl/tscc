@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"lib": ["es7"],
+		"types": ["node"],
+		"module": "commonjs",
+		"rootDir": "src",
+		"outDir": "dist",
+		"declaration": true
+	}
+}
