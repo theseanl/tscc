@@ -1,0 +1,17 @@
+{
+  "name": "@tscc/tscc-spec",
+  "author": "theseanl",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {
+    "fast-glob": "^2.2.7",
+    "toposort": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/toposort": "^2.0.1"
+  },
+  "gitHead": "97e680f7cdef886fef60b26bb926d4a7fcd72895"
+}
