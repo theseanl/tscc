@@ -11,6 +11,6 @@
     "rollup": "^1.12.3"
   },
   "dependencies": {
-	  "@tscc/tscc-spec": "^0.0.0"
+    "@tscc/tscc-spec": "^0.0.0"
   }
 }
