@@ -1,5 +1,8 @@
 # TSCC
 
+[![@tscc/tscc](https://badge.fury.io/js/%40tscc%2Ftscc.svg)](https://badge.fury.io/js/%40tscc%2Ftscc)
+[![@tscc/rollup-plugin-tscc](https://badge.fury.io/js/%40tscc%2Frollup-plugin-tscc.svg)](https://badge.fury.io/js/%40tscc%2Frollup-plugin-tscc)
+
 A collection of tools to seamlessly bundle, minify Typescript with Closure Compiler.
 
 Closure is a wonderful system of tools. The closure compiler is the best javascript minifier and bundler, but it is known to be very difficult to use. Documentations are scarce, and integration with external tools are not well-established.

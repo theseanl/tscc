@@ -12,6 +12,5 @@
   },
   "devDependencies": {
     "@types/toposort": "^2.0.1"
-  },
-  "gitHead": "97e680f7cdef886fef60b26bb926d4a7fcd72895"
+  }
 }
