@@ -1,0 +1,15 @@
+{
+	"modules": {
+		"entry": "./entry.js",
+		"dependent": {
+			"entry": "./dir/dependency.js",
+			"dependencies": [
+				"entry"
+			]
+		}
+	},
+	"prefix": {
+		"rollup": "./golden/generated_",
+		"cc": "."
+	}
+}

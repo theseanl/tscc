@@ -7,4 +7,3 @@ export function removeCcExport(filename: string) {
 	content = content.replace(reCcExport, '');
 	fs.writeFileSync(filename, content);
 }
-

@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
+"var generated_entry = (function (exports) {
+	'use strict';
+
+	function swap([a, b]) {
+		return [b, a];
+	}
+
+	function sort([a, b]) {
+		return a > b ? [a, b] : swap([a, b]);
+	}
+
+	var _ = ({
+		a: sort,
+		s: swap
+	});
+
+	const a = [1, 2];
+	const b = swap(a);
+
+	console.log(b);
+
+	exports.$0 = _;
+	exports.b = b;
+
+	return exports;
+
+}({}));
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.json 2`] = `
+"(function (_, generated_entry_js) {
+	'use strict';
+
+	console.log(_.a([1, generated_entry_js.b]));
+
+}(generated_entry.$0, generated_entry));
+"
+`;

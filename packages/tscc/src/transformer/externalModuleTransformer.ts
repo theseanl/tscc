@@ -5,7 +5,7 @@
  */
 
 import * as ts from 'typescript';
-import ITsccSpecWithTS from './ITsccSpecWithTS';
+import ITsccSpecWithTS from '../spec/ITsccSpecWithTS';
 import {TsickleHost} from 'tsickle';
 import {moduleNameAsIdentifier} from 'tsickle/src/annotator_host';
 import {isVariableRequireStatement} from './transformer_utils';

@@ -3,19 +3,22 @@
 	"author": "theseanl",
 	"description": "A typescript transpiler and bundler that wires up tsickle and closure compiler seamlessly",
 	"version": "0.0.0",
-	"main": "dist/tscc.js",
-	"types": "dist/tscc.d.ts",
+	"main": "./dist/tscc.js",
 	"bin": {
 		"tscc": "./dist/main.js"
 	},
 	"license": "MIT",
 	"scripts": {},
+	"engines": {
+		"node": ">=10.3.0"
+	},
 	"devDependencies": {
-		"@types/fs-extra": "^7.0.0",
-		"typescript": "^3.4.5"
+		"@types/fs-extra": "^7.0.0"
+	},
+	"peerDependencies": {
+		"@tscc/tscc-spec": "^0.0.0"
 	},
 	"dependencies": {
-		"@tscc/tscc-spec": "^0.0.0",
 		"chalk": "^2.4.2",
 		"esprima": "^4.0.1",
 		"estraverse": "^4.2.0",
@@ -26,7 +29,8 @@
 		"minimist": "^1.2.0",
 		"ora": "^3.4.0",
 		"rimraf": "^2.6.3",
-		"tsickle": "^0.35.0"
+		"tsickle": "^0.35.0",
+		"typescript": "~3.4.1"
 	},
 	"publishConfig": {
 		"access": "public"

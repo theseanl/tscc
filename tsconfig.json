@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"lib": ["es7"],
+		"types": ["node"],
+		"target": "es2017",
+		"downlevelIteration": true,
+		"module": "commonjs",
+		"experimentalDecorators": true,
+		"declaration": true,
+		"baseUrl":".",
+		"paths": {
+			"@tscc/*": ["packages/*"]
+		}
+	}
+}

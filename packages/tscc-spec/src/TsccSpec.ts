@@ -1,5 +1,6 @@
-import ITsccSpec, {INamedModuleSpecs} from './ITsccSpec';
-import ITsccSpecJSON, {IModule} from './ITsccSpecJSON';
+import ITsccSpec from './ITsccSpec';
+import ITsccSpecJSON, {IModule, INamedModuleSpecs} from './ITsccSpecJSON';
+import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
 import fs = require('fs');
 import toposort = require('toposort');
@@ -12,6 +13,7 @@ export interface IInputTsccSpecJSON extends ITsccSpecJSON {
 	 */
 	specFile?: string
 }
+
 export default class TsccSpec implements ITsccSpec {
 	private static resolveTsccSpec(root: string): string {
 		if (!fs.existsSync(root)) return;
@@ -49,22 +51,75 @@ export default class TsccSpec implements ITsccSpec {
 
 		return {tsccSpecJSON, tsccSpecJSONPath};
 	}
-	static loadSpec(
+	static loadSpec<T extends typeof TsccSpec>(
+		this: T,
 		tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON
-	): TsccSpec {
+	): InstanceType<T> {
 		let {tsccSpecJSON, tsccSpecJSONPath} = TsccSpec.loadSpecRaw(tsccSpecJSONOrItsPath);
-		return new TsccSpec(tsccSpecJSON, tsccSpecJSONPath);
+		return <InstanceType<T>>new this(tsccSpecJSON, tsccSpecJSONPath);
 	}
 	constructor(
 		protected readonly tsccSpec: ITsccSpecJSON,
 		protected basePath: string
-	) {}
-	// Returns an absolute path by resolving filePath appropriately.
+	) {
+		this.computeOrderedModuleSpecs();
+	}
+	private orderedModuleSpecs: INamedModuleSpecs[];
+	private computeOrderedModuleSpecs() {
+		const modules = this.tsccSpec.modules;
+		if (Array.isArray(modules)) {
+			// Use it as is, TODO but check whether it is sorted
+			this.orderedModuleSpecs = modules;
+			return;
+		}
+		// TODO Closure compiler requires modules to have a single common root.
+		// We may validate it and produce error here.
+		const graph = new DirectedTree<string>();
+		for (let moduleName in modules) {
+			graph.addNodeById(moduleName);
+			// Can be a string literal or IModule
+			let moduleSpecOrModuleEntryFile = modules[moduleName];
+			if (typeof moduleSpecOrModuleEntryFile === 'string') continue;
+			let deps = moduleSpecOrModuleEntryFile.dependencies;
+			if (!deps) continue;
+			for (let dep of deps) {
+				graph.addEdgeById(dep, moduleName);
+			}
+		}
+		let sorted: ReadonlyArray<string>;
+		try {
+			sorted = graph.sort();
+		} catch (e) {
+			if (e instanceof CycleError) {
+				throw new TsccSpecError(`Circular dependency in modules ${[...e.cycle]}`);
+			}
+		}
+		this.orderedModuleSpecs = sorted.map(moduleName => {
+			return TsccSpec.interopModuleSpecs(moduleName, modules[moduleName]);
+		})
+	}
+	getOrderedModuleSpecs() {
+		return this.orderedModuleSpecs;
+	}
+	private static interopModuleSpecs(moduleName: string, moduleSpec: IModule | string): INamedModuleSpecs {
+		if (typeof moduleSpec === 'string') {
+			return {moduleName, entry: moduleSpec, dependencies: [], extraSources: []};
+		}
+		if (!('dependencies' in moduleSpec)) moduleSpec.dependencies = [];
+		if (!('extraSources' in moduleSpec)) moduleSpec.extraSources = [];
+		(moduleSpec as INamedModuleSpecs).moduleName = moduleName;
+		return <INamedModuleSpecs>moduleSpec;
+	}
+	/**
+	 * Paths specified in TSCC spec are resolved with following strategy:
+	 *  - If starts with "./" or "../", resolve relative to the spec file's path.
+	 *  - If it is still not an absolute path, resolve relative to the current working directory.
+	 *    as if cwd is in the PATH.
+	 *  - Otherwise, use the absolute path as is.
+	 *  Also, it preserves the trailing path separator. This, for example, has semantic difference
+	 *  in closure compiler's 'chunk_output_path_prefix' option.
+	 */
 	protected absolute(filePath: string): string {
-		// If starts with ".", resolve relative to the spec file's path.
-		// If it is still not an absolute path, resolve relative to the current working directory.
-		// Otherwise, use as it.
-		// Make sure to preserve the trailing path separator.
 		if (path.isAbsolute(filePath)) return filePath;
 		let endsWithSep = filePath.endsWith(path.sep);
 		let base = /^[\.]{1,2}\//.test(filePath) ?
@@ -73,76 +128,19 @@ export default class TsccSpec implements ITsccSpec {
 		// path.resolve trims trailing separators.
 		return path.resolve(base, filePath) + (endsWithSep ? path.sep : '');
 	}
+	/**
+	 * Resolves with TSCC's convention, but as a relative path from current working directory.
+	 */
 	protected relativeFromCwd(filePath: string): string {
 		let absolute = this.absolute(filePath);
 		let endsWithSep = absolute.endsWith(path.sep);
 		return path.relative(process.cwd(), absolute) + (endsWithSep ? path.sep : '');
-	}
-	resolveRollupExternalDeps(moduleId: string) {
-		return null; // Just a stub
 	}
 	protected getOutputPrefix(target: "cc" | "rollup"): string {
 		let prefix = this.tsccSpec.prefix;
 		if (typeof prefix === 'undefined') return '';
 		if (typeof prefix === 'string') return prefix;
 		return prefix[target];
-	}
-	protected getModule(moduleName: string): IModule {
-		let module = this.tsccSpec.modules[moduleName];
-		if (typeof module === 'string') return {entry: module};
-		return module;
-	}
-	getOutputNameToEntryFileMap() {
-		let out = {};
-		let prefix = this.getOutputPrefix("rollup");
-		let resolvedPrefix = this.relativeFromCwd(prefix);
-		if (resolvedPrefix.startsWith('.')) {
-			throw new TsccSpecError(`Output file prefix ${resolvedPrefix} resides outside of the current working directory`);
-		}
-		for (let moduleName in this.tsccSpec.modules) {
-			let entryFile = this.getModule(moduleName).entry;
-			// If entryFile is a relative path, resolve it relative to the path of tsccSpecJSON.
-			out[resolvedPrefix + moduleName] = this.absolute(entryFile);
-		}
-		return out;
-	}
-	shouldUseClosureDeps() {
-		return this.tsccSpec.closureLibrary === true;
-	}
-	getOrderedModuleSpecs() {
-		// TODO Closure compiler requires modules to have a single common root.
-		// We may validate it and produce error here.
-		const edges: [string, string][] = [];
-		for (let moduleName in this.tsccSpec.modules) {
-			let deps = this.getModule(moduleName).dependencies;
-			if (!deps) continue;
-			for (let dep of deps) {
-				edges.push([moduleName, dep]);
-			}
-		}
-		let sorted: ReadonlyArray<string>;
-		if (edges.length === 0) {
-			// This happens iff there is a single module due to a common root requirement.
-			sorted = Object.keys(this.tsccSpec.modules);
-		} else {
-			try {
-				sorted = toposort(edges);
-			} catch (e) {
-				throw new TsccSpecError(`Circular dependency in modules`);
-			}
-		}
-		return sorted.map(this.moduleNameToNamedModule, this);
-	}
-	private moduleNameToNamedModule(moduleName: string): INamedModuleSpecs {
-		let module = this.getModule(moduleName);
-		const out: Partial<INamedModuleSpecs> = {};
-		if ('entry' in module) {
-			out.entry = this.absolute(module.entry);
-		}
-		if ('dependencies' in module) out.dependencies = module.dependencies.slice();
-		if ('extraSources' in module) out.extraSources = module.extraSources.slice();
-		out.moduleName = moduleName;
-		return <INamedModuleSpecs>out;
 	}
 	getExternalModuleNames() {
 		if (!this.tsccSpec.external) return [];
