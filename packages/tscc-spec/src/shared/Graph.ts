@@ -121,10 +121,10 @@ class Node {
 		return this.outbound.length === 0;
 	}
 	iterateInboundEdges() {
-		return this.inbound.values();
+		return this.inbound[Symbol.iterator]();
 	}
 	iterateOutboundEdges() {
-		return this.outbound.values();
+		return this.outbound[Symbol.iterator]();
 	}
 	*iterateAncestors() {
 		yield this;
