@@ -1,4 +1,6 @@
+index.ts
 src
+node_modules
 tsconfig.json
 yarn-error.log
 

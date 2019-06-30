@@ -17,6 +17,14 @@ export declare interface IModule {
 	extraSources?: ReadonlyArray<string>
 }
 
+export interface INamedModuleSpecs extends IModule {
+	/**
+	 * The name of this module, to be used as the name of the output file, and to
+	 * refer modules in IModules.dependencies key.
+	 */
+	moduleName: string
+}
+
 export declare interface IStyles {
 	/**
 	 * A list of file paths, which will be compiled to a single css file.
@@ -40,7 +48,12 @@ declare interface ITsccSpecJSON {
 		 * It supports path delimiters.
 		 */
 		readonly [moduleName: string]: string|Readonly<IModule>
-	}
+	} | 
+	/**
+	 * Or alternatively, provide then in a custom order with module's name as a key as well,
+	 * it must be topologically sorted
+	 */ 
+	INamedModuleSpecs[]
 	/**
 	 * Similar to rollup's input option "external", maps module IDs to global names that's assumed
 	 * to be present in the global scope. Type declaration files must be available in the respective

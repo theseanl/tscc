@@ -1,7 +1,8 @@
 # TSCC
 
-[![@tscc/tscc](https://badge.fury.io/js/%40tscc%2Ftscc.svg)](https://badge.fury.io/js/%40tscc%2Ftscc)
-[![@tscc/rollup-plugin-tscc](https://badge.fury.io/js/%40tscc%2Frollup-plugin-tscc.svg)](https://badge.fury.io/js/%40tscc%2Frollup-plugin-tscc)
+[![tscc npm version](https://img.shields.io/npm/v/@tscc/tscc.svg?style=popout&color=blue&label=%40tscc%2Ftscc)](https://www.npmjs.com/package/@tscc/tscc)
+[![rollup-plugin-tscc npm version](https://img.shields.io/npm/v/@tscc/rollup-plugin-tscc.svg?style=popout&color=blue&label=%40tscc%2Frollup-plugin-tscc)](https://www.npmjs.com/package/@tscc/rollup-plugin-tscc)
+[![CircleCI](https://circleci.com/gh/theseanl/tscc.svg?style=svg)](https://circleci.com/gh/theseanl/tscc)
 
 A collection of tools to seamlessly bundle, minify Typescript with Closure Compiler.
 
@@ -13,7 +14,7 @@ TSCC aims to encapsulate these tools in an minimal, ergonomic API, and provide a
 
 ## Features
 
- - Automatically configures settings for tsickle and closure compiler, wires up tsickle outpout to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
+ - Automatically configures settings for tsickle and closure compiler, wires up tsickle output to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
  - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables so that it works like rollup.
  
 ## Installation 
@@ -160,8 +161,11 @@ This project came out from an experience I have had with developing several Java
 
 On the other hand, there is a work (ABC, Angular BuildTools Convergence, or Angular Bazel Closure-compiler) going on from the side of Angular to incorporate Closure compiler into its build tooling, which is actually tsickle's main application. However, one has to use bazel which are uncommon to JS development, and angular is much like an another language than Typescript, it can't be used for community outside Angular. 
  
+TSCC is meant to provide a framework-agnostic tooling that can be used to bridge this gap.
+
 ## Milestones
 
  - Add unit tests.
  - Provide an ergonomic API for using JS files which are already closure-annotated together with transpiled TS files. This will enable usage with Closure Library.
  - Provide `tscc-templates` and `tscc-css` modules that use Closure Templates and Closure Stylesheets, so that they can imported to TS sources like webpack.
+ - Sourcemap support

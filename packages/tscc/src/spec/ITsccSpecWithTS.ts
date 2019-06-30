@@ -16,14 +16,11 @@ export default interface ITsccSpecWithTS extends ITsccSpec {
 	 * Returns a list of file names included in the TS project.
 	 */
 	getAbsoluteFileNamesSet():Set<string>
-	resolveExternalModuleTypeReference(moduleName:string):string;
 	/**
-	 * Basically this maps a module name in `import ... from ${moduleName}` to an identifier
-	 * tsickle uses when it converts the statement to `goog.requireType(${typeref})`.
-	 * Maps external module name to its type definition file if exists, and moduleName otherwise.
+	 * For a given module name as used in import ... from ${moduleName}, returns a type reference file's
+	 * file name. Returns null if it cannot find a type definition for a module's name.
 	 */
-	// getExternalModuleNamesToTypeReferenceMap():Map<string, string>
-	// getExternalModulesTypeReference():ReadonlyArray<string>
+	resolveExternalModuleTypeReference(moduleName:string):string;
 	/**
 	 * Create a unique hash for a project, consisting of the absolute path of tsconfig,
 	 * absolute path of tsccspec, and their contents.

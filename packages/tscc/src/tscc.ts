@@ -1,21 +1,21 @@
 import * as ts from "typescript"
 import * as tsickle from "tsickle";
-import TsccSpecWithTS, {TsError} from "./TsccSpecWithTS";
-import ITsccSpecWithTS from "./ITsccSpecWithTS";
+import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
+import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
 import fs = require('fs');
 import path = require('path');
 import stream = require('stream');
 import fsExtra = require('fs-extra');
 import chalk from 'chalk';
-import {IInputTsccSpecJSON, INamedModuleSpecsWithId} from '@tscc/tscc-spec'
+import {IInputTsccSpecJSON} from '@tscc/tscc-spec'
 import {Cache, FSCacheAccessor} from './graph/Cache'
 import {ISourceNode} from './graph/ISourceNode';
 import {sourceNodeFactory} from './graph/source_node_factory'
 import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
-import externalModuleTransformer, {getExternsForExternalModules} from './externalModuleTransformer'
-import decoratorPropertyTransformer from './decoratorPropertyTransformer'
+import externalModuleTransformer, {getExternsForExternalModules} from './transformer/externalModuleTransformer'
+import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer'
 import {registerTypeBlacklistedModuleName, patchTypeTranslator} from './blacklist_symbol_type';
-import Logger from './Logger';
+import Logger from './log/Logger';
 import {flatten, riffle} from './array_utils';
 import {removeCcExport} from './remove_cc_export';
 
@@ -287,17 +287,25 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 			logger.log(ts.formatDiagnostic(warning, compilerHost));
 		},
 		options,
-		// Supports import from './dir' that resolves to './dir/index.ts'
+		/**
+		 * Supports import from './dir' that resolves to './dir/index.ts'
+		 */
 		convertIndexImportShorthand: true,
 		moduleResolutionHost: compilerHost,
-		fileNameToModuleId: (fileName) => path.relative(process.cwd(), fileName), // different from tsickle, just trying to make it simpler
+		fileNameToModuleId: (fileName) => path.relative(process.cwd(), fileName), 
+		/**
+		 * Unlike the default function that tsickle uses, here we are actually resolving
+		 * the imported name with typescript's API. This is safer for consumers may use
+		 * custom path mapping using "baseUrl", "paths" , but at the cost of relinquishing
+		 * deterministic output based on a single file.
+		 */
 		pathToModuleName: (context: string, fileName: string) => {
 			// Resolve module via ts API	
 			const resolved = ts.resolveModuleName(fileName, context, options, compilerHost);
 			if (resolved && resolved.resolvedModule) {
-				return convertToGoogModuleAdmissileName(resolved.resolvedModule.resolvedFileName)
+				return convertToGoogModuleAdmissibleName(resolved.resolvedModule.resolvedFileName)
 			}
-			return convertToGoogModuleAdmissileName(fileName);
+			return convertToGoogModuleAdmissibleName(fileName);
 		}
 	}
 
@@ -308,7 +316,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
  * A valid goog.module name must start with [a-zA-Z_$] end only contain [a-zA-Z0-9._$]. 
  * Maps path separators to ".", 
  */
-function convertToGoogModuleAdmissileName(modulePath: string): string {
+function convertToGoogModuleAdmissibleName(modulePath: string): string {
 	return modulePath
 		.replace(/\.[tj]sx?$/, '') //remove file extension
 		.replace(/[\/\\]/g, '.')

@@ -6,7 +6,7 @@ import path = require('path');
 
 export class TsError extends Error {
 	constructor(
-		public diagnostics:ReadonlyArray<ts.Diagnostic>
+		public diagnostics: ReadonlyArray<ts.Diagnostic>
 	) {
 		super(ts.formatDiagnostics(diagnostics, ts.createCompilerHost({})));
 	}
@@ -85,10 +85,12 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2019]: "ECMASCRIPT_2019",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
-	getOutputFileNames():string[] {
-		return Object.keys(this.tsccSpec.modules).map(moduleName => {
-			return this.absolute(this.getOutputPrefix('cc')) + moduleName + '.js';
-		});
+	getOutputFileNames(): string[] {
+		return this.getOrderedModuleSpecs()
+			.map(moduleSpec => {
+				const { moduleName } = moduleSpec;
+				return this.absolute(this.getOutputPrefix('cc')) + moduleName + '.js';
+			});
 	}
 	getBaseCompilerFlags() {
 		const baseFlags = this.tsccSpec.compilerFlags || {};
@@ -134,19 +136,6 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			return resolved.resolvedTypeReferenceDirective.resolvedFileName;
 		}
 		return null;
-	}
-	getExternalModuleNamesToTypeReferenceMap() {
-		const out = new Map();
-		this.getExternalModuleNames().forEach(moduleName => {
-			let typeRef = this.resolveExternalModuleTypeReference(moduleName) || moduleName;
-			out.set(moduleName, typeRef);
-		});
-		return out;
-	}
-	getExternalModulesTypeReference() {
-		return this.getExternalModuleNames()
-			.map(this.resolveExternalModuleTypeReference, this)
-			.filter(resolvedFileName => !!resolvedFileName)
 	}
 	getProjectHash(): string {
 		return require('crypto').createHash('sha256')

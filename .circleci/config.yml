@@ -1,0 +1,34 @@
+cache_key: &cache_key tscc-{{ checksum "yarn.lock" }}
+save_cache: &save_cache
+  save_cache:
+    key: *cache_key
+    paths:
+      - "node_modules"
+
+version: 2
+
+jobs:
+  build:
+    parallelism: 3
+    docker:
+      - image: circleci/node:10.4
+    working_directory: ~/tscc
+    steps:
+      - checkout
+      - restore_cache:
+          key: *cache_key
+      - run: yarn install
+      - run: yarn lerna bootstrap
+      - run:
+          name: run tests
+          command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+          environment: 
+            JEST_JUNIT_OUTPUT: "reports/junit/results.xml"
+      - run:
+          name: compile typescript
+          command: yarn tsc --noEmit
+      - *save_cache
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit

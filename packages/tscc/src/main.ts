@@ -3,9 +3,9 @@
 import minimist = require('minimist');
 import chalk from 'chalk';
 import tscc, {TEMP_DIR, CcError} from './tscc';
-import {TsError} from './TsccSpecWithTS'
+import {TsError} from './spec/TsccSpecWithTS'
 import {TsccSpecError} from '@tscc/tscc-spec'
-import Logger from './Logger';
+import Logger from './log/Logger';
 /**
  * example: tscc -c src/tscc.spec.json
  * TODO Support passing json with command line arguments
