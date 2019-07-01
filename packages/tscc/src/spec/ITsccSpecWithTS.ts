@@ -1,4 +1,4 @@
-import ITsccSpec from '@tscc/tscc-spec/src/ITsccSpec';
+import {ITsccSpec} from '@tscc/tscc-spec';
 import * as ts from 'typescript'
 
 export default interface ITsccSpecWithTS extends ITsccSpec {

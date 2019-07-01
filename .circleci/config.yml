@@ -26,7 +26,7 @@ jobs:
             JEST_JUNIT_OUTPUT: "reports/junit/results.xml"
       - run:
           name: compile typescript
-          command: yarn tsc --noEmit
+          command: yarn lerna exec -- -- tsc --noEmit
       - *save_cache
       - store_test_results:
           path: reports/junit

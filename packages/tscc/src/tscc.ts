@@ -16,7 +16,6 @@ import externalModuleTransformer, {getExternsForExternalModules} from './transfo
 import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer'
 import {registerTypeBlacklistedModuleName, patchTypeTranslator} from './blacklist_symbol_type';
 import Logger from './log/Logger';
-import {flatten, riffle} from './array_utils';
 import {removeCcExport} from './remove_cc_export';
 
 
