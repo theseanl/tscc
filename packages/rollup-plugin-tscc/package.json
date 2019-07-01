@@ -1,25 +1,22 @@
 {
-  "name": "@tscc/rollup-plugin-tscc",
-  "author": "theseanl",
-  "description": "A rollup plugin to use tscc module specification",
-  "version": "0.1.1",
-  "license": "MIT",
-  "main": "./dist/index.js",
-  "scripts": {
-    "clean": "rm -rf dist"
-  },
-  "devDependencies": {
-    "rollup": "^1.12.3",
-    "rollup-plugin-virtual": "^1.0.1"
-  },
-  "peerDependencies": {
-    "@tscc/tscc-spec": "~0.1.1"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
-  "dependencies": {
-    "rollup": "1.16.3"
-  }
+	"name": "@tscc/rollup-plugin-tscc",
+	"author": "theseanl",
+	"description": "A rollup plugin to use tscc module specification",
+	"version": "0.1.1",
+	"license": "MIT",
+	"main": "./dist/index.js",
+	"scripts": {
+		"clean": "rm -rf dist"
+	},
+	"devDependencies": {
+		"rollup": "^1.16.3",
+		"rollup-plugin-virtual": "^1.0.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
+	"dependencies": {
+		"@tscc/tscc-spec": "~0.1.1"
+	}
 }

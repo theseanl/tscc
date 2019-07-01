@@ -60,6 +60,7 @@ if (require.main === module) {
 			} else {
 				tsccLogger.log(chalk.red(`The compilation terminated with an unexpected error.`));
 				tsccLogger.log(e);
+				tsccLogger.log(e.stack);
 			}
 			process.exit(1);
 		})

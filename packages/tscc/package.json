@@ -17,10 +17,8 @@
 	"devDependencies": {
 		"@types/fs-extra": "^8.0.0"
 	},
-	"peerDependencies": {
-		"@tscc/tscc-spec": "~0.1.1"
-	},
 	"dependencies": {
+		"@tscc/tscc-spec": "~0.1.1",
 		"chalk": "^2.4.2",
 		"fs-extra": "^8.0.1",
 		"google-closure-compiler-java": "^20190513.0.0",

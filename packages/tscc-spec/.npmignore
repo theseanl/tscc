@@ -1,6 +1,5 @@
 index.ts
-src
+/src
 node_modules
 tsconfig.json
 yarn-error.log
-
