@@ -27,7 +27,7 @@
 		"fs-extra": "^8.0.1",
 		"global": "^4.3.2",
 		"google-closure-compiler-java": "^20190513.0.0",
-		"google-closure-library": "^20190528.0.0",
+		"google-closure-library": "^20190618.0.0",
 		"minimist": "^1.2.0",
 		"ora": "^3.4.0",
 		"rimraf": "^2.6.3",

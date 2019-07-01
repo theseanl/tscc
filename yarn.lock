@@ -2731,10 +2731,10 @@ google-closure-compiler-java@^20190513.0.0:
   resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20190513.0.0.tgz#e78e0878899cfa2ac06b7c586ccdec3c41aa367d"
   integrity sha512-0dFZwAREck9W780tVW4AW1c4ztrigLXGJ+dLCXFCwVJZS0pmhmZx3YEByl/aFSU9etIjLwYkYo73xjPyZ/AbtA==
 
-google-closure-library@^20190528.0.0:
-  version "20190528.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-library/-/google-closure-library-20190528.0.0.tgz#ab9820baf7c6102702500775a4d86ea01ba38af1"
-  integrity sha512-Kvpz/Y0MLgiHsNmyEgOJ8p/DLDDWDHkEzY9wlEaYiZRMKOEtC5DlQ1F4PMZ2eY5PgOnFUCavFh5CPPp7f991Ig==
+google-closure-library@^20190618.0.0:
+  version "20190618.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-library/-/google-closure-library-20190618.0.0.tgz#819ebc8e100a8847ed48d959a0b3a272dc82c615"
+  integrity sha512-V0RbatvAmCfdOTeTXXbXklGU1hgPus8YkpjyaMBmoCcajgtk9vL+SsRhD1Ntk6QNkbzD9WGKLdyovMw7NJ8VnA==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.15"
