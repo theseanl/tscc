@@ -15,7 +15,7 @@
 		"node": ">=10.3.0"
 	},
 	"devDependencies": {
-		"@types/fs-extra": "^7.0.0"
+		"@types/fs-extra": "^8.0.0"
 	},
 	"peerDependencies": {
 		"@tscc/tscc-spec": "^0.0.0"
