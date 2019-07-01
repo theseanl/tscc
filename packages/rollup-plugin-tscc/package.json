@@ -2,11 +2,11 @@
   "name": "@tscc/rollup-plugin-tscc",
   "author": "theseanl",
   "description": "A rollup plugin to use tscc module specification",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "./dist/index.js",
   "scripts": {
-	  "clean": "rm -rf dist"
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "rollup": "^1.12.3",
