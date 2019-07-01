@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "main": "dist/index.js",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+	  "clean": "rm -rf dist"
+  },
   "dependencies": {
     "fast-glob": "^2.2.7",
     "toposort": "^2.0.2"

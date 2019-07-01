@@ -6,10 +6,6 @@
 		"downlevelIteration": true,
 		"module": "commonjs",
 		"experimentalDecorators": true,
-		"declaration": true,
-		"baseUrl":".",
-		"paths": {
-			"@tscc/*": ["packages/*"]
-		}
+		"declaration": true
 	}
 }

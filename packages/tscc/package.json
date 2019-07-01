@@ -8,7 +8,9 @@
 		"tscc": "./dist/main.js"
 	},
 	"license": "MIT",
-	"scripts": {},
+	"scripts": {
+		"clean": "rm -rf dist"
+	},
 	"engines": {
 		"node": ">=10.3.0"
 	},

@@ -5,7 +5,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "main": "./dist/index.js",
-  "scripts": {},
+  "scripts": {
+	  "clean": "rm -rf dist"
+  },
   "devDependencies": {
     "rollup": "^1.12.3",
     "rollup-plugin-virtual": "^1.0.1"
