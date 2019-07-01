@@ -13,7 +13,7 @@
     "rollup-plugin-virtual": "^1.0.1"
   },
   "peerDependencies": {
-    "@tscc/tscc-spec": "^0.0.0"
+    "@tscc/tscc-spec": "~0.1.1"
   },
   "publishConfig": {
     "access": "public"
