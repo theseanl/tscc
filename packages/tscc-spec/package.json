@@ -1,11 +1,11 @@
 {
   "name": "@tscc/tscc-spec",
   "author": "theseanl",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-	  "clean": "rm -rf dist"
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "fast-glob": "^2.2.7",
