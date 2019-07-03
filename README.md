@@ -6,16 +6,27 @@
 
 A collection of tools to seamlessly bundle, minify Typescript with Closure Compiler.
 
+## Migrate
+
+It is easy to migrate an existing Typescript project to use with TSCC.
+Check out [todomvc app](https://github.com/theseanl/todomvc/tree/master/typescript-react) using Typescript and React, forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use with TSCC to see how it can be done.
+
+---
+
+## Features
+
+ - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle output to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
+ - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin.
+ - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables so that it works like rollup.
+
+
+## Background
+
 Closure is a wonderful system of tools. The closure compiler is the best javascript minifier and bundler, but it is known to be very difficult to use. Documentations are scarce, and integration with external tools are not well-established.
 
 Tsickle is another wonderful tool. It finally makes it ergonomic to write code that can naturally be consumed by closure compiler, in that it transforms `.ts` files to `.js` files which are well-annotated, which would otherwise not even be consumed by the compiler, and automatically generates "externs" file from declaration files. However, like closure compiler, they have just release the tool and provided few documentation, and does not actively support bugs occuring when "not used in a proper way" (as they are used internally in Google). Also, it only does transpilation, there is no tool to put transpiled files to closure compiler, which is another painful part.
 
 TSCC aims to encapsulate these tools in an minimal, ergonomic API, and provide a faster, easier alternative bundling [Rollup](https://rollupjs.org), which is great for rapid development. It can be used as a drop-in replacement for rollup in existing project using rollup, after moving chunk information in `rollup.config.js` to `tscc.spec.json`. TSCC spec file is a single source of truth for all of your module bundling information.
-
-## Features
-
- - Automatically configures settings for tsickle and closure compiler, wires up tsickle output to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
- - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables so that it works like rollup.
  
 ## Installation 
 
@@ -25,7 +36,7 @@ TSCC aims to encapsulate these tools in an minimal, ergonomic API, and provide a
  
 ### Command line
 
-`tscc [--help] [--clean] [-spec <spec_file_path>]`
+`tscc [--help] [--clean] [--spec <spec_file_path>] [--project <typescript_project_root>]`
 
 ### JS API
 
@@ -34,7 +45,7 @@ import tscc from 'tscc';
 
 tscc({ 
 	/* Contents of spec JSON */
-})
+}, tsConfigRoot?)
 
 // or,
 
