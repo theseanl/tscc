@@ -279,7 +279,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 			// controls whether a warning will cause compilation failure.
 		},
 		// This affects, for example, usage of const in const mod = goog.require('..').
-		es5Mode: options.target === ts.ScriptTarget.ES3 || options.target === ts.ScriptTarget.ES5,
+		es5Mode: options.target === undefined || options.target === ts.ScriptTarget.ES3 || options.target === ts.ScriptTarget.ES5,
 		googmodule: true,
 		transformDecorators: true,
 		transformTypesToClosure: true,
