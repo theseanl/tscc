@@ -1,4 +1,4 @@
-import {TsccSpec, IInputTsccSpecJSON, ITsccSpecJSON} from '@tscc/tscc-spec'
+import {TsccSpec, IInputTsccSpecJSON, ITsccSpecJSON, TsccSpecError} from '@tscc/tscc-spec'
 import ITsccSpecWithTS from './ITsccSpecWithTS';
 import * as ts from 'typescript';
 import fs = require('fs');
@@ -17,14 +17,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		tsConfigRoot: string = process.cwd(),
 	) {
 		const configFileName = ts.findConfigFile(tsConfigRoot, fs.existsSync);
-		const {config: json, error} = ts.readConfigFile(configFileName, ts.sys.readFile);
-		if (error) {
-			throw new TsError([error])
+		if (configFileName === undefined) {
+			throw new TsccSpecError(`Cannot find tsconfig.json at ${tsConfigRoot}.`)
 		}
-		const parsedConfig = ts.parseJsonConfigFileContent(
-			json, ts.sys, path.dirname(configFileName),
-			{}, configFileName
-		);
+		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, {}, <any>ts.sys);
 		if (parsedConfig.errors.length) {
 			throw new TsError(parsedConfig.errors);
 		}
@@ -54,8 +50,12 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			options.outDir = null;
 		}
 		if (!options.importHelpers) {
-			onTsccWarning(`tsickle uses its own tslib optimized for closure compiler, importHelpers option was set forcibly.`);
+			onTsccWarning(`tsickle uses its own tslib optimized for closure compiler. importHelpers flag is set.`);
 			options.importHelpers = true;
+		}
+		if (options.removeComments) {
+			onTsccWarning(`Closure compiler relies on type annotations, removeComments flag is unset.`);
+			options.removeComments = false;
 		}
 		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath,
 			parsedConfig, configFileName);
@@ -88,26 +88,28 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	getOutputFileNames(): string[] {
 		return this.getOrderedModuleSpecs()
 			.map(moduleSpec => {
-				const { moduleName } = moduleSpec;
+				const {moduleName} = moduleSpec;
 				return this.absolute(this.getOutputPrefix('cc')) + moduleName + '.js';
 			});
 	}
 	getBaseCompilerFlags() {
 		const baseFlags = this.tsccSpec.compilerFlags || {};
+		const defaultFlags = {};
 
-		const language_in: string = baseFlags["language_in"] ||
-			TsccSpecWithTS.tsTargetToCcTarget[this.parsedConfig.options.target];
-		const language_out = baseFlags["language_out"] || "ECMASCRIPT5";
-		const compilation_level = baseFlags["compilation_level"] || "ADVANCED";
-		const chunk_output_path_prefix = baseFlags["chunk_output_path_prefix"] ||
-			this.absolute(this.getOutputPrefix('cc'));
+		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[this.parsedConfig.options.target];
+		defaultFlags["language_out"] = "ECMASCRIPT5";
+		defaultFlags["compilation_level"] = "ADVANCED";
+		if (this.getOrderedModuleSpecs().length > 1) {
+			// Multi-chunk build uses --chunk and --chunk_output_path_prefix.
+			defaultFlags["chunk_output_path_prefix"] = this.absolute(this.getOutputPrefix('cc'));
+		} else {
+			// Single-chunk build uses --js_output_file.
+			defaultFlags["js_output_file"] = 
+				this.absolute(this.getOutputPrefix('cc')) + 
+				this.getOrderedModuleSpecs()[0].moduleName + '.js';
+		}
 
-		const flagsMap = Object.assign({
-			language_in,
-			language_out,
-			compilation_level,
-			chunk_output_path_prefix
-		}, baseFlags);
+		const flagsMap = Object.assign(defaultFlags, baseFlags);
 		const outFlags: string[] = [];
 		for (let [key, value] of Object.entries(flagsMap)) {
 			if (Array.isArray(value)) {
@@ -121,7 +123,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		return outFlags;
 	}
 	getAbsoluteFileNamesSet() {
-		return new Set(this.parsedConfig.fileNames.map(fileName => path.resolve(fileName)));
+		return new Set(
+			this.parsedConfig.fileNames
+				.map(fileName => path.resolve(path.dirname(this.tsconfigPath), fileName))
+		);
 	}
 	resolveExternalModuleTypeReference(moduleName: string) {
 		const resolved = ts.resolveTypeReferenceDirective(

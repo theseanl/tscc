@@ -119,11 +119,14 @@ export default class ClosureDependencyGraph {
 
 		// prepend modules which are only forwardDeclare'd to the very first module.
 		sortedFileNames[0] = [...forwardDeclaredFileNames, ...sortedFileNames[0]];
-
-		const flags = riffle("--chunk", sortedFileNames.map((depsOfAModule, index) => {
-			let entryPoint = entryPoints[index];
-			return `${entryPoint.moduleName}:${depsOfAModule.length}:${(entryPoint.dependencies || []).join(':')}`
-		}))
+		const flags = entryPoints.length === 1 ?
+			// single chunk build uses --js_output_file instead of --chunk, which is set in tsccspecwithts.
+			// when --chunk is used, closure compiler generates $weak$.js chunks.
+			[] :
+			riffle("--chunk", sortedFileNames.map((depsOfAModule, index) => {
+				let entryPoint = entryPoints[index];
+				return `${entryPoint.moduleName}:${depsOfAModule.length}:${(entryPoint.dependencies || []).join(':')}`
+			}));
 
 		return {src: flatten(sortedFileNames), flags}
 	}

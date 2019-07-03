@@ -3,7 +3,6 @@ import ITsccSpecJSON, {IModule, INamedModuleSpecs} from './ITsccSpecJSON';
 import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
 import fs = require('fs');
-import toposort = require('toposort');
 import fg = require('fast-glob');
 
 export interface IInputTsccSpecJSON extends ITsccSpecJSON {
@@ -95,20 +94,21 @@ export default class TsccSpec implements ITsccSpec {
 			}
 		}
 		this.orderedModuleSpecs = sorted.map(moduleName => {
-			return TsccSpec.interopModuleSpecs(moduleName, modules[moduleName]);
+			return this.interopModuleSpecs(moduleName, modules[moduleName]);
 		})
 	}
 	getOrderedModuleSpecs() {
 		return this.orderedModuleSpecs;
 	}
-	private static interopModuleSpecs(moduleName: string, moduleSpec: IModule | string): INamedModuleSpecs {
-		if (typeof moduleSpec === 'string') {
-			return {moduleName, entry: moduleSpec, dependencies: [], extraSources: []};
-		}
-		if (!('dependencies' in moduleSpec)) moduleSpec.dependencies = [];
-		if (!('extraSources' in moduleSpec)) moduleSpec.extraSources = [];
-		(moduleSpec as INamedModuleSpecs).moduleName = moduleName;
-		return <INamedModuleSpecs>moduleSpec;
+	private interopModuleSpecs(moduleName: string, moduleSpec: IModule | string): INamedModuleSpecs {
+		let spec: Partial<INamedModuleSpecs> =
+			typeof moduleSpec === 'string' ? {entry: moduleSpec} : moduleSpec;
+		if (!('dependencies' in spec)) spec.dependencies = [];
+		if (!('extraSources' in spec)) spec.extraSources = [];
+		spec.moduleName = moduleName;
+		// Resolve entry file name to absolute path
+		spec.entry = this.absolute(spec.entry);
+		return <INamedModuleSpecs>spec;
 	}
 	/**
 	 * Paths specified in TSCC spec are resolved with following strategy:
@@ -121,7 +121,8 @@ export default class TsccSpec implements ITsccSpec {
 	 */
 	protected absolute(filePath: string): string {
 		if (path.isAbsolute(filePath)) return filePath;
-		let endsWithSep = filePath.endsWith(path.sep);
+		// Special handling for '' - treat it as if it ends with a separator
+		let endsWithSep = filePath.endsWith(path.sep) || filePath.length === 0;
 		let base = /^[\.]{1,2}\//.test(filePath) ?
 			path.dirname(this.basePath) :
 			process.cwd();

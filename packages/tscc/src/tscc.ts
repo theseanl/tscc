@@ -28,14 +28,18 @@ export const TEMP_DIR = ".tscc_temp";
  * If it is an object, it will treated as a JSON format object of the spec from a file located in
  * the current working directory. If no argument was passed, it will lookup the spec file on the
  * current working directory.
+ * The second argument indicates the path to the tsconfig.json file.
  */
-export default async function tscc(tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON) {
+export default async function tscc(
+	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
+	tsProject: string = process.cwd()
+) {
 	const tsccLogger = new Logger(chalk.green("TSCC: "), process.stderr);
 	const tsLogger = new Logger(chalk.blue("TS: "), process.stderr);
 
 	const tsccSpec: ITsccSpecWithTS = TsccSpecWithTS.loadSpecWithTS(
 		tsccSpecJSONOrItsPath,
-		process.cwd(),
+		tsProject,
 		(msg) => {tsccLogger.log(msg);}
 	);
 
@@ -121,7 +125,7 @@ export default async function tscc(tsccSpecJSONOrItsPath: string | IInputTsccSpe
 
 	const {src, flags} = closureDepsGraph.getSortedFilesAndFlags(
 		tsccSpec.getOrderedModuleSpecs().map(entry => ({
-			moduleId: transformerHost.pathToModuleName(entry.entry, '.'),
+			moduleId: transformerHost.pathToModuleName('', entry.entry),
 			...entry
 		}))
 	)
@@ -291,7 +295,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		 */
 		convertIndexImportShorthand: true,
 		moduleResolutionHost: compilerHost,
-		fileNameToModuleId: (fileName) => path.relative(process.cwd(), fileName), 
+		fileNameToModuleId: (fileName) => path.relative(process.cwd(), fileName),
 		/**
 		 * Unlike the default function that tsickle uses, here we are actually resolving
 		 * the imported name with typescript's API. This is safer for consumers may use

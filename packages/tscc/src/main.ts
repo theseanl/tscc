@@ -24,12 +24,7 @@ async function main(args) {
 		console.log(`Removed ${TEMP_DIR}.`);
 		return 0;
 	}
-	if (args.spec) {
-		let configFilePath: string = args.spec;
-		await tscc(configFilePath);
-		return 0;
-	}
-	printHelp();
+	await tscc(args.spec, args.project);
 	return 0;
 }
 
@@ -37,11 +32,13 @@ if (require.main === module) {
 	const tsccLogger = new Logger(chalk.green('TSCC: '));
 	const tsLogger = new Logger(chalk.blue('TS: '));
 	main(minimist(process.argv.slice(2), {
-		string: ["spec"],
+		string: ["spec", "project"],
 		boolean: ["clean", "help", "version"],
 		alias: {
 			"spec": "c",
-			"version": "v"
+			"help": "h",
+			"version": "v",
+			"project": "p"
 		},
 		unknown: (arg) => {
 			console.error(`Unknown argument: ${arg}`);
@@ -69,11 +66,15 @@ if (require.main === module) {
 function printHelp() {
 	printVersion();
 	console.log(`
-Usage: tscc --spec [<specFilePath>] : Compile with tscc spec file at the path.
-                                      alias: -c
-       tscc --clean                 : Clear temporary files.
-       tscc --version               : Prints version. alias: -v
-       tscc --help                  : Prints this.
+Usage: tscc --spec [<specFilePath>]    : Compile with tscc spec file at the path.
+                                         Defaults to the current working directory.
+                                         alias: -c
+            --project [<tsconfigPath>] : path to the tsconfig.json file, similar to
+                                         tsc --project argument. Defaults to the 
+                                         current working directory. alias: -p
+       tscc --clean                    : Clear temporary files.
+       tscc --version                  : Prints version. alias: -v
+       tscc --help                     : Prints this.
 `.trim())
 }
 function printVersion() {
