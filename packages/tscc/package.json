@@ -8,7 +8,7 @@
 		"tree-shaking",
 		"minify-javascript"
 	],
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"main": "./dist/tscc.js",
 	"bin": {
 		"tscc": "./dist/main.js"
@@ -46,6 +46,5 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
-	"optionalDependencies": {}
+	"gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0"
 }
