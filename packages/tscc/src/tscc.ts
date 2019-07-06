@@ -74,8 +74,6 @@ export default async function tscc(
 		// async operation
 		await closureDepsGraph.addSourceByFileNames(tsccSpec.getJsFiles(), fileAccessor);
 	}
-	// const depsSorter = new DepsSorter();
-	// if (tsccSpec.shouldUseClosureDeps()) depsSorter.addClosureDeps();
 
 	let isFirstFile = true;
 	const pushToStdInStream = (...args: string[]) => {
@@ -96,11 +94,15 @@ export default async function tscc(
 		if (tsccSpec.isDebug()) {
 			fsExtra.outputFileSync(path.join(tempFileDir, filePath), contents);
 		}
-		filePath = path.resolve(filePath);
+		if (!path.isAbsolute(filePath)) filePath = path.resolve(tsProject, filePath);
 		closureDepsGraph.addSourceByContent(filePath, contents);
+		// Closure compiler produces an error if output file's name is the same as one of
+		// input files, which are in this case .js files. Since it is a legitimate use, we
+		// append TEMP_DIR to make it not collide with any real files.
+		const virtualPath = path.join(TEMP_DIR, filePath);
 		tsickleOutput.set(filePath, {
 			src: contents,
-			path: path.isAbsolute(filePath) ? path.resolve(process.cwd(), filePath) : filePath
+			path: virtualPath
 		});
 	};
 
