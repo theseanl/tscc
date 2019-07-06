@@ -4,7 +4,7 @@ import TsccSpecRollupFacade from './spec/TsccSpecRollupFacade';
 import ITsccSpecRollupFacade from './spec/ITsccSpecRollupFacade';
 import MultiMap from './MultiMap';
 import computeChunkAllocation from './sort_chunks';
-import mergeChunks, { ChunkMerger } from './merge_chunks';
+import mergeChunks  from './merge_chunks';
 import path = require('path');
 
 const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
@@ -80,7 +80,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			// 0. Merge bundles that ought to be merged with this entry point
 			const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle);
 			// 1. Delete keys for chunks that are included in this merged chunks
-			for (let chunk of chunkAllocation.getAll(entry)) {
+			for (let chunk of chunkAllocation.get(entry)) {
 				delete bundle[chunk];
 			}
 			// 2. Add the merged bundle object

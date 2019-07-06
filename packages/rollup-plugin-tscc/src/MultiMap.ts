@@ -25,11 +25,11 @@ export default class MultiMap<K, V> {
 			if (values.has(value)) return key;
 		}
 	}
-	getAll(key: K): V[] {
+	get(key: K): V[] {
 		if (!this.map.has(key)) return [];
 		return [...this.map.get(key)];
 	}
-	setAll(key: K, values: Iterable<V>) {
+	putAll(key: K, values: Iterable<V>) {
 		this.map.set(key, new Set(values));
 		return this;
 	}

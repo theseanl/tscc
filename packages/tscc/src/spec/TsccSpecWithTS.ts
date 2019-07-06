@@ -97,7 +97,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		const defaultFlags = {};
 
 		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[
-			this.parsedConfig.options.target || ts.ScriptTarget.ES3 
+			this.parsedConfig.options.target || ts.ScriptTarget.ES3
 		]; // ts default value is ES3.
 		defaultFlags["language_out"] = "ECMASCRIPT5";
 		defaultFlags["compilation_level"] = "ADVANCED";
@@ -106,20 +106,27 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			defaultFlags["chunk_output_path_prefix"] = this.absolute(this.getOutputPrefix('cc'));
 		} else {
 			// Single-chunk build uses --js_output_file.
-			defaultFlags["js_output_file"] = 
-				this.absolute(this.getOutputPrefix('cc')) + 
+			defaultFlags["js_output_file"] =
+				this.absolute(this.getOutputPrefix('cc')) +
 				this.getOrderedModuleSpecs()[0].moduleName + '.js';
 		}
 
 		const flagsMap = Object.assign(defaultFlags, baseFlags);
 		const outFlags: string[] = [];
+		const pushFlag = (key: string, value: string | number | boolean) => {
+			if (typeof value === 'boolean') {
+				if (value === true) outFlags.push('--' + key);
+			} else {
+				outFlags.push('--' + key, String(value));
+			}
+		}
 		for (let [key, value] of Object.entries(flagsMap)) {
 			if (Array.isArray(value)) {
 				for (let val of value) {
-					outFlags.push('--' + key, String(val));
+					pushFlag(key, val);
 				}
 			} else {
-				outFlags.push('--' + key, String(value));
+				pushFlag(key, value);
 			}
 		}
 		return outFlags;

@@ -45,11 +45,11 @@ export default function computeChunkAllocation(
 		leafToDependents.add(infimum, chunkName);
 	}
 	for (let entry of entryMap.keys()) {
-		let sorted = leafToDependents.getAll(entry).sort((chunk1, chunk2) => {
+		let sorted = leafToDependents.get(entry).sort((chunk1, chunk2) => {
 			// As the same order as they appear in sortedChunks (root-to-leaf)
 			return sortedChunks.indexOf(chunk1) - sortedChunks.indexOf(chunk2);
 		});
-		leafToDependents.setAll(entry, sorted);
+		leafToDependents.putAll(entry, sorted);
 	}
 	return leafToDependents;
 }

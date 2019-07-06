@@ -22,7 +22,7 @@ export default async function mergeChunks(
 // Each chunk's export object is exported as a separate namespace, whose name is chosen
 // so as not to collide with exported names of the entry module. We pass this namespace
 // as rollup's global option in order to reference those from other chunks.
-export class ChunkMerger {
+class ChunkMerger {
 	private entryModuleNamespaces: Map<string, string>
 	private chunkNamespaces: Map<string, string>
 	private unresolveChunk: Map<string, string>;

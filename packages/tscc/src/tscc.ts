@@ -15,9 +15,10 @@ import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
 import externalModuleTransformer, {getExternsForExternalModules} from './transformer/externalModuleTransformer'
 import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer'
 import {registerTypeBlacklistedModuleName, patchTypeTranslator} from './blacklist_symbol_type';
+import patchTsickleResolveModule, {getPackageBoundary} from './patch_tsickle_module_resolver';
 import Logger from './log/Logger';
 import {removeCcExport} from './remove_cc_export';
-
+import spawnCompiler from './spawn_compiler';
 
 export const TEMP_DIR = ".tscc_temp";
 
@@ -109,10 +110,12 @@ export default async function tscc(
 	pushImmediately("[");
 	// Manually push tslib, goog(base.js), goog.reflect, which are required in compilation
 	libs.forEach(({path, id}) => {
+		// ..only when user-provided sources do not provide such modules
 		if (closureDepsGraph.hasModule(id)) return;
 		writeFileHook(path, fs.readFileSync(path, 'utf8'))
 	})
 
+	patchTsickleResolveModule(); // check comments in its source - required to generate proper externs
 	const result = tsickle.emitWithTsickle(program, transformerHost, tsccSpec.getCompilerHost(),
 		tsccSpec.getCompilerOptions(), undefined, writeFileHook, undefined, false, {
 			afterTs: [
@@ -203,23 +206,6 @@ const libs = [
 
 export class CcError extends Error {}
 
-function spawnCompiler(args: string[], onClose: (code: number) => void, logger: Logger, debug?: boolean) {
-	if (debug) logger.log(`args: java ` + args.join(' '));
-	const compilerProcess = require('child_process').spawn('java', args);
-	compilerProcess.stdout.on('data', (data) => {
-		logger.write(data);
-	});
-	compilerProcess.stderr.on('data', (data) => {
-		logger.log(data);
-	})
-	compilerProcess.on('error', (err) => {
-		logger.log(chalk.red(`Closure compiler spawn error, Is java in your path?\n${err.message}`));
-		onClose(1);
-	});
-	compilerProcess.on('close', onClose);
-	return compilerProcess;
-}
-
 declare interface IClosureCompilerInputJSON {
 	path: string,
 	src: string,
@@ -255,13 +241,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 	}
 
 	const externalModuleRoots = resolvedExternalModuleTypeRefs
-		.map(fileName => {
-			// From a resolved file name, extract its containing folder in node_modules.
-			let segments = path.normalize(fileName).split(path.sep);
-			let i = segments.lastIndexOf("node_modules");
-			let moduleDir = segments.slice(0, i + 2).join(path.sep);
-			return moduleDir + path.sep;
-		});
+		.map(getPackageBoundary);
 
 	const transformerHost: tsickle.TsickleHost = {
 		shouldSkipTsickleProcessing(fileName: string) {

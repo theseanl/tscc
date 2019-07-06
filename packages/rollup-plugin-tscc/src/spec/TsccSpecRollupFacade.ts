@@ -42,7 +42,7 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 		for (let { moduleName, dependencies } of this.getOrderedModuleSpecs()) {
 			// we set outputOption.entryFileName as [name].js - gotta add .js to match
 			// an expected output file name.
-			out.setAll(
+			out.putAll(
 				this.addPrefixAndExtension(moduleName),
 				dependencies.map(this.addPrefixAndExtension, this));
 		}
