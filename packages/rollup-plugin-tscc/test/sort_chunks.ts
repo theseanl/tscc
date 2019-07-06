@@ -12,10 +12,10 @@ describe(`computeChunkAllocation`, function () {
 	})
 	test(`Returns an expected allocation map for a diamond dependency graph`, function () {
 		const diamondEntryDep = new MultiMap<string, string>();
-		diamondEntryDep.setAll("a.js", []);
-		diamondEntryDep.setAll("b.js", ["a.js"]);
-		diamondEntryDep.setAll("c.js", ["a.js"]);
-		diamondEntryDep.setAll("d.js", ["b.js", "c.js"]);
+		diamondEntryDep.putAll("a.js", []);
+		diamondEntryDep.putAll("b.js", ["a.js"]);
+		diamondEntryDep.putAll("c.js", ["a.js"]);
+		diamondEntryDep.putAll("d.js", ["b.js", "c.js"]);
 
 		const chunkDep = {
 			"a.js": ["ab.js", "ac.js", "ad.js", "abc.js", "abd.js", "acd.js", "abcd.js"],

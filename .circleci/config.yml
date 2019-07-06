@@ -11,7 +11,7 @@ jobs:
   build:
     parallelism: 3
     docker:
-      - image: circleci/node:10.4
+      - image: circleci/node:10.16.0
     working_directory: ~/tscc
     steps:
       - checkout
