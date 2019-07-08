@@ -13,7 +13,7 @@ export class TsError extends Error {
 }
 
 export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS {
-	private static loadTsConfig(
+	static loadTsConfig(
 		tsConfigRoot: string = process.cwd(),
 	) {
 		const configFileName = ts.findConfigFile(tsConfigRoot, fs.existsSync);

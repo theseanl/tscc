@@ -8,30 +8,8 @@ import * as ts from 'typescript';
 import ITsccSpecWithTS from '../spec/ITsccSpecWithTS';
 import {TsickleHost} from 'tsickle';
 import {moduleNameAsIdentifier} from 'tsickle/src/annotator_host';
-import {isVariableRequireStatement} from './transformer_utils';
+import {createGoogCall, createSingleQuoteStringLiteral, namespaceToQualifiedName, isVariableRequireStatement} from './transformer_utils';
 
-// Copied from tsickle
-/** Creates a call expression corresponding to `goog.${methodName}(${literal})`. */
-function createGoogCall(methodName: string, literal: ts.StringLiteral): ts.CallExpression {
-	return ts.createCall(
-		ts.createPropertyAccess(ts.createIdentifier('goog'), methodName), undefined, [literal]
-	);
-}
-function createSingleQuoteStringLiteral(text: string): ts.StringLiteral {
-	const stringLiteral = ts.createLiteral(text);
-	(stringLiteral as any).singleQuote = true;
-	return stringLiteral;
-}
-
-function namespaceToQualifiedName(namespace: string): ts.Expression {
-	let names = namespace.split('.');
-	let l = names.length;
-	let qualifiedName: ts.Expression = ts.createIdentifier(names[0]);
-	for (let i = 1; i < l; i++) {
-		qualifiedName = ts.createPropertyAccess(qualifiedName, ts.createIdentifier(names[i]));
-	}
-	return qualifiedName;
-}
 
 /**
  * This is a transformer run after ts transformation, before googmodule transformation.
@@ -96,7 +74,14 @@ export default function externalModuleTransformer(spec: ITsccSpecWithTS, tsickle
 				const setOriginalNode = (range: ts.Statement) => {
 					return ts.setOriginalNode(ts.setTextRange(range, original), original);
 				}
-				// require('tslib') requires special treatment - map it to goog.require('tslib')
+				/**
+				 * require('tslib') requires special treatment - map it to goog.require('tslib')
+				 * It needs to be linked to a custom `tslib` provided with tsickle (which seems not
+				 * to be included in tsickle npm package) which declares module name `tslib`.
+				 * Due to the `pathToModuleName` actually resolving module names to generate goog
+				 * module names, if unchanged here `require('tslib')` will end up being something like
+				 * `goog.require('node_modules.tslib.tslib')`.
+				 */
 				if (importedUrl === 'tslib') {
 					let varDecl = ts.createVariableDeclaration(
 						newIdent, undefined, createGoogCall('require', createSingleQuoteStringLiteral('tslib'))

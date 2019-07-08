@@ -80,8 +80,9 @@ export default function decoratorPropertyTransformer(tsickleHost: TsickleHost):
 				if (!identifierIsEmitHelper(caller)) return;
 				// Found a candidate. Decorator helper call signature:
 				// __decorate([decoratorsArray], <target>, <propertyName>, <desc>)
+				// Note that class decorator only has 2 arguments.
 				let propNameLiteral = node.arguments[2];
-				if (!ts.isStringLiteral(propNameLiteral)) return;
+				if (!propNameLiteral || !ts.isStringLiteral(propNameLiteral)) return;
 				let propName = propNameLiteral.text;
 
 				// Create goog.reflect.objectProperty
@@ -100,29 +101,13 @@ export default function decoratorPropertyTransformer(tsickleHost: TsickleHost):
 					),
 					propNameLiteral
 				);
-				const newCallExpression = ts.createCall(
-					caller, undefined, [
-						node.arguments[0],
-						node.arguments[1],
-						googReflectObjectProperty,
-						node.arguments[3]
-					]
-				);
-				// We will create a if (false) block at the end to annotate these properties
-				// with @nocollapse.
-				const propertyAccess =
-					ts.createPropertyAccess(
-						ts.createParen(ts.getMutableClone(target)),
-						ts.createIdentifier(propName)
-					)
-				// Annotate it
-				ts.setSyntheticLeadingComments(propertyAccess, [{
-					kind: ts.SyntaxKind.MultiLineCommentTrivia,
-					text: "* @nocollapase ",
-					pos: -1,
-					end: -1,
-					hasTrailingNewLine: false
-				}])
+				// Replace third argument of __decorate call to goog.reflect.objectProperty.
+				// If TS output is in ES3 mode, there will be 3 arguments in __decorate call.
+				// if its higher than or equal to ES5 mode, there will be 4 arguments.
+				// The number of arguments must be preserved.
+				const decorateArgs = node.arguments.slice();
+				decorateArgs.splice(2, 1, googReflectObjectProperty);
+				const newCallExpression = ts.createCall(caller, undefined, decorateArgs);
 				const binaryExpression = ts.createBinary(
 					ts.createElementAccess(
 						ts.createIdentifier("self"),

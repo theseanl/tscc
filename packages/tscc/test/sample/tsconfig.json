@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "commonjs",
+		"declaration": false,
+		"importHelpers": true,
+		"experimentalDecorators":true
+	}
+}
