@@ -72,9 +72,18 @@ export default class ClosureDependencyGraph {
 	// Walks the graph, marking type-required nodes and required nodes
 	// (with DepsSorter#forwardDeclared, DepsSorter#required Sets)
 	// required-marker has precedence over type-required-marker.
-	private *getReferencedNode(node: string | ISourceNode)
-		: IterableIterator<ISourceNode> {
-		if (typeof node === 'string') {node = this.getSourceNode(node);}
+	private *getReferencedNode(node: string | ISourceNode): IterableIterator<ISourceNode> {
+		if (typeof node === 'string') {
+			node = this.getSourceNode(node);
+		}
+
+		if (this.forwardDeclared.has(node)) {
+			this.forwardDeclared.delete(node);
+		}
+		if (this.required.has(node)) {
+			return;
+		}
+		this.required.add(node);
 
 		yield node;
 
@@ -87,14 +96,6 @@ export default class ClosureDependencyGraph {
 
 		for (let required of node.required) {
 			let reqNode = this.getSourceNode(required);
-			if (this.forwardDeclared.has(reqNode)) {
-				this.forwardDeclared.delete(reqNode);
-			}
-			if (this.required.has(reqNode)) {
-				continue;
-			}
-			this.required.add(reqNode);
-
 			yield* this.getReferencedNode(reqNode);
 		}
 	}
@@ -105,6 +106,7 @@ export default class ClosureDependencyGraph {
 		let sortedFileNames = entryPoints.map(entryPoint => {
 			let deps: string[];
 			if (entryPoint.moduleId === null) {
+				// For empty chunks included to allow code motion moving into it
 				deps = [];
 			} else {
 				deps = [...this.getReferencedNode(entryPoint.moduleId)].map(ClosureDependencyGraph.getFileName);
@@ -116,7 +118,6 @@ export default class ClosureDependencyGraph {
 		});
 
 		let forwardDeclaredFileNames = [...this.forwardDeclared].map(ClosureDependencyGraph.getFileName);
-
 		// prepend modules which are only forwardDeclare'd to the very first module.
 		sortedFileNames[0] = [...forwardDeclaredFileNames, ...sortedFileNames[0]];
 		const flags = entryPoints.length === 1 ?
@@ -125,7 +126,12 @@ export default class ClosureDependencyGraph {
 			[] :
 			riffle("--chunk", sortedFileNames.map((depsOfAModule, index) => {
 				let entryPoint = entryPoints[index];
-				return `${entryPoint.moduleName}:${depsOfAModule.length}:${(entryPoint.dependencies || []).join(':')}`
+				const args:(string|number)[]=[entryPoint.moduleName, depsOfAModule.length];
+				if (index !== 0) {
+					// Do not specify dependencies for the very first (root) chunk.
+					args.push(...entryPoint.dependencies);
+				}
+				return args.join(':');
 			}));
 
 		return {src: flatten(sortedFileNames), flags}

@@ -2,4 +2,5 @@ node_modules
 dist
 lerna-debug.log
 junit.xml
+.tscc_temp
 

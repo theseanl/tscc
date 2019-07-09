@@ -6,6 +6,7 @@
  */
 import ora = require('ora');
 import readline = require('readline');
+import console = require('console');
 
 export default class Logger {
 	private console: Console

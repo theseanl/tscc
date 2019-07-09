@@ -18,7 +18,7 @@ export async function sourceNodeFactory(closureSourcePath: string): Promise<ISou
 	return parser.getSourceNode();
 }
 
-export function sourceNodeFactoryFromContent(fileName:string, content:string):ISourceNode {
+export function sourceNodeFactoryFromContent(fileName: string, content: string): ISourceNode {
 	const lines = content.split('\n');
 	const parser = new ClosureSourceLineParser(fileName);
 	for (const line of lines) {
@@ -81,13 +81,14 @@ class ClosureSourceLineParser {
 		return {
 			fileName: this.closureSourcePath,
 			provides: this.moduleSymbol ? [this.moduleSymbol] : [...this.providedSymbols],
-			required: ['goog', ...this.requiredSymbols], // goog is implicitly required by every module
+			// goog is implicitly required by every module
+			required: this.providedSymbols.has('goog') ? [] : ['goog', ...this.requiredSymbols],
 			forwardDeclared: [...this.forwardDeclaredSymbols]
 		}
 	}
 }
 
-function toGoogPrimitiveRegex(name: string, assignment:boolean = false) {
+function toGoogPrimitiveRegex(name: string, assignment: boolean = false) {
 	let src = `goog\\.${name}\\(['"](.*)['"]\\)`
 	if (assignment) {
 		src = `(?:(?:var|let|const)\\s+[a-zA-Z0-9$_,:\\{\\}\\s]*\\s*=\\s*)` + src;
@@ -108,7 +109,7 @@ const reStartPureComment = /^\s*\/\*\*/;
 const reEndComment = /\*\//;
 
 export class ClosureSourceError extends Error {
-	constructor(msg:string, public fatal = true) {
+	constructor(msg: string, public fatal = true) {
 		super(msg);
 	}
 }

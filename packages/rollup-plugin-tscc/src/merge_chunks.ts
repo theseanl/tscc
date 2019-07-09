@@ -7,13 +7,7 @@ export default async function mergeChunks(
 	chunkAllocation: MultiMap<string, string>,
 	bundle: rollup.OutputBundle,
 ) {
-	try {
 	return await new ChunkMerger(entry, chunkAllocation, bundle).getBundleOutput();
-	
-	} catch(e) {
-		console.error(`wtf`);
-		console.error(e);
-	}
 }
 
 // Merge chunks to their allocated entry chunk.

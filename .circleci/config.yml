@@ -11,7 +11,7 @@ jobs:
   build:
     parallelism: 3
     docker:
-      - image: circleci/node:10.16.0
+      - image: webpackcontrib/circleci-jdk9-node10
     working_directory: ~/tscc
     steps:
       - checkout
