@@ -11,10 +11,14 @@ jobs:
   build:
     parallelism: 3
     docker:
-      - image: webpackcontrib/circleci-jdk9-node10
+      - image: circleci/openjdk:9-node
     working_directory: ~/tscc
     steps:
       - checkout
+      - run:
+          name: update node
+          command: |
+            curl -sSL "https://nodejs.org/dist/v11.10.0/node-v11.10.0-linux-x64.tar.xz" | sudo tar --strip-components=2 -xJ -C /usr/local/bin/ node-v11.10.0-linux-x64/bin/node
       - restore_cache:
           key: *cache_key
       - run: yarn install
