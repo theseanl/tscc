@@ -96,8 +96,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		const baseFlags = this.tsccSpec.compilerFlags || {};
 		const defaultFlags = {};
 
+		let {target}=this.parsedConfig.options;
 		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[
-			this.parsedConfig.options.target || ts.ScriptTarget.ES3
+			typeof target === 'undefined' ? ts.ScriptTarget.ES3 : target
 		]; // ts default value is ES3.
 		defaultFlags["language_out"] = "ECMASCRIPT5";
 		defaultFlags["compilation_level"] = "ADVANCED";
@@ -110,6 +111,8 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				this.absolute(this.getOutputPrefix('cc')) +
 				this.getOrderedModuleSpecs()[0].moduleName + '.js';
 		}
+		defaultFlags["generate_exports"] = true;
+		defaultFlags["export_local_property_definitions"] = true;
 
 		const flagsMap = Object.assign(defaultFlags, baseFlags);
 		const outFlags: string[] = [];
