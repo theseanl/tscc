@@ -91,7 +91,7 @@ class ChunkMerger {
 				let outputChunk = <rollup.OutputChunk>bundle[id];
 				return {
 					code: outputChunk.code,
-					map: toRawSourceMap(outputChunk.map)
+					map: toInputSourceMap(outputChunk.map)
 				}
 			}
 			// This code path should not be taken
@@ -154,9 +154,10 @@ class ChunkMerger {
 export class ChunkMergeError extends Error {}
 
 /**
- * Workaround for {@link https://github.com/rollup/rollup/issues/2967}
+ * Converts SourceMap type used by OutputChunk type to ExistingRawSourceMap type used by load hooks.
  */
-function toRawSourceMap(sourcemap: rollup.SourceMap): rollup.RawSourceMap {
+function toInputSourceMap(sourcemap: rollup.SourceMap): rollup.ExistingRawSourceMap{
 	if (!sourcemap) return;
-	return {...sourcemap, version: 3};
+	return {...sourcemap};
 }
+
