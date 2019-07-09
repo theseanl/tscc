@@ -9,7 +9,7 @@ A collection of tools to seamlessly bundle, minify Typescript with Closure Compi
 ## Migrate
 
 It is easy to migrate an existing Typescript project to use with TSCC.
-Check out [todomvc app](https://github.com/theseanl/todomvc/tree/master/typescript-react) using Typescript and React, forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use with TSCC to see how it can be done.
+Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use with TSCC to get a sense of what it is like.
 
 ---
 
@@ -154,23 +154,35 @@ This is a boolean value. When it is enabled, it will write intermediate Tsickle 
 
 Best practice is to provide them as a separate script tag instead of bundling it together, as such libraries do not in general safe to be compiled by Closure Compiler. Declare them as external modules in the spec file, and import them like you would usually do. Then you can benefit from IDE's type checking functionality while tscc can lookup their type definitions and include them as closure compiler's externs.
 
+#### More detailed description of what tscc does
+
+My idea have been to make the option 2 in your explanation #1041 (Thanks for writing it) systematic:
+
+ 1. Users write `import React from 'react'`, so that users' IDE can find necessary typings.
+ 2. TSCC configures tsickle to process type declaration files of module 'react' that Typescript located for us -- usually in node_modules directory.
+ 3. With the help of some Typescript transformers, TSCC removes the above import statements. Doing it requires suppressing `goog.requireType('react')` and substituting `const React = require('react')` to something like `const React_1 = React`.
+ 4. To inform Closure about such a user-provided global variable name, TSCC generates additional externs for such a global variable, like
+    ```javascript
+    /**
+     * @const
+     * @type {some$file$name$mangled$by$tsickle}
+     */
+    var React = {};
+    ```
+    tsickle writes module-scoped externs to certain mangled namespace like this, so I am grabbing that namespace to create externs like this. To my understanding, this will provide the required information to Closure, please correct me if I'm wrong.
+
 ### Things to know
 
-Although TSCC tries to hide CC specifics as much as it can, some knowledge over it is required:
+Closure compiler is capable of minifying modern javascript up to ECMASCRIPT 2019. If you only support modern environments, you can set closure compiler output langauge to ES6 or higher, it will provide smaller output in general.
+
+Although TSCC tries to hide CC specifics as much as it can, it's good to have some knowledge on it:
  - Read the [official documentation](https://developers.google.com/closure/compiler/) in order to get used to some notions used.
  - Not all code works directly with closure compiler (even if it is well-annotated). Read about [compiler assumptions](https://github.com/google/closure-compiler/wiki/Compiler-Assumptions) from their wiki; Basically, you should not use some dynamic nature of JS (the bad part!). Below are some common situations.
    - Do not access an object's property with a string literal, as closure compiler won't try to rename it. If you access `foo.bar` in your code and also do `foo["bar"]` at another part of the code, closure compiler may rename `foo.bar` to something like `foo.a` whereas the latter to `foo.bar`, so it will break the code.
    - Circular references of Javascript modules are not allowed.
    - Output module spec must have a single root module, making it a connected tree.[Ref](https://stackoverflow.com/questions/10395810/how-do-i-split-my-javascript-into-modules-using-googles-closure-compiler/10401030#10401030)
  - Tsickle [officially states](https://github.com/angular/tsickle#warning-work-in-progress) that it is still in experimental phase, and there are some caveats.
-   - Tsickle does not support annotation of all typescript types. In most of cases, closure compiler is still able to guess unknown types so it does not break the output code, 
-   - It does not support indexed properties, in particular, any `declare`d properties together with indexed properties won't be preserved by the compiler.
-     ```
-     declare interface Mixed {
-         will_not_be_preserved:boolean
-         [key:string]:boolean
-     }
-     ```
+   - Tsickle does not support annotation of all typescript types. For example, it does not convert indexed properties of Typescript to closure type, so if an interface is `declare`d with a property, such an interface won't be preserved -- keep an eye on tsickle warnings about unknown types. A good news is that closure compiler is still able to guess unknown types in most of cases, so it does not break the output code often.
    - TS `namespace`s are not converted to something like those in closure library, so it does not benefit from closure compiler's property flattening. (Apparently google internally prevents use of [namespaces](https://github.com/angular/tsickle/issues/713#issuecomment-358806943).)
  - Some objects are present in Typescript but not in closure compiler, so sometimes you may need to provide externs to those manually.
  
@@ -178,8 +190,8 @@ Although TSCC tries to hide CC specifics as much as it can, some knowledge over 
 
 This project came out from an experience I have had with developing several Javascript software, both as a frontend project and browser extension, userscripts injected into client's browsers. In many cases "content script" are `eval`ed, so the source holds a string form of a JS code, so there was a rather strong motivation for squizing bundle size as much as one can in order to reduce client's memory footprint. Closure tools, albeit not "trendy", was the best tool for it -- the compiler is simply the best, Closure Templates directly compiles into JS and required runtime libraries are extremely small, and Closure Stylesheets provides class name shortening. However, incorporating all of these and at the same time providing an alternative build for debugging required a lot of work due to lack of support and community tooling.
 
-On the other hand, there is a work (ABC, Angular BuildTools Convergence, or Angular Bazel Closure-compiler) going on from the side of Angular to incorporate Closure compiler into its build tooling, which is actually tsickle's main application. However, one has to use bazel which are uncommon to JS development, and angular is much like an another language than Typescript, it can't be used for community outside Angular. 
- 
+On the other hand, currently most of available tooling using tsickle and closure compiler is limited to angular community. It seemed a pity that such a great tooling cannot benefit a much broader audiences.
+
 TSCC is meant to provide a framework-agnostic tooling that can be used to bridge this gap.
 
 ## Milestones
