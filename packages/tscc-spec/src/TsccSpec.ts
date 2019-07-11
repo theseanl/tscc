@@ -135,7 +135,9 @@ export default class TsccSpec implements ITsccSpec {
 	protected relativeFromCwd(filePath: string): string {
 		let absolute = this.absolute(filePath);
 		let endsWithSep = absolute.endsWith(path.sep);
-		return path.relative(process.cwd(), absolute) + (endsWithSep ? path.sep : '');
+		const relative = path.relative(process.cwd(), absolute);
+		// Special handling for '' - do not add a separator at the end
+		return relative + (endsWithSep && relative.length > 0 ? path.sep : '');
 	}
 	protected getOutputPrefix(target: "cc" | "rollup"): string {
 		let prefix = this.tsccSpec.prefix;

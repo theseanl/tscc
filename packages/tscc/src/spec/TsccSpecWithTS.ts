@@ -1,4 +1,4 @@
-import {TsccSpec, IInputTsccSpecJSON, ITsccSpecJSON, TsccSpecError} from '@tscc/tscc-spec'
+import {TsccSpec, IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpecError} from '@tscc/tscc-spec'
 import ITsccSpecWithTS from './ITsccSpecWithTS';
 import * as ts from 'typescript';
 import fs = require('fs');
@@ -28,11 +28,12 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	}
 	static loadSpecWithTS(
 		tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
-		tsConfigRoot: string,
+		tsConfigRoot?: string,
 		onTsccWarning: (msg: string) => void = noop
 	) {
+		// When TS project root is not provided, it will be assumed to be the location of tscc spec file.
 		let {tsccSpecJSON, tsccSpecJSONPath} = TsccSpecWithTS.loadSpecRaw(tsccSpecJSONOrItsPath);
-		let {configFileName, parsedConfig} = TsccSpecWithTS.loadTsConfig(tsConfigRoot);
+		let {configFileName, parsedConfig} = TsccSpecWithTS.loadTsConfig(tsConfigRoot || tsccSpecJSONPath);
 		/**
 		 * Prune compiler options
 		 *  - "module" to "commonjs"
@@ -46,8 +47,12 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			options.module = ts.ModuleKind.CommonJS;
 		}
 		if (options.outDir) {
-			onTsccWarning(`tsickle does not use --outDir, it is ignored.`);
-			options.outDir = null;
+			onTsccWarning(`--outDir option is ignored. Use prefix option in the spec file.`);
+			options.outDir = undefined;
+		}
+		if (options.rootDir) {
+			onTsccWarning(`--rootDir option is ignored.`);
+			options.rootDir = undefined;
 		}
 		if (!options.importHelpers) {
 			onTsccWarning(`tsickle uses its own tslib optimized for closure compiler. importHelpers flag is set.`);
@@ -57,8 +62,14 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			onTsccWarning(`Closure compiler relies on type annotations, removeComments flag is unset.`);
 			options.removeComments = false;
 		}
-		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath,
-			parsedConfig, configFileName);
+		if (options.inlineSourceMap) {
+			onTsccWarning(`Inlining sourcemap is not supported. inlineSourceMap flag is unset.`);
+			options.inlineSourceMap = false;
+			// inlineSource option depends on sourceMap or inlineSourceMap being enabled
+			// so enabling sourceMap in order not to break tsc.
+			options.sourceMap = true;
+		}
+		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath, parsedConfig, configFileName);
 	}
 	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig.options);
 	constructor(
@@ -68,6 +79,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		private tsconfigPath: string
 	) {
 		super(tsccSpec, basePath);
+	}
+	getTSRoot() {
+		return path.dirname(this.tsconfigPath);
 	}
 	getCompilerOptions() {
 		return this.parsedConfig.options;
@@ -92,11 +106,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				return this.absolute(this.getOutputPrefix('cc')) + moduleName + '.js';
 			});
 	}
-	getBaseCompilerFlags() {
-		const baseFlags = this.tsccSpec.compilerFlags || {};
-		const defaultFlags = {};
+	private getDefaultFlags(): {[flag: string]: primitives | primitives[]} {
+		let {target, sourceMap, inlineSources} = this.parsedConfig.options;
 
-		let {target}=this.parsedConfig.options;
+		const defaultFlags = {};
 		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[
 			typeof target === 'undefined' ? ts.ScriptTarget.ES3 : target
 		]; // ts default value is ES3.
@@ -104,17 +117,33 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		defaultFlags["compilation_level"] = "ADVANCED";
 		if (this.getOrderedModuleSpecs().length > 1) {
 			// Multi-chunk build uses --chunk and --chunk_output_path_prefix.
-			defaultFlags["chunk_output_path_prefix"] = this.absolute(this.getOutputPrefix('cc'));
+			// This path will appear in a sourcemap that closure compiler generates - need to use
+			// relative path in order not to leak global directory structure.
+			defaultFlags["chunk_output_path_prefix"] = this.relativeFromCwd(this.getOutputPrefix('cc'));
 		} else {
 			// Single-chunk build uses --js_output_file.
 			defaultFlags["js_output_file"] =
-				this.absolute(this.getOutputPrefix('cc')) +
+				this.relativeFromCwd(this.getOutputPrefix('cc')) +
 				this.getOrderedModuleSpecs()[0].moduleName + '.js';
 		}
 		defaultFlags["generate_exports"] = true;
 		defaultFlags["export_local_property_definitions"] = true;
 
+		if (sourceMap) {
+			defaultFlags["create_source_map"] = "%outname%.map";
+			defaultFlags["apply_input_source_maps"] = true;
+		}
+		if (inlineSources) {
+			defaultFlags["source_map_include_content"] = true;
+		}
+
+		return defaultFlags;
+	}
+	getBaseCompilerFlags() {
+		const baseFlags = this.tsccSpec.compilerFlags || {};
+		const defaultFlags = this.getDefaultFlags();
 		const flagsMap = Object.assign(defaultFlags, baseFlags);
+
 		const outFlags: string[] = [];
 		const pushFlag = (key: string, value: string | number | boolean) => {
 			if (typeof value === 'boolean') {

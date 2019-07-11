@@ -19,3 +19,20 @@ exports[`tscc e2e case_1: case_1/c.js 1`] = `
 "console.log(\\"ac\\");console.log(\\"bc\\");console.log(\\"cc\\");
 "
 `;
+
+exports[`tscc e2e case_2_sourcemaps: case_2_sourcemaps/a.js 1`] = `
+"console.log(\\"Hello world!\\");
+"
+`;
+
+exports[`tscc e2e case_2_sourcemaps: case_2_sourcemaps/a.js.map 1`] = `
+"{
+\\"version\\":3,
+\\"file\\":\\".tscc_temp/case_2_sourcemaps/a.js\\",
+\\"lineCount\\":1,
+\\"mappings\\":\\"AACCA,OAAAC,IAAA,CAECC,cAFD;\\",
+\\"sources\\":[\\"a.ts\\"],
+\\"names\\":[\\"console\\",\\"log\\",\\"b\\"]
+}
+"
+`;

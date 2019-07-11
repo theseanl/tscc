@@ -1,10 +1,10 @@
 import * as rollup from 'rollup';
-import { IInputTsccSpecJSON } from '@tscc/tscc-spec';
+import {IInputTsccSpecJSON} from '@tscc/tscc-spec';
 import TsccSpecRollupFacade from './spec/TsccSpecRollupFacade';
 import ITsccSpecRollupFacade from './spec/ITsccSpecRollupFacade';
 import MultiMap from './MultiMap';
 import computeChunkAllocation from './sort_chunks';
-import mergeChunks  from './merge_chunks';
+import mergeChunks from './merge_chunks';
 import path = require('path');
 
 const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
@@ -50,16 +50,13 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			return Promise.resolve('');
 		}
 	};
-	/**
-	 * Hack `bundle` object, as described in {@link https://github.com/rollup/rollup/issues/2938}
-	 */
 	const generateBundle: rollup.Plugin["generateBundle"] = async (options, bundle, isWrite) => {
 		// Quick path for single-module builds
 		if (spec.getOrderedModuleSpecs.length === 1) return;
 
 		// Get entry dependency from spec
 		const entryDeps = spec.getRollupOutputNameDependencyMap();
-		 
+
 		// Get chunk dependency from rollup.OutputBundle
 		const chunkDeps = {};
 		for (let [fileName, chunkInfo] of Object.entries(bundle)) {
@@ -76,7 +73,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		/**
 		 * Hack `bundle` object, as described in {@link https://github.com/rollup/rollup/issues/2938}
 		 */
-		await Promise.all([...entryDeps.keys()].map(async (entry:string) => {
+		await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
 			// 0. Merge bundles that ought to be merged with this entry point
 			const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle);
 			// 1. Delete keys for chunks that are included in this merged chunks
@@ -88,7 +85,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		}));
 	};
 
-	return { name, generateBundle, options, outputOptions, resolveId, load };
+	return {name, generateBundle, options, outputOptions, resolveId, load};
 };
 
 function isChunk(output: rollup.OutputChunk | rollup.OutputAsset): output is rollup.OutputChunk {

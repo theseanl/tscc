@@ -1,0 +1,6 @@
+{
+	"modules": {
+		"a": "./a.ts"
+	},
+	"prefix": ".tscc_temp/case_2_sourcemaps/"
+}

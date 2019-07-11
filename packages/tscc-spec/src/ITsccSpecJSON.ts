@@ -102,7 +102,7 @@ declare interface ITsccSpecJSON {
 	debug?:boolean
 }
 
-type primitives = string | boolean | number;
+export type primitives = string | boolean | number;
 
 export default ITsccSpecJSON;
 

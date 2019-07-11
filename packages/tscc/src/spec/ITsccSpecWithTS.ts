@@ -2,6 +2,7 @@ import {ITsccSpec} from '@tscc/tscc-spec';
 import * as ts from 'typescript'
 
 export default interface ITsccSpecWithTS extends ITsccSpec {
+	getTSRoot():string
 	getCompilerOptions():Readonly<ts.CompilerOptions>
 	getCompilerHost():ts.CompilerHost
 	getOutputFileNames():string[]

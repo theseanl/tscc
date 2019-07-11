@@ -2,7 +2,7 @@ import {FSCacheAccessor} from './Cache';
 import {ISourceNode} from './ISourceNode';
 import {sourceNodeFactoryFromContent, ClosureSourceError} from './source_node_factory';
 import {INamedModuleSpecsWithId} from '@tscc/tscc-spec'
-import {flatten, riffle} from '../array_utils'
+import {flatten, riffle} from '../shared/array_utils'
 
 // To be used as arguments of DepsSorter#getDeps
 export interface IEntryPoint {

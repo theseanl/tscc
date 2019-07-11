@@ -20,6 +20,20 @@ describe("sourceNodeFactoryFromContent", function () {
 		expect(node.provides).toEqual(["this.is.a.goog.module"]);
 		expect(node.required.sort()).toEqual(["another.module", "goog"]);
 		expect(node.forwardDeclared.sort()).toEqual(["another.module", "type.only.module"]);
+	});
+	test(`produces goog base from @provideGoog`, function () {
+		const content1 = `
+/**
+ * @provideGoog
+ */`;
+		const node1 = sourceNodeFactoryFromContent('virtual_file_name', content1);
+		expect(node1.provides).toEqual(["goog"]);
+		expect(node1.required).toEqual([]);
+
+		const content2 = `/** @provideGoog */`;
+		const node2 = sourceNodeFactoryFromContent('virtual_file_name', content2);
+		expect(node2.provides).toEqual(["goog"]);
+		expect(node2.required).toEqual([]);
 	})
 })
 
