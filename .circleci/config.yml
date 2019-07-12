@@ -23,10 +23,11 @@ jobs:
           key: *cache_key
       - run: yarn install
       - run: yarn lerna bootstrap
+      - run: cd packages/tscc; yarn add google-closure-compiler-linux
       - run:
           name: run tests
           command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
-          environment: 
+          environment:
             JEST_JUNIT_OUTPUT: "reports/junit/results.xml"
       - run:
           name: compile typescript

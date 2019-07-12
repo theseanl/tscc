@@ -1,12 +1,17 @@
 import Logger from './log/Logger';
 import chalk from 'chalk';
 
-export default function spawnCompiler(args: string[], onClose: (code: number) => void, logger: Logger, debug?: boolean) {
-	if (debug) logger.log(`args: java ` + args.join(' '));
-	const compilerProcess = require('child_process').spawn('java', args);
+export default function spawnCompiler(providedArgs: string[], onClose: (code: number) => void, logger: Logger, debug?: boolean) {
+	const {bin, args} = getSupportedCompiler();
+	args.push(...providedArgs);
+
+	if (debug) logger.log(`args: ${bin} ` + args.join(' '));
+
+	const compilerProcess = require('child_process').spawn(bin, args);
 	compilerProcess.stdout.on('data', (data) => {
 		logger.write(data);
 	});
+	// TODO consider moving this to tscc.ts.
 	compilerProcess.stderr.on('data', (data) => {
 		logger.log(data);
 	})
@@ -18,4 +23,21 @@ export default function spawnCompiler(args: string[], onClose: (code: number) =>
 	return compilerProcess;
 }
 
+function getSupportedCompiler() {
+	const pkgName = PlatformToCompilerPackageName[process.platform];
+	if (pkgName) {
+		try {
+			// Try resolving optional dependencies
+			return {bin: require(pkgName), args: []};
+		} catch (e) {}
+	}
+	// Not found, defaults to JAVA version.
+	return {bin: 'java', args: ['-jar', require('google-closure-compiler-java')]};
+}
+
+enum PlatformToCompilerPackageName {
+	'darwin' = 'google-closure-compiler-osx',
+	'win32' = 'google-closure-compiler-windows',
+	'linux' = 'google-closure-compiler-linux'
+}
 

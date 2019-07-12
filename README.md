@@ -96,7 +96,7 @@ It will compile & bundle typescript sourced based on module spec described in `s
 ```js
 import tscc from 'tscc';
 
-tscc({ 
+tscc({
     /* Contents of spec JSON */
 }, tsConfigRoot?)
 
@@ -104,7 +104,7 @@ tscc({
 
 tscc("path_or_dirname_of_spec_file");
 
-// or, 
+// or,
 
 tscc({
     /* Contents of spec JSON */
@@ -201,7 +201,7 @@ It is a name that will be prepended to the output chunk's name. It is prepended 
         "variable_renaming_report": "out/report.map"
     }
 ```
-It is a key-value pair of flags to be passed to the closure compiler. Keys are literally [closure compiler options](https://github.com/google/closure-compiler/wiki/Flags-and-Options) minus the leading `--`. flags which accepts multiple values can be represented as an array of values. TSCC sets default values for many flags, in particular, the compilation works even without the `compilerOptions` key in the spec. Any values provided here will override default flags. TSCC will treat these values as opaque data. 
+It is a key-value pair of flags to be passed to the closure compiler. Keys are literally [closure compiler options](https://github.com/google/closure-compiler/wiki/Flags-and-Options) minus the leading `--`. flags which accepts multiple values can be represented as an array of values. TSCC sets default values for many flags, in particular, the compilation works even without the `compilerOptions` key in the spec. Any values provided here will override default flags. TSCC will treat these values as opaque data.
 
 ### `debug`
 
@@ -228,11 +228,21 @@ Best practice is to provide them as a separate script tag instead of bundling it
 
 ### Things to know
 
+#### Closure compiler handles modern javascript natively
+
 Closure compiler is capable of minifying modern javascript up to ECMASCRIPT 2019. If you only support modern environments, you can set closure compiler output langauge to ES6 or higher, it will provide smaller output in general.
+
+#### Sourcemaps
 
 In order to enable sourcemaps, enable `compilerOptions.sourceMap` flag in `tsconfig.json`. Then TSCC will configure closure compiler to emit appropriate sourcemaps.
 
-Although TSCC tries to hide CC specifics as much as it can, it's good to have some knowledge on it:
+#### Using prebuilt closure compiler images
+
+By default, `tscc` command will use the java version of the compiler, which requires `java` to exist in `PATH` environment variable. Platform specific binary images are available in npm: [google-closure-compiler-windows](https://www.npmjs.com/package/google-closure-compiler-windows), [google-closure-compiler-osx](https://www.npmjs.com/package/google-closure-compiler-osx), [google-closure-compiler-linux](https://www.npmjs.com/package/google-closure-compiler-linux), and these are optional dependency of @tscc/tscc package. If you install one of them, `tscc` command will use it and it will provide significantly faster compile time in most cases.
+
+#### Rules imposed by closure compiler and tsickle
+
+Although TSCC tries to hide closure compiler specifics as much as it can, it's good to have some knowledge on it:
  - Read the [official documentation](https://developers.google.com/closure/compiler/) in order to get used to some notions used.
  - Not all code works directly with closure compiler (even if it is well-annotated). Read about [compiler assumptions](https://github.com/google/closure-compiler/wiki/Compiler-Assumptions) from their wiki; Basically, you should not use some dynamic nature of JS (the bad part!). Below are some common situations.
    - Do not access an object's property with a string literal, as closure compiler won't try to rename it. If you access `foo.bar` in your code and also do `foo["bar"]` at another part of the code, closure compiler may rename `foo.bar` to something like `foo.a` whereas the latter to `foo.bar`, so it will break the code.
@@ -242,7 +252,7 @@ Although TSCC tries to hide CC specifics as much as it can, it's good to have so
    - Tsickle does not support annotation of all typescript types. For example, it does not convert indexed properties of Typescript to closure type, so if an interface is `declare`d with a property, such an interface won't be preserved -- keep an eye on tsickle warnings about unknown types. A good news is that closure compiler is still able to guess unknown types in most of cases, so it does not break the output code often.
    - TS `namespace`s are not converted to something like those in closure library, so it does not benefit from closure compiler's property flattening. (Apparently google internally prevents use of [namespaces](https://github.com/angular/tsickle/issues/713#issuecomment-358806943).)
  - Some objects are present in Typescript but not in closure compiler, so sometimes you may need to provide externs to those manually.
- 
+
 ## Motivation
 
 This project came out from an experience I have had with developing several Javascript software, both as a frontend project and browser extension, userscripts injected into client's browsers. In many cases "content script" are `eval`ed, so the source holds a string form of a JS code, so there was a rather strong motivation for squizing bundle size as much as one can in order to reduce client's memory footprint. Closure tools, albeit not "trendy", was the best tool for it -- the compiler is simply the best, Closure Templates directly compiles into JS and required runtime libraries are extremely small, and Closure Stylesheets provides class name shortening. However, incorporating all of these and at the same time providing an alternative build for debugging required a lot of work due to lack of support and community tooling.

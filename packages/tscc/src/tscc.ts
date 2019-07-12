@@ -127,6 +127,8 @@ export default async function tscc(
 	pushImmediately(null);
 	/// ----- end tsickle call -----
 
+	// TODO Change this to use `--json_streams BOTH`, and use gulp-replace-sourcemap
+	// to get correct sourcemaps for declrator transformation.
 	return new Promise((resolve, reject) => {
 		/**
 		 * Spawn compiler process with module dependency information
@@ -134,7 +136,6 @@ export default async function tscc(
 		const ccLogger = new Logger(chalk.redBright("ClosureCompiler: "), process.stderr);
 		ccLogger.startTask("Closure Compiler");
 		const compilerProcess = spawnCompiler([
-			"-jar", require.resolve('google-closure-compiler-java/compiler.jar'),
 			...tsccSpec.getBaseCompilerFlags(),
 			...flags,
 			'--json_streams', "IN",
@@ -343,7 +344,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		 * deterministic output based on a single file.
 		 */
 		pathToModuleName: (context: string, fileName: string) => {
-			// Resolve module via ts API	
+			// Resolve module via ts API
 			const resolved = ts.resolveModuleName(fileName, context, options, compilerHost);
 			if (resolved && resolved.resolvedModule) {
 				fileName = resolved.resolvedModule.resolvedFileName;
@@ -358,8 +359,8 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 }
 
 /**
- * A valid goog.module name must start with [a-zA-Z_$] end only contain [a-zA-Z0-9._$]. 
- * Maps path separators to ".", 
+ * A valid goog.module name must start with [a-zA-Z_$] end only contain [a-zA-Z0-9._$].
+ * Maps path separators to ".",
  */
 function convertToGoogModuleAdmissibleName(modulePath: string): string {
 	return modulePath

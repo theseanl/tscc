@@ -31,6 +31,11 @@
 	"devDependencies": {
 		"@types/fs-extra": "^8.0.0"
 	},
+	"optionalDependencies": {
+		"google-closure-compiler-linux": "^20190618.0.0",
+		"google-closure-compiler-osx": "^20190618.0.0",
+		"google-closure-compiler-windows": "^20190618.0.0"
+	},
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.1.8",
 		"chalk": "^2.4.2",
