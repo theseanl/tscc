@@ -4,7 +4,7 @@
 [![rollup-plugin-tscc npm version](https://img.shields.io/npm/v/@tscc/rollup-plugin-tscc.svg?style=popout&color=blue&label=%40tscc%2Frollup-plugin-tscc)](https://www.npmjs.com/package/@tscc/rollup-plugin-tscc)
 [![CircleCI](https://circleci.com/gh/theseanl/tscc.svg?style=svg)](https://circleci.com/gh/theseanl/tscc)
 
-A collection of tools to seamlessly bundle, minify Typescript with Closure Compiler.
+TSCC is a collection of tools to seamlessly bundle, minify Typescript project with Closure Compiler.
 
 ## Migrate
 
@@ -18,19 +18,66 @@ Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the o
  - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
  - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin, emulating chunking behaviour of closure compiler to get the same set of output files.
  - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables, so that you can use closure compiler output just like ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globls" option of rollup](https://rollupjs.org/guide/en/#outputglobals).
- - 
 
 ## Background
 
 Closure is a wonderful system of tools. The closure compiler is the best javascript minifier and bundler, but it is known to be very difficult to use. Documentations are scarce, and integration with external tools are not well-established.
 
-Tsickle is another wonderful tool. It finally makes it ergonomic to write code that can naturally be consumed by closure compiler, in that it transforms `.ts` files to `.js` files which are well-annotated, which would otherwise not even be consumed by the compiler, and automatically generates "externs" file from declaration files. However, like closure compiler, one has to careful in setting it up, otherwise strange bugs can occur which are not actively worked on as of now. Also, it only performs transpilation, there is no tool to put transpiled files to closure compiler, which is another painful part.
+Tsickle is another wonderful tool. It finally makes it ergonomic to write code that can naturally be consumed by closure compiler, in that it transforms `.ts` files to well-annotated `.js` files, which would otherwise not even be consumed by the compiler, and automatically generates [externs](https://developers.google.com/closure/compiler/docs/api-tutorial3#externs) file from declaration files. However, like closure compiler, one has to careful in setting it up, otherwise strange bugs can occur which are not actively worked on as of now. Also, it only performs transpilation, there is no tool to put transpiled files to closure compiler, which is another painful part.
 
-TSCC aims to encapsulate these tools in an minimal, ergonomic API, and provide a faster, easier alternative bundling [Rollup](https://rollupjs.org), which is great for rapid development. It can be used as a drop-in replacement for rollup in existing project using rollup, after moving chunk information in `rollup.config.js` to `tscc.spec.json`. TSCC spec file is a single source of truth for all of your module bundling information.
- 
-## Installation 
+TSCC aims to encapsulate these tools in a minimal, ergonomic API, and provide a faster, easier alternative bundling [Rollup](https://rollupjs.org), which is great for rapid development. It can be used as a drop-in replacement for rollup in existing project using rollup, after moving chunk information in `rollup.config.js` to [`tscc.spec.json`](#tscc-spec-files). TSCC spec file is a single source of truth for all of your module bundling information.
 
-`yarn add -D @tscc/tscc`, or to use as a command-line tool, `yarn global add @tscc/tscc` 
+## Getting started
+
+Suppose that we have a project with the following directory structure.
+```
+my_project
+├───tsconfig.json
+├───rollup.config.js
+└───src
+    ├───Components
+    │    ... 
+    └───app.ts
+```
+
+1. Install tscc cli:
+    ```
+    yarn global add @tscc/tscc
+    ```
+2. Create a [_spec file_](#tscc-spec-file) `tscc.spec.json` next to `tsconfig.json`.
+    ```jsonc
+    {
+        "modules": {
+            "out": "src/app.ts" // entry file path
+        }
+    }
+    ```
+3. Execute at the project root:
+    ```
+    tscc
+    ```
+In order to setup an alternative rollup build,
+
+1. In your project's directory, install `@tscc/rollup-plugin-tscc` by executing:
+    ```
+    yarn add -D @tscc/rollup-plugin-tscc
+    ```
+2. Import `rollup-plugin-tscc` plugin in rollup config file.
+    ```js
+    // rollup.config.js
+    import tscc from '@tscc/rollup-plugin-tscc';
+    export default {
+		output: {
+			...,
+			dir: '.'
+		}
+		plugins: [
+			tscc(),
+			typescript()
+		]
+    }
+    ```
+3. Execute `rollup` at the project root.
 
 ## Usage
  
@@ -69,7 +116,7 @@ tscc({
 
 ### Usage with rollup
 
-@tscc/rollup-plugin-tscc package provides a rollup plugin which can be used in rollup configuration files.
+@tscc/rollup-plugin-tscc package provides a rollup plugin which will provide chunking information in your spec file to rollup.
 
 Install `rollup-plugin-tscc` by executing `yarn add -D @tscc/rollup-plugin-tscc`.
 ```js
@@ -93,9 +140,9 @@ module.exports = {
 ```
 Then it will provide the information in your spec file to rollup, and post-process code-splitting chunks produced by rollup to match the behavior of Closure Compiler, so that you can use `rollup` build interchangeably with `tscc` build.
 The plugin will control the `input`, `output.dir`, `output.entryFileNames`, `output.chunkFileNames` option.
-It does not transpile TS to JS, one has to provide another plugin manually, such as [rollup-plugin-typescript2](https://github.com/ezolenko/rollup-plugin-typescript2).
+Note that it does not transpile TS to JS, one has to provide another plugin manually, such as [rollup-plugin-typescript2](https://github.com/ezolenko/rollup-plugin-typescript2).
 
-### Tscc spec files
+## Tscc spec files
 
 Tscc spec file is a single source of truth of your bundling information. It describes each of output bundle's entry file and dependencies among them. It also describes which modules imported in your source shall be treated as an external module and aliased with which global variable.
 
@@ -109,11 +156,11 @@ Tscc spec file is a single source of truth of your bundling information. It desc
 }
 ```
 
-#### `modules`
+### `modules`
 
 ```jsonc
     "modules": {
-        "index: "index.ts",
+        "index": "index.ts",
         "dependent_a": {
             "entry": "dependent_a_entry_file.ts",
             "dependencies": [ "index" ],
@@ -123,7 +170,7 @@ Tscc spec file is a single source of truth of your bundling information. It desc
 ```
 `modules` option is a key-value pair of module name and module's specification. If a specification only consists of a entry file name, it can simply be a string representing the entry file's path, which is sufficient for most of build situation where no code splitting is applied. In general, module's specification consists of `entry`, `dependencies`, and `extraSources`. `dependencies` is an array of module names that this module depends on. It can be omitted if empty. `extraSources` is an array of file names, which are not included in the Typescript project but still needed to be provided to the closure compiler, such as css renaming maps generated by [Closure Stylesheets](https://github.com/google/closure-stylesheets). It can be omitted if empty. A module's name is an identifier to be used as a output chunk's name. To control the output directory, use `prefix` option.
 
-#### `external`
+### `external`
 ```jsonc
 {
     "external": {
@@ -135,7 +182,7 @@ Tscc spec file is a single source of truth of your bundling information. It desc
 
 It is identical to the [`output.global` option](https://rollupjs.org/guide/en#core-functionality) of rollup. It is a key-value pair, where key is a module name as used in `import ... from 'module_name'` statement, and value is a name of a global variable which this imported value will refer to.
 
-#### `prefix`
+### `prefix`
 
 ```jsonc
     "prefix": "dist/"
@@ -144,19 +191,19 @@ It is identical to the [`output.global` option](https://rollupjs.org/guide/en#co
 ```
 It is a name that will be prepended to the output chunk's name. It is prepended _as is_, which means that if no trailing path separator was provided, it will modify the output file's name. If it is a relative path starting from the current directory ("."), it will be resolved relative to the spec file's location. Otherwise, any relative path will be resolved relative to the current working directory, and absolute paths are used as is. 
 
-#### `compilerFlags`
+### `compilerFlags`
 
 ```jsonc
     "compilerFlags": {
         "assume_function_wrapper": true,
         "rewrite_polyfills": true,
-        "language_out": "ECMASCRIPT_2015",
+        "language_out": "ECMASCRIPT_2019",
         "variable_renaming_report": "out/report.map"
     }
 ```
 It is a key-value pair of flags to be passed to the closure compiler. Keys are literally [closure compiler options](https://github.com/google/closure-compiler/wiki/Flags-and-Options) minus the leading `--`. flags which accepts multiple values can be represented as an array of values. TSCC sets default values for many flags, in particular, the compilation works even without the `compilerOptions` key in the spec. Any values provided here will override default flags. TSCC will treat these values as opaque data. 
 
-#### `debug`
+### `debug`
 
 This is a boolean value. When it is enabled, it will write intermediate Tsickle output to a temporary directory (`.tscc_temp`), and print arguments used to call closure compiler.
 
@@ -183,6 +230,8 @@ Best practice is to provide them as a separate script tag instead of bundling it
 
 Closure compiler is capable of minifying modern javascript up to ECMASCRIPT 2019. If you only support modern environments, you can set closure compiler output langauge to ES6 or higher, it will provide smaller output in general.
 
+In order to enable sourcemaps, enable `compilerOptions.sourceMap` flag in `tsconfig.json`. Then TSCC will configure closure compiler to emit appropriate sourcemaps.
+
 Although TSCC tries to hide CC specifics as much as it can, it's good to have some knowledge on it:
  - Read the [official documentation](https://developers.google.com/closure/compiler/) in order to get used to some notions used.
  - Not all code works directly with closure compiler (even if it is well-annotated). Read about [compiler assumptions](https://github.com/google/closure-compiler/wiki/Compiler-Assumptions) from their wiki; Basically, you should not use some dynamic nature of JS (the bad part!). Below are some common situations.
@@ -204,7 +253,6 @@ TSCC is meant to provide a framework-agnostic tooling that can be used to bridge
 
 ## Milestones
 
- - Add unit tests.
- - Provide an ergonomic API for using JS files which are already closure-annotated together with transpiled TS files. This will enable usage with Closure Library.
- - Provide `tscc-templates` and `tscc-css` modules that use Closure Templates and Closure Stylesheets, so that they can imported to TS sources like webpack.
+ - Integration with [Closure Templates](https://github.com/google/closure-templates) and [Closure Stylesheets](https://github.com/google/closure-stylesheets). Both tools produce Javascript sources that are meant to be consumed by Closure Compiler. As separate companion packages `tscc-templates` and `tscc-styles`, it will be possible to pipe these intermediate output to closure compiler, and produce typescript module declaration files that will provide type information of templates.
+ - Providing an ergonomic API for using closure-annotated JS files together with transpiled TS files.
 
