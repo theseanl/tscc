@@ -55,7 +55,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			options.rootDir = undefined;
 		}
 		if (!options.importHelpers) {
-			onTsccWarning(`tsickle uses its own tslib optimized for closure compiler. importHelpers flag is set.`);
+			onTsccWarning(`tsickle uses a custom tslib optimized for closure compiler. importHelpers flag is set.`);
 			options.importHelpers = true;
 		}
 		if (options.removeComments) {

@@ -3,4 +3,5 @@ dist
 lerna-debug.log
 junit.xml
 .tscc_temp
+yarn-error.log
 

@@ -23,6 +23,8 @@ describe(`tscc e2e`, function () {
 			.filter(dirent => dirent.isFile())
 			.map(dirent => dirent.name)
 			.sort();
+
+		expect(generatedFiles.sort()).toMatchSnapshot(dirName);
 		await Promise.all(generatedFiles.map(async (fileName) => {
 			expect(await fsp.readFile(path.join(TEMP_DIR, dirName, fileName), 'utf8'))
 				.toMatchSnapshot(dirName + '/' + fileName);

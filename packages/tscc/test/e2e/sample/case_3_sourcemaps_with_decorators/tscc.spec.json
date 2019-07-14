@@ -1,0 +1,6 @@
+{
+	"modules": {
+		"a": "./a.ts"
+	},
+	"prefix": ".tscc_temp/case_3_sourcemaps_with_decorators/"
+}

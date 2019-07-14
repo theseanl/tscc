@@ -19,9 +19,12 @@ import patchTsickleResolveModule, {getPackageBoundary} from './patch_tsickle_mod
 import Logger from './log/Logger';
 import PartialMap from './shared/PartialMap';
 import getDefaultLibs from './default_libs'
-import {removeCcExport} from './remove_cc_export';
 import spawnCompiler from './spawn_compiler';
 import {riffle} from './shared/array_utils';
+
+import * as StreamArray from 'stream-json/streamers/StreamArray';
+import {IClosureCompilerInputJson, ClosureJsonToVinyl, RemoveTempGlobalAssignments} from './shared/vinyl_utils'
+import vfs = require('vinyl-fs');
 
 export const TEMP_DIR = ".tscc_temp";
 
@@ -78,9 +81,9 @@ export default async function tscc(
 		await closureDepsGraph.addSourceByFileNames(tsccSpec.getJsFiles(), fileAccessor);
 	}
 
-	const tsickleOutput: PartialMap<string, IClosureCompilerInputJSON> = new PartialMap();
+	const tsickleOutput: PartialMap<string, IClosureCompilerInputJson> = new PartialMap();
 
-	const {writeFile, writeExtern, externPath} =
+	const {writeFile, writeExterns, externPath} =
 		getWriteFileImpl(tsccSpec, tsickleOutput, closureDepsGraph);
 
 	const stdInStream = new stream.Readable({read: function () {}});
@@ -105,7 +108,7 @@ export default async function tscc(
 				externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
 			]
 		});
-	// If tsickle errors, print diagnostics and exit. 
+	// If tsickle errors, print diagnostics and exit.
 	if (result.diagnostics.length) throw new TsError(result.diagnostics);
 
 	const {src, flags} = closureDepsGraph.getSortedFilesAndFlags(
@@ -121,7 +124,7 @@ export default async function tscc(
 	// ..only after attaching tscc's generated externs
 	const externs = tsickle.getGeneratedExterns(result.externs, '') +
 		getExternsForExternalModules(tsccSpec, transformerHost);
-	writeExtern(externs);
+	writeExterns(externs);
 
 	pushImmediately("]");
 	pushImmediately(null);
@@ -135,52 +138,60 @@ export default async function tscc(
 		 */
 		const ccLogger = new Logger(chalk.redBright("ClosureCompiler: "), process.stderr);
 		ccLogger.startTask("Closure Compiler");
-		const compilerProcess = spawnCompiler([
-			...tsccSpec.getBaseCompilerFlags(),
-			...flags,
-			'--json_streams', "IN",
-			'--externs', externPath,
-			...riffle('--externs', defaultLibsProvider.externs)
-		], (code) => {
+
+		const onCompilerProcessClose = (code) => {
 			if (code === 0) {
 				ccLogger.succeed();
 				ccLogger.unstick();
 				tsccLogger.log(`Compilation success.`)
 				if (tsccSpec.isDebug()) tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
-				tsccSpec.getOutputFileNames().forEach(removeCcExport)
-				resolve();
+				//tsccSpec.getOutputFileNames().forEach(removeCcExport)
 			} else {
 				ccLogger.fail(`Closure compiler error`);
 				ccLogger.unstick();
 				ccLogger.log(`Exited with code ${code}.`);
 				reject(new CcError(String(code)));
 			}
-		}, ccLogger, tsccSpec.isDebug());
+		};
 
-		stdInStream.pipe(compilerProcess.stdin);
+		const compilerProcess = spawnCompiler([
+			...tsccSpec.getBaseCompilerFlags(),
+			...flags,
+			'--json_streams', "BOTH",
+			'--externs', externPath,
+			...riffle('--externs', defaultLibsProvider.externs)
+		], ccLogger, onCompilerProcessClose, tsccSpec.isDebug());
+
+		stdInStream
+			.pipe(compilerProcess.stdin);
+
+		// Use gulp-style transform streams to post-process cc output - see shared/vinyl_utils.ts.
+		// TODO support returning gulp stream directly
+		const useSourceMap: boolean = tsccSpec.getCompilerOptions().sourceMap;
+		compilerProcess.stdout
+			.pipe(StreamArray.withParser())
+			.pipe(new ClosureJsonToVinyl(useSourceMap, tsccLogger))
+			.pipe(new RemoveTempGlobalAssignments(tsccLogger))
+			.pipe(vfs.dest('.', {sourcemaps: '.'})) // Can we remove dependency on vinyl-fs?
+			.on('end', resolve)
 	});
 }
 
 export class CcError extends Error {}
 
-declare interface IClosureCompilerInputJSON {
-	path: string,
-	src: string,
-	sourceMap?: string
-}
-
 /**
  * Remove `//# sourceMappingURL=...` from source TS output which typescript generates when
  * sourceMap is enabled. Closure Compiler does not recognize attached sourcemaps in Vinyl
  * if this comment is present.
- * This may deserve its own issue in Closure Compiler repo.
+ * TODO if closure is actually looking for sourcemaps within that url, check that if we can provide 
+ * sourcemap in such a way that closure can find it, and remove this workaround.
  */
 function removeSourceMappingUrl(tsOutput: string): string {
 	return tsOutput.replace(reSourceMappingURL, '');
 }
 const reSourceMappingURL = /^\/\/[#@]\s*sourceMappingURL\s*=\s*.*?\s*$/mi;
 
-function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJSON>, closureDepsGraph: ClosureDependencyGraph) {
+function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJson>, closureDepsGraph: ClosureDependencyGraph) {
 	const tempFileDir = path.join(process.cwd(), TEMP_DIR, spec.getProjectHash());
 	fsExtra.mkdirpSync(tempFileDir);
 	// Closure compiler produces an error if output file's name is the same as one of
@@ -226,11 +237,11 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 		}
 	}
 
-	const writeExtern = (contents: string) => {
+	const writeExterns = (contents: string) => {
 		fs.writeFileSync(externPath, contents);
 	}
 	const externPath = path.join(tempFileDir, "externs_generated.js");
-	return {writeFile, writeExtern, externPath}
+	return {writeFile, writeExterns, externPath}
 }
 
 function pushToStream(stream: stream.Readable, ...args: string[]) {
@@ -240,28 +251,28 @@ function pushToStream(stream: stream.Readable, ...args: string[]) {
 function pushTsickleOutputToStream(
 	src: string[], // file names, ordered to be pushed to compiler sequentially
 	tsccSpec: ITsccSpecWithTS,
-	tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJSON>,
+	tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJson>,
 	stdInStream: stream.Readable,
-	tsccLogger: Logger
+	logger: Logger
 ) {
 	let isFirstFile = true;
 	const pushToStdInStream = (...args: string[]) => {
 		pushToStream(stdInStream, ...args);
 	};
-	const pushVinylToStdInStream = (json: IClosureCompilerInputJSON) => {
+	const pushVinylToStdInStream = (json: IClosureCompilerInputJson) => {
 		if (isFirstFile) isFirstFile = false;
 		else pushToStdInStream(",");
 		pushToStdInStream(JSON.stringify(json));
 	}
 	if (tsccSpec.isDebug()) {
-		tsccLogger.log(`File orders:`);
-		src.forEach(sr => tsccLogger.log(sr));
+		logger.log(`File orders:`);
+		src.forEach(sr => logger.log(sr));
 	}
 	setImmediate(() => {
 		src.forEach(name => {
-			let out = <IClosureCompilerInputJSON>tsickleVinylOutput.get(name);
+			let out = <IClosureCompilerInputJson>tsickleVinylOutput.get(name);
 			if (!out) {
-				tsccLogger.log(`File not emitted from tsickle: ${name}`);
+				logger.log(`File not emitted from tsickle: ${name}`);
 			} else {
 				pushVinylToStdInStream(out);
 			}
@@ -325,9 +336,9 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		untyped: false,
 		logWarning(warning) {
 			// TODO add compiler debug flag to ignore diagnostics for files in node_modules
-//			if (warning.file) {
-//				if (warning.file.fileName.indexOf('node_modules') !== -1) return;
-//			}
+			//			if (warning.file) {
+			//				if (warning.file.fileName.indexOf('node_modules') !== -1) return;
+			//			}
 			logger.log(ts.formatDiagnostic(warning, compilerHost));
 		},
 		options,

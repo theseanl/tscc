@@ -1,5 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`tscc e2e case_1: case_1 1`] = `
+Array [
+  "$weak$.js",
+  "a.js",
+  "b.js",
+  "c.js",
+]
+`;
+
 exports[`tscc e2e case_1: case_1/$weak$.js 1`] = `
 "
 "
@@ -20,19 +29,46 @@ exports[`tscc e2e case_1: case_1/c.js 1`] = `
 "
 `;
 
+exports[`tscc e2e case_2_sourcemaps: case_2_sourcemaps 1`] = `
+Array [
+  "a.js",
+  "a.js.map",
+]
+`;
+
 exports[`tscc e2e case_2_sourcemaps: case_2_sourcemaps/a.js 1`] = `
 "console.log(\\"Hello world!\\");
+//# sourceMappingURL=a.js.map
 "
 `;
 
-exports[`tscc e2e case_2_sourcemaps: case_2_sourcemaps/a.js.map 1`] = `
-"{
-\\"version\\":3,
-\\"file\\":\\".tscc_temp/case_2_sourcemaps/a.js\\",
-\\"lineCount\\":1,
-\\"mappings\\":\\"AACCA,OAAAC,IAAA,CAECC,cAFD;\\",
-\\"sources\\":[\\"a.ts\\"],
-\\"names\\":[\\"console\\",\\"log\\",\\"b\\"]
-}
+exports[`tscc e2e case_2_sourcemaps: case_2_sourcemaps/a.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\".tscc_temp/case_2_sourcemaps/a.js\\",\\"lineCount\\":1,\\"mappings\\":\\"AACCA,OAAAC,IAAA,CAECC,cAFD;\\",\\"sources\\":[\\"a.ts\\"],\\"names\\":[\\"console\\",\\"log\\",\\"b\\"]}"`;
+
+exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators 1`] = `
+Array [
+  "a.js",
+  "a.js.map",
+]
+`;
+
+exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js 1`] = `
+"/*
+ Copyright (c) Microsoft Corporation. All rights reserved.
+ Licensed under the Apache License, Version 2.0 (the \\"License\\"); you may not use
+ this file except in compliance with the License. You may obtain a copy of the
+ License at http://www.apache.org/licenses/LICENSE-2.0
+
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+ MERCHANTABLITY OR NON-INFRINGEMENT.
+
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+*/
+function d(){}d.prototype.a=function(){console.log(\\"a\\")};(function(e,b,c,f){var g=arguments.length,a=3>g?b:null===f?f=Object.getOwnPropertyDescriptor(b,c):f,h;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(e,b,c,f);else for(var k=e.length-1;0<=k;k--)if(h=e[k])a=(3>g?h(a):3<g?h(b,c,a):h(b,c))||a;return 3<g&&a&&Object.defineProperty(b,c,a),a})([function(e,b,c){return c}],d.prototype,\\"a\\",null);(new d).a();
+//# sourceMappingURL=a.js.map
 "
 `;
+
+exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js.map 1`] = `"{\\"version\\":3,\\"sources\\":[\\"a.ts\\",\\"../../../../third_party/tsickle/third_party/tslib/tslib.js\\"],\\"names\\":[\\"A\\",\\"b\\",\\"console\\",\\"log\\",\\"exports.__decorate\\",\\"decorators\\",\\"target\\",\\"key\\",\\"desc\\",\\"c\\",\\"arguments\\",\\"length\\",\\"r\\",\\"Object\\",\\"getOwnPropertyDescriptor\\",\\"d\\",\\"Reflect\\",\\"i\\",\\"defineProperty\\",\\"decorator\\",\\"prop\\",\\"prototype\\"],\\"mappings\\":\\"A;;;;;;;;;;;;;;AAIA,QAAMA,EAAN,EAAA,EAEC,CAAA,UAAA,EAAAC,CAAAA,QAAC,EAAA,CAAIC,OAAAC,IAAA,CAAY,GAAZ,CAAJ,CCmEmBC,UAAS,CAACC,CAAD,CAAaC,CAAb,CAAqBC,CAArB,CAA0BC,CAA1B,CAAgC,CAAA,IACtDC,EAAIC,SAAAC,OADkD,CAChCC,EAAQ,CAAJ,CAAAH,CAAA,CAAQH,CAAR,CAA0B,IAAT,GAAAE,CAAA,CAAgBA,CAAhB,CAAuBK,MAAAC,yBAAA,CAAgCR,CAAhC,CAAwCC,CAAxC,CAAvB,CAAsEC,CAD3D,CACiEO,CAG3H,IAAuB,QAAvB,GAAI,MAAOC,QAAX,EAAmCA,OAAnC,EAA6E,UAA7E,GAA8C,MAAOA,QAAA,SAArD,CAAyFJ,CAAA,CAAII,OAAA,SAAA,CAAoBX,CAApB,CAAgCC,CAAhC,CAAwCC,CAAxC,CAA6CC,CAA7C,CAA7F,KACK,KAAK,IAAIS,EAAIZ,CAAAM,OAAJM,CAAwB,CAAjC,CAAyC,CAAzC,EAAoCA,CAApC,CAA4CA,CAAA,EAA5C,CAAiD,GAAIF,CAAJ,CAAQV,CAAA,CAAWY,CAAX,CAAR,CAAuBL,CAAA,EAAS,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAEH,CAAF,CAAR,CAAmB,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAeK,CAAf,CAAR,CAA4BG,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAhD,GAAmEK,CAChJ,OAAW,EAAJ,CAAAH,CAAA,EAASG,CAAT,EAAcC,MAAAK,eAAA,CAAsBZ,CAAtB,CAA8BC,CAA9B,CAAmCK,CAAnC,CAAd,CAAqDA,CANF,CAAzCR,CDlEpB,CAAA,CAPDe,QAAkB,CAACb,CAAD,CAASc,CAAT,CAA2BZ,CAA3B,CAAkD,CACnE,MAAOA,EAD4D,CAOnE,CAAA,CAFUR,CAAAqB,UAEV,CAFU,GAEV,CAFU,IAEV,CAEDpB,EAAC,IAAID,CAALC,GAAA\\",\\"file\\":\\".tscc_temp/case_3_sourcemaps_with_decorators/a.js\\"}"`;

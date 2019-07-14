@@ -157,6 +157,6 @@ export function getExternsForExternalModules(tsccSpec: ITsccSpecWithTS, tsickleH
  */
 ${tsickleHost.es5Mode ? 'var' : 'const'} ${toGlobalName[moduleName]} = {};\n`;
 	}
-	if (out.length) return header + out;
+	if (out.length) out = header + out;
+	return out;
 }
-
