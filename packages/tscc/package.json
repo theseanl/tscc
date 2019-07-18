@@ -32,20 +32,19 @@
 		"@types/fs-extra": "^8.0.0",
 		"@types/stream-json": "^1.0.0",
 		"@types/vinyl": "^2.0.3",
-		"magic-string": "^0.25.3",
-		"sourcemap-codec": "^1.4.6"
+		"magic-string": "^0.25.3"
 	},
 	"optionalDependencies": {
-		"google-closure-compiler-linux": "^20190618.0.0",
-		"google-closure-compiler-osx": "^20190618.0.0",
-		"google-closure-compiler-windows": "^20190618.0.0"
+		"google-closure-compiler-linux": "^20190709.0.0",
+		"google-closure-compiler-osx": "^20190709.0.0",
+		"google-closure-compiler-windows": "^20190709.0.0"
 	},
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.1.8",
 		"@types/vinyl-fs": "^2.4.11",
 		"chalk": "^2.4.2",
 		"fs-extra": "^8.0.1",
-		"google-closure-compiler-java": "20190618.0.0",
+		"google-closure-compiler-java": "20190709.0.0",
 		"minimist": "^1.2.0",
 		"ora": "^3.4.0",
 		"resolve-from": "^5.0.0",
