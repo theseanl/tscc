@@ -8,7 +8,7 @@
 		"tree-shaking",
 		"minify-javascript"
 	],
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"license": "MIT",
 	"homepage": "https://github.com/theseanl/tscc",
 	"repository": {
@@ -31,7 +31,7 @@
 	},
 	"gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
 	"dependencies": {
-		"@tscc/tscc-spec": "^0.1.8",
+		"@tscc/tscc-spec": "^0.1.9",
 		"rollup": "^1.16.7"
 	}
 }
