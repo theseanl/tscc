@@ -101,8 +101,7 @@ export default async function tscc(
 	})
 
 	patchTsickleResolveModule(); // check comments in its source - required to generate proper externs
-	const result = tsickle.emitWithTsickle(program, transformerHost, tsccSpec.getCompilerHost(),
-		tsccSpec.getCompilerOptions(), undefined, writeFile, undefined, false, {
+	const result = tsickle.emit(program, transformerHost, writeFile,undefined, undefined, false, {
 			afterTs: [
 				decoratorPropertyTransformer(transformerHost),
 				externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
@@ -130,8 +129,6 @@ export default async function tscc(
 	pushImmediately(null);
 	/// ----- end tsickle call -----
 
-	// TODO Change this to use `--json_streams BOTH`, and use gulp-replace-sourcemap
-	// to get correct sourcemaps for declrator transformation.
 	return new Promise((resolve, reject) => {
 		/**
 		 * Spawn compiler process with module dependency information
@@ -183,7 +180,7 @@ export class CcError extends Error {}
  * Remove `//# sourceMappingURL=...` from source TS output which typescript generates when
  * sourceMap is enabled. Closure Compiler does not recognize attached sourcemaps in Vinyl
  * if this comment is present.
- * TODO if closure is actually looking for sourcemaps within that url, check that if we can provide 
+ * TODO if closure is actually looking for sourcemaps within that url, check that if we can provide
  * sourcemap in such a way that closure can find it, and remove this workaround.
  */
 function removeSourceMappingUrl(tsOutput: string): string {
