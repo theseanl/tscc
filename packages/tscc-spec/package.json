@@ -7,7 +7,8 @@
   "scripts": {
     "clean": "rm -rf dist"
   },
-  "devDependencies": {
-    "@types/toposort": "^2.0.1"
+  "devDependencies": {},
+  "dependencies": {
+    "fast-glob": "^3.0.4"
   }
 }
