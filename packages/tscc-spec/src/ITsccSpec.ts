@@ -1,4 +1,4 @@
-import {IModule, INamedModuleSpecs} from './ITsccSpecJSON';
+import {INamedModuleSpecs, IDebugOptions} from './ITsccSpecJSON';
 
 export interface INamedModuleSpecsWithId extends INamedModuleSpecs {
 	moduleId: string
@@ -23,4 +23,8 @@ export default interface ITsccSpec {
 	 * Returns a list of file names provided by the jsFiles key.
 	 */
 	getJsFiles(): string[]
+	/**
+	 * Get debugging options.
+	 */
+	debug():Readonly<IDebugOptions>
 }

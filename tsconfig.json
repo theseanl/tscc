@@ -5,6 +5,7 @@
 		"target": "es2017",
 		"module": "commonjs",
 		"experimentalDecorators": true,
-		"declaration": true
+		"declaration": true,
+		"stripInternal": true
 	}
 }

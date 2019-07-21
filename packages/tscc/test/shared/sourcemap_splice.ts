@@ -65,14 +65,14 @@ describe(`Seeker`, function () {
 		expect(t.pos(0, 21)).toEqual([0, 8]);
 	});
 
-	test.skip(`correctly maps positions when it skips quering several lines`, function () {
+	test(`correctly maps positions when it skips quering several lines`, function () {
 		const {intervals} = splitTestString(testString);
 		const seeker = new Seeker(testString, intervals);
 		const t = new TestSupport(seeker);
 
 		expect(t.pos(4, 4)).toEqual([3, 8]);
 		expect(t.pos(8, 10)).toEqual([5, 3]);
-		expect(t.pos(12, 4)).toEqual([9, 4])
+		expect(t.pos(12, 4)).toBeUndefined();
 	})
 
 	test(`correctly maps positions when there are intervals ending with line break characters`, function () {

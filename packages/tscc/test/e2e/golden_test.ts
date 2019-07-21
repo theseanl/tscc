@@ -17,7 +17,7 @@ describe(`tscc e2e`, function () {
 	test.each(directories)(`%s`, async function (dirName) {
 		const projectRoot = path.join(samplesRoot, dirName);
 
-		await tscc(projectRoot, projectRoot);
+		await tscc(projectRoot);
 
 		const generatedFiles = (await fsp.readdir(path.join(TEMP_DIR, dirName), {withFileTypes: true}))
 			.filter(dirent => dirent.isFile())

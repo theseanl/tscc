@@ -1,6 +1,6 @@
-import {TsccSpec, IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpecError} from '@tscc/tscc-spec'
-import ITsccSpecWithTS from './ITsccSpecWithTS';
+import {IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
 import * as ts from 'typescript';
+import ITsccSpecWithTS from './ITsccSpecWithTS';
 import fs = require('fs');
 import path = require('path');
 
@@ -12,76 +12,138 @@ export class TsError extends Error {
 	}
 }
 
+type TWarningCallback = (msg: string) => void;
+
 export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS {
-	static loadTsConfig(
-		tsConfigRoot: string = process.cwd(),
-	) {
-		const configFileName = ts.findConfigFile(tsConfigRoot, fs.existsSync);
-		if (configFileName === undefined) {
-			throw new TsccSpecError(`Cannot find tsconfig.json at ${tsConfigRoot}.`)
+	static loadTsConfigFromArgs(tsArgs: string[], specRoot: string, onWarning: TWarningCallback) {
+		const {options, fileNames, errors} = ts.parseCommandLine(tsArgs);
+		if (errors.length) {
+			throw new TsError(errors);
 		}
-		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, {}, <any>ts.sys);
+		if (fileNames.length) {
+			onWarning(`Files provided via TS args are ignored.`);
+		}
+		// If "--project" argument is supplied - load tsconfig from there, merge things with this.
+		// Otherwise, we lookup from tsccSpecPath - this is what is different to "tsc" (which looks up
+		// the current working directory).
+		// I think this is a more reasonable behavior, since many users will just put spec.json and
+		// tsconfig.json at the same directory, they will otherwise have to provide the same information
+		// twice, once for tscc and once for tsc.
+		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(options.project || specRoot);
+		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
+	}
+	// compilerOptions is a JSON object in the form of tsconfig.json's compilerOption value.
+	// Its value will override compiler options.
+	static loadTsConfigFromPath(tsConfigPath: string, compilerOptions?: object) {
+		if (!fs.existsSync(tsConfigPath)) {
+			throw new TsccSpecError(`No file or directory found at ${tsConfigPath}`);
+		}
+		const configFileName = fs.lstatSync(tsConfigPath).isFile() ?
+			path.resolve(tsConfigPath) :
+			TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath);
+		let options: ts.CompilerOptions = {}, errors: ts.Diagnostic[];
+		if (compilerOptions) {
+			({options, errors} = ts.convertCompilerOptionsFromJson(
+				compilerOptions, path.dirname(configFileName)
+			));
+			if (errors.length) {
+				throw new TsError(errors);
+			}
+		}
+		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
+	}
+	private static findConfigFileAndThrow(searchLocation: string) {
+		const configFileName = ts.findConfigFile(searchLocation, fs.existsSync);
+		if (configFileName === undefined) {
+			throw new TsccSpecError(`Cannot find tsconfig.json at ${searchLocation}.`)
+		}
+		return configFileName;
+	}
+	private static loadTsConfigFromResolvedPath(configFileName: string, options: ts.CompilerOptions) {
+		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, options, <any>ts.sys);
 		if (parsedConfig.errors.length) {
 			throw new TsError(parsedConfig.errors);
 		}
-		return {configFileName, parsedConfig};
+		const projectRoot = path.dirname(configFileName);
+		return {projectRoot, parsedConfig};
 	}
 	static loadSpecWithTS(
 		tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
-		tsConfigRoot?: string,
+		tsConfigPathOrTsArgs?: string | string[],
+		compilerOptionsOverride?: object,
 		onTsccWarning: (msg: string) => void = noop
 	) {
 		// When TS project root is not provided, it will be assumed to be the location of tscc spec file.
 		let {tsccSpecJSON, tsccSpecJSONPath} = TsccSpecWithTS.loadSpecRaw(tsccSpecJSONOrItsPath);
-		let {configFileName, parsedConfig} = TsccSpecWithTS.loadTsConfig(tsConfigRoot || tsccSpecJSONPath);
-		/**
-		 * Prune compiler options
-		 *  - "module" to "commonjs"
-		 *  - Get values of outDir, strip it, and pass it to closure compiler
-		 *  - Warn when rootDir is used - it is of no use.
-		 */
-		const options = parsedConfig.options;
+		let specRoot = path.dirname(tsccSpecJSONPath);
+		let {projectRoot, parsedConfig} = Array.isArray(tsConfigPathOrTsArgs) ?
+			TsccSpecWithTS.loadTsConfigFromArgs(tsConfigPathOrTsArgs, specRoot, onTsccWarning) :
+			TsccSpecWithTS.loadTsConfigFromPath(tsConfigPathOrTsArgs || specRoot, compilerOptionsOverride);
+
+		TsccSpecWithTS.pruneCompilerOptions(parsedConfig.options, onTsccWarning);
+		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath, parsedConfig, projectRoot);
+	}
+	/**
+	 * Prune compiler options
+	 *  - "module" to "commonjs"
+	 *  - Get values of outDir, strip it, and pass it to closure compiler
+	 *  - Warn when rootDir is used - it is of no use.
+	 */
+	private static pruneCompilerOptions(options: ts.CompilerOptions, onWarning: TWarningCallback) {
 		if (options.module !== ts.ModuleKind.CommonJS) {
-			onTsccWarning(`tsickle converts TypeScript modules to Closure modules via CommonJS internally.`
+			onWarning(`tsickle converts TypeScript modules to Closure modules via CommonJS internally.`
 				+ `"module" flag is overridden to "commonjs".`);
 			options.module = ts.ModuleKind.CommonJS;
 		}
 		if (options.outDir) {
-			onTsccWarning(`--outDir option is ignored. Use prefix option in the spec file.`);
+			onWarning(`--outDir option is ignored. Use prefix option in the spec file.`);
 			options.outDir = undefined;
 		}
 		if (options.rootDir) {
-			onTsccWarning(`--rootDir option is ignored.`);
+			onWarning(`--rootDir option is ignored.`);
 			options.rootDir = undefined;
 		}
 		if (!options.importHelpers) {
-			onTsccWarning(`tsickle uses a custom tslib optimized for closure compiler. importHelpers flag is set.`);
+			onWarning(`tsickle uses a custom tslib optimized for closure compiler. importHelpers flag is set.`);
 			options.importHelpers = true;
 		}
 		if (options.removeComments) {
-			onTsccWarning(`Closure compiler relies on type annotations, removeComments flag is unset.`);
+			onWarning(`Closure compiler relies on type annotations, removeComments flag is unset.`);
 			options.removeComments = false;
 		}
 		if (options.inlineSourceMap) {
-			onTsccWarning(`Inlining sourcemap is not supported. inlineSourceMap flag is unset.`);
+			onWarning(`Inlining sourcemap is not supported. inlineSourceMap flag is unset.`);
 			options.inlineSourceMap = false;
 			// inlineSource option depends on sourceMap or inlineSourceMap being enabled
 			// so enabling sourceMap in order not to break tsc.
 			options.sourceMap = true;
 		}
-		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath, parsedConfig, configFileName);
 	}
 	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig.options);
 	constructor(
 		tsccSpec: ITsccSpecJSON,
 		basePath: string,
 		private parsedConfig: ts.ParsedCommandLine,
-		private tsconfigPath: string
+		private projectRoot: string
 	) {
 		super(tsccSpec, basePath);
+		this.validateSpec();
+	}
+	protected validateSpec() {
+		// Checks that each of entry files is provided in tsConfig.
+		const fileNames = this.getAbsoluteFileNamesSet();
+		const modules = this.getOrderedModuleSpecs();
+		for (let module of modules) {
+			if (!fileNames.has(module.entry)) {
+				throw new TsccSpecError(
+					`An entry file ${module.entry} is not provided ` +
+					`in a typescript project ${this.projectRoot}.`
+				)
+			}
+		}
 	}
 	getTSRoot() {
-		return path.dirname(this.tsconfigPath);
+		return this.projectRoot;
 	}
 	getCompilerOptions() {
 		return this.parsedConfig.options;
@@ -166,14 +228,14 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	getAbsoluteFileNamesSet() {
 		return new Set(
 			this.parsedConfig.fileNames
-				.map(fileName => path.resolve(path.dirname(this.tsconfigPath), fileName))
+				.map(fileName => path.resolve(this.projectRoot, fileName))
 		);
 	}
 	resolveExternalModuleTypeReference(moduleName: string) {
 		const resolved = ts.resolveTypeReferenceDirective(
 			moduleName,
 			// Following convention of Typescript source code
-			path.join(path.dirname(this.tsconfigPath), '__inferred type names__.ts'),
+			path.join(this.projectRoot, '__inferred type names__.ts'),
 			this.getCompilerOptions(),
 			this.getCompilerHost()
 		);
@@ -187,15 +249,11 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		return require('crypto').createHash('sha256')
 			.update(
 				this.basePath + JSON.stringify(this.tsccSpec) +
-				this.tsconfigPath + JSON.stringify(this.parsedConfig.options)
+				this.projectRoot + JSON.stringify(this.parsedConfig.options)
 			)
 			.digest('hex');
-	}
-	isDebug() {
-		return this.tsccSpec.debug === true;
 	}
 }
 
 function noop() {}
-function exit() {return process.exit(1);}
 

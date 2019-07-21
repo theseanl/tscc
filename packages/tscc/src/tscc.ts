@@ -1,29 +1,28 @@
-import * as ts from "typescript"
+import {IInputTsccSpecJSON} from '@tscc/tscc-spec';
+import chalk from 'chalk';
+import * as StreamArray from 'stream-json/streamers/StreamArray';
 import * as tsickle from "tsickle";
-import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
+import * as ts from "typescript";
+import {patchTypeTranslator, registerTypeBlacklistedModuleName} from './blacklist_symbol_type';
+import getDefaultLibs from './default_libs';
+import {Cache, FSCacheAccessor} from './graph/Cache';
+import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
+import {ISourceNode} from './graph/ISourceNode';
+import {sourceNodeFactory} from './graph/source_node_factory';
+import Logger from './log/Logger';
+import patchTsickleResolveModule, {getPackageBoundary} from './patch_tsickle_module_resolver';
+import {riffle} from './shared/array_utils';
+import PartialMap from './shared/PartialMap';
+import {ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignments} from './shared/vinyl_utils';
+import spawnCompiler from './spawn_compiler';
 import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
+import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
+import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer';
+import externalModuleTransformer, {getExternsForExternalModules} from './transformer/externalModuleTransformer';
 import fs = require('fs');
 import path = require('path');
 import stream = require('stream');
 import fsExtra = require('fs-extra');
-import chalk from 'chalk';
-import {IInputTsccSpecJSON} from '@tscc/tscc-spec'
-import {Cache, FSCacheAccessor} from './graph/Cache'
-import {ISourceNode} from './graph/ISourceNode';
-import {sourceNodeFactory} from './graph/source_node_factory'
-import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
-import externalModuleTransformer, {getExternsForExternalModules} from './transformer/externalModuleTransformer'
-import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer'
-import {registerTypeBlacklistedModuleName, patchTypeTranslator} from './blacklist_symbol_type';
-import patchTsickleResolveModule, {getPackageBoundary} from './patch_tsickle_module_resolver';
-import Logger from './log/Logger';
-import PartialMap from './shared/PartialMap';
-import getDefaultLibs from './default_libs'
-import spawnCompiler from './spawn_compiler';
-import {riffle} from './shared/array_utils';
-
-import * as StreamArray from 'stream-json/streamers/StreamArray';
-import {IClosureCompilerInputJson, ClosureJsonToVinyl, RemoveTempGlobalAssignments} from './shared/vinyl_utils'
 import vfs = require('vinyl-fs');
 
 export const TEMP_DIR = ".tscc_temp";
@@ -36,18 +35,34 @@ export const TEMP_DIR = ".tscc_temp";
  * the current working directory. If no argument was passed, it will lookup the spec file on the
  * current working directory.
  * The second argument indicates the path to the tsconfig.json file.
+ * The third argument is what would you put in tsconfig.json's compilerOptions. Options specified there
+ * will override those of tsconfig.json.
  */
 export default async function tscc(
 	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
-	tsProject?: string
-) {
+	tsConfigPathOrTsArgs?: string,
+	compilerOptionsOverride?: object
+):Promise<void>
+/** @internal */
+export default async function tscc(
+	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
+	tsConfigPathOrTsArgs: string[],
+	compilerOptionsOverride?: object
+):Promise<void>
+/** @internal */
+export default async function tscc(
+	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
+	tsConfigPathOrTsArgs?: string | string[],
+	compilerOptionsOverride?: object
+):Promise<void> {
 	const tsccLogger = new Logger(chalk.green("TSCC: "), process.stderr);
 	const tsLogger = new Logger(chalk.blue("TS: "), process.stderr);
 
-	const tsccSpec: ITsccSpecWithTS = TsccSpecWithTS.loadSpecWithTS(
+	const tsccSpec = TsccSpecWithTS.loadSpecWithTS(
 		tsccSpecJSONOrItsPath,
-		tsProject,
-		(msg) => {tsccLogger.log(msg);}
+		tsConfigPathOrTsArgs,
+		compilerOptionsOverride,
+		(msg: string) => {tsccLogger.log(msg)}
 	);
 
 	const program = ts.createProgram(
@@ -63,6 +78,7 @@ export default async function tscc(
 	/**
 	 * Ideally, the dependency graph should be determined from ts sourceFiles, and the compiler
 	 * process can be spawned asynchronously before calling tsickle.
+	 * Then, we will be able to set `tsickleHost.shouldSkipTsickleProcessing` and the order of
 	 * Then, we will be able to set `tsickleHost.shouldSkipTsickleProcessing` and the order of
 	 * files that are transpiled by tsickle. This has an advantage in that we can stream JSONs
 	 * in order that they came out from tsickle, cuz Closure compiler requires JSON files to be
@@ -101,12 +117,12 @@ export default async function tscc(
 	})
 
 	patchTsickleResolveModule(); // check comments in its source - required to generate proper externs
-	const result = tsickle.emit(program, transformerHost, writeFile,undefined, undefined, false, {
-			afterTs: [
-				decoratorPropertyTransformer(transformerHost),
-				externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
-			]
-		});
+	const result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
+		afterTs: [
+			decoratorPropertyTransformer(transformerHost),
+			externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
+		]
+	});
 	// If tsickle errors, print diagnostics and exit.
 	if (result.diagnostics.length) throw new TsError(result.diagnostics);
 
@@ -141,8 +157,9 @@ export default async function tscc(
 				ccLogger.succeed();
 				ccLogger.unstick();
 				tsccLogger.log(`Compilation success.`)
-				if (tsccSpec.isDebug()) tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
-				//tsccSpec.getOutputFileNames().forEach(removeCcExport)
+				if (tsccSpec.debug().persistArtifacts) {
+					tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
+				}
 			} else {
 				ccLogger.fail(`Closure compiler error`);
 				ccLogger.unstick();
@@ -157,7 +174,7 @@ export default async function tscc(
 			'--json_streams', "BOTH",
 			'--externs', externPath,
 			...riffle('--externs', defaultLibsProvider.externs)
-		], ccLogger, onCompilerProcessClose, tsccSpec.isDebug());
+		], ccLogger, onCompilerProcessClose, tsccSpec.debug().persistArtifacts);
 
 		stdInStream
 			.pipe(compilerProcess.stdin);
@@ -207,7 +224,7 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 		// Typescript calls writeFileCallback with absolute path.
 		// On the contrary, "file" property of sourcemaps are relative path from ts project root.
 		// For consistency, we convert absolute paths here to path relative to ts project root.
-		if (spec.isDebug()) {
+		if (spec.debug().persistArtifacts) {
 			fsExtra.outputFileSync(path.join(tempFileDir, filePath), contents);
 		}
 		switch (path.extname(filePath)) {
@@ -261,7 +278,7 @@ function pushTsickleOutputToStream(
 		else pushToStdInStream(",");
 		pushToStdInStream(JSON.stringify(json));
 	}
-	if (tsccSpec.isDebug()) {
+	if (tsccSpec.debug().persistArtifacts) {
 		logger.log(`File orders:`);
 		src.forEach(sr => logger.log(sr));
 	}
@@ -308,6 +325,8 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 	const externalModuleRoots = resolvedExternalModuleTypeRefs
 		.map(getPackageBoundary);
 
+	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules"];
+
 	const transformerHost: tsickle.TsickleHost = {
 		shouldSkipTsickleProcessing(fileName: string) {
 			const absFileName = path.resolve(fileName);
@@ -332,10 +351,12 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		enableAutoQuoting: false,
 		untyped: false,
 		logWarning(warning) {
-			// TODO add compiler debug flag to ignore diagnostics for files in node_modules
-			//			if (warning.file) {
-			//				if (warning.file.fileName.indexOf('node_modules') !== -1) return;
-			//			}
+			if (warning.file) {
+				let {fileName} = warning.file;
+				for (let i = 0, l = ignoreWarningsPath.length; i < l; i++) {
+					if (fileName.indexOf(ignoreWarningsPath[i]) !== -1) return;
+				}
+			}
 			logger.log(ts.formatDiagnostic(warning, compilerHost));
 		},
 		options,

@@ -23,7 +23,6 @@ describe(`decoratorPropertyTransformer`, function () {
 			expect(compiled).toMatchSnapshot(testFiles[i] + ' - es5');
 		})
 
-
 		const {out: es3Out} = emit(samplesRoot, testFilePaths, {target: ts.ScriptTarget.ES3});
 		[...es3Out.values()].forEach((compiled, i) => {
 			expect(compiled).toMatchSnapshot(testFiles[i] + ' - es3');
@@ -32,7 +31,7 @@ describe(`decoratorPropertyTransformer`, function () {
 })
 
 function emit(tsconfigPath: string, files: string[], override: Partial<ts.CompilerOptions> = {}) {
-	const {parsedConfig} = TsccSpecWithTS.loadTsConfig(tsconfigPath);
+	const {parsedConfig} = TsccSpecWithTS.loadTsConfigFromPath(tsconfigPath);
 	const {options} = parsedConfig;
 	Object.assign(options, override);
 	const host = ts.createCompilerHost(options);

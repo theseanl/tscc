@@ -27,9 +27,5 @@ export default interface ITsccSpecWithTS extends ITsccSpec {
 	 * absolute path of tsccspec, and their contents.
 	 */
 	getProjectHash(): string
-	/**
-	 * Whether or not to write intermediate tsickle output to temp directory (for debugging)
-	 */
-	isDebug(): boolean
-
 }
+

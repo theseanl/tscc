@@ -1,5 +1,5 @@
 import ITsccSpec from './ITsccSpec';
-import ITsccSpecJSON, {IModule, INamedModuleSpecs} from './ITsccSpecJSON';
+import ITsccSpecJSON, {IModule, INamedModuleSpecs, IDebugOptions} from './ITsccSpecJSON';
 import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
 import fs = require('fs');
@@ -68,7 +68,8 @@ export default class TsccSpec implements ITsccSpec {
 		const modules = this.tsccSpec.modules;
 		if (Array.isArray(modules)) {
 			// Use it as is, TODO but check whether it is sorted
-			this.orderedModuleSpecs = modules;
+			this.orderedModuleSpecs =
+				modules.map(module => this.interopModuleSpecs(module.moduleName, module))
 			return;
 		}
 		// TODO Closure compiler requires modules to have a single common root.
@@ -159,6 +160,9 @@ export default class TsccSpec implements ITsccSpec {
 			return <string[]>fg.sync(this.tsccSpec.jsFiles)
 		}
 		return [];
+	}
+	debug(): Readonly<IDebugOptions> {
+		return this.tsccSpec.debug || {};
 	}
 }
 

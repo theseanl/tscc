@@ -68,16 +68,10 @@ declare interface ITsccSpecJSON {
 	jsFiles?:string[]
 	/**
 	 * Directory names to emit outputs in, or prefixes for output file names.
-	 * It will just be prepended to module names.
+	 * It will just be prepended to module names, so if its last character is not a path separator,
+	 * it will modify the output file's name.
 	 */
 	prefix?: string | { readonly rollup: string, readonly cc: string }
-	/**
-	 * If set as true, the bundler will enable loading and bundling of closure libraries
-	 * Otherwise, statements like `import * from "goog:array"` won't work.
-	 * This is a shortcut, meant to avoid creating dependency graph of closure libraries
-	 * every time. TODO cache dependency graph for consumer's project.
-	 */
-	closureLibrary: boolean
 	/**
 	 * Compiler flags to be passed to closure compiler. Tscc treats it as an opaque data.
 	 * "js", "chunk", "entry_point": computed from <modules>
@@ -99,7 +93,18 @@ declare interface ITsccSpecJSON {
 		 */
 		[styleName: string]: Readonly<IStyles>
 	}
-	debug?:boolean
+	debug?:IDebugOptions
+}
+
+export interface IDebugOptions {
+	/**
+	 * Write intermediate tsickle output to disk. Prints closure compiler arguments to stderr.
+	 */
+	persistArtifacts?:boolean,
+	/**
+	 * Ignore tsickle warnings for specified paths. Default: ["node_modules"]
+	 */
+	ignoreWarningsPath?:string[]
 }
 
 export type primitives = string | boolean | number;

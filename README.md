@@ -8,8 +8,8 @@ TSCC is a collection of tools to seamlessly bundle, minify Typescript project wi
 
 ## Migrate
 
-It is easy to migrate an existing Typescript project to use with TSCC.
-Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use with TSCC to get a sense of what it is like.
+It is easy to migrate an existing Typescript project to build with TSCC.
+Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use TSCC to get a sense of what it is like.
 
 ---
 
@@ -17,7 +17,7 @@ Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the o
 
  - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
  - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin, emulating chunking behaviour of closure compiler to get the same set of output files.
- - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables, so that you can use closure compiler output just like ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globls" option of rollup](https://rollupjs.org/guide/en/#outputglobals).
+ - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables. Think of it as an analogue of ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globls" option of rollup](https://rollupjs.org/guide/en/#outputglobals) for closure compiler.
 
 ## Background
 
@@ -36,7 +36,7 @@ my_project
 ├───rollup.config.js
 └───src
     ├───Components
-    │    ... 
+    │    ...
     └───app.ts
 ```
 
@@ -67,52 +67,67 @@ In order to setup an alternative rollup build,
     // rollup.config.js
     import tscc from '@tscc/rollup-plugin-tscc';
     export default {
-		output: {
-			...,
-			dir: '.'
-		}
-		plugins: [
-			tscc(),
-			typescript()
-		]
+        output: {
+            ...,
+            dir: '.'
+        }
+        plugins: [
+            tscc(),
+            typescript()
+        ]
     }
     ```
 3. Execute `rollup` at the project root.
 
 ## Usage
- 
+
 ### Command line
 
 @tscc/tscc package provides a single command line interface `tscc`.
 
 ```
-tscc [--help] [--clean] [--spec <spec_file_path>] [--project <typescript_project_root>]
+tscc [--help] [--clean] [--spec <spec_file_path>] [-- <typescript_flags> [-- <closure_compiler_flags>]]
 ```
 
-It will compile & bundle typescript sourced based on module spec described in `spec_file`. If `--spec` flag is omitted, it will be assumed to be the current working directory. If `--project` is omitted, it will be assumed to be the same directory where the spec file lives in.
+It will compile & bundle typescript sourced based on module spec described in `spec_file`. Alternatively, one can provide the spec file's key-value pairs via command line arguments, see below. Note that one have to provide a spec file or at least a value for a 'module' - if both are omitted, it will assume that the spec file's path is implicitly set as the current working directory.
+
+Arguments passed after the first `--`, if exists, will be passed to the typescript compiler as one would pass to `tsc`, and arguments after the second `--` will be passed to the closure compiler. e.g. `tscc --spec src -- --target ES5 -- --assume_function_wrapper`. Note that `tsc` assumes that the project root (`--project`) is the current working directory when it is omitted, but `tscc` assumes that it is the containing directory of the spec file.
 
 ### JS API
+
+Simply provide contents of spec file as an argument:
 
 ```js
 import tscc from 'tscc';
 
 tscc({
-    /* Contents of spec JSON */
-}, tsConfigRoot?)
+    modules: {
+        bundle: 'entry.ts'
+    },
+    prefix: 'dist/'
+    // ...
+}).then(() => console.log('Done'));
+```
 
-// or,
+The default export `tscc` function accepts up to 3 arguments.
+```ts
+tscc(
+    json_content_of_spec_file_or_path_to_spec_file,
+    path_to_search_for_tsconfig?:string,
+    typescript_compiler_option_override?:
+):Promise<void>
+```
+The first argument is either a string representing the path of the spec file or a JSON content of the spec file. The JSON object can additionally have `specFile` property, whose value is a path to a spec file. TSCC will lookup tscc spec file at that path and merge its contents.
 
-tscc("path_or_dirname_of_spec_file");
-
-// or,
-
+```js
 tscc({
     /* Contents of spec JSON */
     specFile: "path_to_spec_file"
 })
-
 // To load spec file from the path and override it.
 ```
+
+The second argument should be self-explanatory; the third argument is what would you put in tsconfig.json's "compilerOption" key, it will override those provided with the second argument.
 
 ### Usage with rollup
 
@@ -170,7 +185,10 @@ Tscc spec file is a single source of truth of your bundling information. It desc
 ```
 `modules` option is a key-value pair of module name and module's specification. If a specification only consists of a entry file name, it can simply be a string representing the entry file's path, which is sufficient for most of build situation where no code splitting is applied. In general, module's specification consists of `entry`, `dependencies`, and `extraSources`. `dependencies` is an array of module names that this module depends on. It can be omitted if empty. `extraSources` is an array of file names, which are not included in the Typescript project but still needed to be provided to the closure compiler, such as css renaming maps generated by [Closure Stylesheets](https://github.com/google/closure-stylesheets). It can be omitted if empty. A module's name is an identifier to be used as a output chunk's name. To control the output directory, use `prefix` option.
 
+CLI equivalent is `--module <module_name>:<entry_file>:<comma_separated_dependencies>:<comma_separated_extra_sources>`.
+
 ### `external`
+
 ```jsonc
 {
     "external": {
@@ -182,6 +200,8 @@ Tscc spec file is a single source of truth of your bundling information. It desc
 
 It is identical to the [`output.global` option](https://rollupjs.org/guide/en#core-functionality) of rollup. It is a key-value pair, where key is a module name as used in `import ... from 'module_name'` statement, and value is a name of a global variable which this imported value will refer to.
 
+CLI equivalent is `--external <module_name>:<global_variable_name>`.
+
 ### `prefix`
 
 ```jsonc
@@ -189,7 +209,9 @@ It is identical to the [`output.global` option](https://rollupjs.org/guide/en#co
     // or,
     "prefix": { "rollup": "dev/", "cc": "dist/" }
 ```
-It is a name that will be prepended to the output chunk's name. It is prepended _as is_, which means that if no trailing path separator was provided, it will modify the output file's name. If it is a relative path starting from the current directory ("."), it will be resolved relative to the spec file's location. Otherwise, any relative path will be resolved relative to the current working directory, and absolute paths are used as is. 
+It is a name that will be prepended to the output chunk's name. It is prepended _as is_, which means that if no trailing path separator was provided, it will modify the output file's name. If it is a relative path starting from the current directory ("."), it will be resolved relative to the spec file's location. Otherwise, any relative path will be resolved relative to the current working directory, and absolute paths are used as is.
+
+CLI equivalent is `--prefix dist/` (or `--prefix.rollup dev/ --prefix.cc dist/`).
 
 ### `compilerFlags`
 
@@ -205,7 +227,15 @@ It is a key-value pair of flags to be passed to the closure compiler. Keys are l
 
 ### `debug`
 
-This is a boolean value. When it is enabled, it will write intermediate Tsickle output to a temporary directory (`.tscc_temp`), and print arguments used to call closure compiler.
+```jsonc
+    "debug": {
+        "persistArtifacts": true,
+        "ignoreWarningsPath": ["/node_modules/", "/vendor/"]
+    }
+```
+It is a key-value pair of debugging options.
+ - `persistArtifacts`: writes intermediate tsickle output to a directory `.tscc_temp`.
+ - `ignoreWarningsPath`: Paths to ignore warnings produced by tsickle. It uses a simple substring search. This value defaults to `["/node_modules/"]`.
 
 ### Importing external libraries from NPM
 
@@ -265,4 +295,5 @@ TSCC is meant to provide a framework-agnostic tooling that can be used to bridge
 
  - Integration with [Closure Templates](https://github.com/google/closure-templates) and [Closure Stylesheets](https://github.com/google/closure-stylesheets). Both tools produce Javascript sources that are meant to be consumed by Closure Compiler. As separate companion packages `tscc-templates` and `tscc-styles`, it will be possible to pipe these intermediate output to closure compiler, and produce typescript module declaration files that will provide type information of templates.
  - Providing an ergonomic API for using closure-annotated JS files together with transpiled TS files.
+ - Providing an API for returning gulp stream.
 
