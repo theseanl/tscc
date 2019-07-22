@@ -36,7 +36,7 @@ my_project
 ├───rollup.config.js
 └───src
     ├───Components
-    │    ...
+    │   ...
     └───app.ts
 ```
 
@@ -44,7 +44,7 @@ my_project
     ```
     yarn global add @tscc/tscc
     ```
-2. Create a [_spec file_](#tscc-spec-file) `tscc.spec.json` next to `tsconfig.json`.
+2. Create a [_spec file_](#tscc-spec-files) `tscc.spec.json` next to `tsconfig.json`.
     ```jsonc
     {
         "modules": {
@@ -261,6 +261,10 @@ Best practice is to provide them as a separate script tag instead of bundling it
 #### Closure compiler handles modern javascript natively
 
 Closure compiler is capable of minifying modern javascript up to ECMASCRIPT 2019. If you only support modern environments, you can set closure compiler output langauge to ES6 or higher, it will provide smaller output in general.
+
+#### Use `declare interface` to prevent property name renaming
+
+Often you will need to prevent closure compiler renaming certain property names. Since you are writing typescript, such a property name will be a part of a certain interface. Add `declare` to that `interface` declaration. This does not produce additional meanings in typescript, but it will inform tsickle to create externs for the type so that properties of the interface are not renamed by closure compiler. Check out the tsickle's [documentation](https://github.com/angular/tsickle#declare).
 
 #### Sourcemaps
 
