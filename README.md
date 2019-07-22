@@ -17,7 +17,7 @@ Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the o
 
  - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence with dependency information, as required by closure compiler.
  - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin, emulating chunking behaviour of closure compiler to get the same set of output files.
- - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables. Think of it as an analogue of ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globls" option of rollup](https://rollupjs.org/guide/en/#outputglobals) for closure compiler.
+ - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables. Think of it as an analogue of ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globals" option of rollup](https://rollupjs.org/guide/en/#outputglobals) for closure compiler.
 
 ## Background
 
