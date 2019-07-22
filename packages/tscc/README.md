@@ -1,3 +1,3 @@
 # TSCC
 
-Refer to the [README of main package](https://github.com/theseanl/tscc).
+We refer to the [README of the main package](https://github.com/theseanl/tscc).

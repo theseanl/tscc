@@ -15,7 +15,7 @@ Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the o
 
 ## Features
 
- - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence to dependency information which is required by closure compiler.
+ - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence with dependency information, as required by closure compiler.
  - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin, emulating chunking behaviour of closure compiler to get the same set of output files.
  - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables. Think of it as an analogue of ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globls" option of rollup](https://rollupjs.org/guide/en/#outputglobals) for closure compiler.
 
@@ -287,7 +287,7 @@ Although TSCC tries to hide closure compiler specifics as much as it can, it's g
 
 This project came out from an experience I have had with developing several Javascript software, both as a frontend project and browser extension, userscripts injected into client's browsers. In many cases "content script" are `eval`ed, so the source holds a string form of a JS code, so there was a rather strong motivation for squizing bundle size as much as one can in order to reduce client's memory footprint. Closure tools, albeit not "trendy", was the best tool for it -- the compiler is simply the best, Closure Templates directly compiles into JS and required runtime libraries are extremely small, and Closure Stylesheets provides class name shortening. However, incorporating all of these and at the same time providing an alternative build for debugging required a lot of work due to lack of support and community tooling.
 
-On the other hand, currently most of available tooling using tsickle and closure compiler is limited to angular community. It seemed a pity that such a great tooling cannot benefit a much broader audiences.
+On the other hand, currently most of available tooling using tsickle and closure compiler is limited to angular community. Tsickle is integrated into Angular's compiler and it provides some angular-specific code transformations (they are not enabled in TSCC). However, after all tsickle is a general-purpose transpiler. It seemed a pity that such a great tooling cannot benefit much broader audiences.
 
 TSCC is meant to provide a framework-agnostic tooling that can be used to bridge this gap.
 
