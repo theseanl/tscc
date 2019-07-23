@@ -70,7 +70,7 @@ In order to setup an alternative rollup build,
         output: {
             ...,
             dir: '.'
-        }
+        },
         plugins: [
             tscc(),
             typescript()
@@ -114,7 +114,7 @@ The default export `tscc` function accepts up to 3 arguments.
 tscc(
     json_content_of_spec_file_or_path_to_spec_file,
     path_to_search_for_tsconfig?:string,
-    typescript_compiler_option_override?:
+    typescript_compiler_option_override?
 ):Promise<void>
 ```
 The first argument is either a string representing the path of the spec file or a JSON content of the spec file. The JSON object can additionally have `specFile` property, whose value is a path to a spec file. TSCC will lookup tscc spec file at that path and merge its contents.
