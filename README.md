@@ -4,28 +4,28 @@
 [![rollup-plugin-tscc npm version](https://img.shields.io/npm/v/@tscc/rollup-plugin-tscc.svg?style=popout&color=blue&label=%40tscc%2Frollup-plugin-tscc)](https://www.npmjs.com/package/@tscc/rollup-plugin-tscc)
 [![CircleCI](https://circleci.com/gh/theseanl/tscc.svg?style=svg)](https://circleci.com/gh/theseanl/tscc)
 
-TSCC is a collection of tools to seamlessly bundle, minify Typescript project with Closure Compiler.
+TSCC is a collection of tools to seamlessly bundle and minify Typescript project using Closure Compiler.
 
 ## Migrate
 
-It is easy to migrate an existing Typescript project to build with TSCC.
-Check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use TSCC to get a sense of what it is like.
+It is easy to migrate an existing Typescript project to TSCC.
+To get a sense of what it is like, check out [todomvc apps](https://github.com/theseanl/todomvc/) forked from the original [tastejs/todomvc](https://github.com/tastejs/todomvc) and modified to use TSCC.
 
 ---
 
 ## Features
 
- - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence with dependency information, as required by closure compiler.
- - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin, emulating chunking behaviour of closure compiler to get the same set of output files.
- - External module support - lookup `require`d nodejs modules, and wire them so that externs are generated, and transforms any code that uses externally imported variables. Think of it as an analogue of ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globals" option of rollup](https://rollupjs.org/guide/en/#outputglobals) for closure compiler.
+ - Automatically configures settings for [tsickle](https://github.com/angular/tsickle) and [closure compiler](https://github.com/google/closure-compiler), and wires up tsickle js outputs and sourcemaps to closure compiler, sorted in accordence with dependency information, as required by closure compiler.
+ - Provides an alternative [rollup](https://rollupjs.org) build using `rollup-plugin-tscc` plugin, emulating the chunking behaviour of closure compiler to get the same set of output files as what closure compiler would produce.
+ - External module support: looks up `require`d nodejs modules and wires them so that externs are generated, and transforms any code that uses externally imported variables. Think of it as an analogue of ["external" option of webpack](https://webpack.js.org/configuration/externals/#externals) or ["globals" option of rollup](https://rollupjs.org/guide/en/#outputglobals) for closure compiler.
 
 ## Background
 
-Closure is a wonderful system of tools. The closure compiler is the best javascript minifier and bundler, but it is known to be very difficult to use. Documentations are scarce, and integration with external tools are not well-established.
+Closure is a wonderful system of tools. The closure compiler is the best javascript minifier and bundler, but it is known to be very difficult to use. Documentations are scarce, and integration with external tools is not well-established.
 
-Tsickle is another wonderful tool. It finally makes it ergonomic to write code that can naturally be consumed by closure compiler, in that it transforms `.ts` files to well-annotated `.js` files, which would otherwise not even be consumed by the compiler, and automatically generates [externs](https://developers.google.com/closure/compiler/docs/api-tutorial3#externs) file from declaration files. However, like closure compiler, one has to careful in setting it up, otherwise strange bugs can occur which are not actively worked on as of now. Also, it only performs transpilation, there is no tool to put transpiled files to closure compiler, which is another painful part.
+Tsickle is another wonderful tool. It has finally made it ergonomic to write codes that can naturally be consumed by closure compiler — it transforms `.ts` files to well-annotated `.js` files, which would otherwise not even be consumed by the compiler and automatically generates [externs](https://developers.google.com/closure/compiler/docs/api-tutorial3#externs) file from declaration files. However, as in closure compiler, one has to be careful with setting it up, otherwise strange bugs can occur which are not actively worked on as of now. Also, it only performs transpilation — there is no tool to feed transpiled files to closure compiler, which is another painful part.
 
-TSCC aims to encapsulate these tools in a minimal, ergonomic API, and provide a faster, easier alternative bundling [Rollup](https://rollupjs.org), which is great for rapid development. It can be used as a drop-in replacement for rollup in existing project using rollup, after moving chunk information in `rollup.config.js` to [`tscc.spec.json`](#tscc-spec-files). TSCC spec file is a single source of truth for all of your module bundling information.
+TSCC aims to encapsulate these tools in a minimal, ergonomic API, and provides a faster and easier alternative bundling method using [Rollup](https://rollupjs.org) via a companion rollup-plugin-tscc plugin, which is great for rapid development. TSCC can be used as a drop-in replacement for rollup in existing projects using rollup, after moving chunk information in `rollup.config.js` to [`tscc.spec.json`](#tscc-spec-files). TSCC spec file is a single source of truth for all of your module bundling information.
 
 ## Getting started
 
@@ -289,7 +289,8 @@ Although TSCC tries to hide closure compiler specifics as much as it can, it's g
 
 ## Motivation
 
-This project came out from an experience I have had with developing several Javascript software, both as a frontend project and browser extension, userscripts injected into client's browsers. In many cases "content script" are `eval`ed, so the source holds a string form of a JS code, so there was a rather strong motivation for squizing bundle size as much as one can in order to reduce client's memory footprint. Closure tools, albeit not "trendy", was the best tool for it -- the compiler is simply the best, Closure Templates directly compiles into JS and required runtime libraries are extremely small, and Closure Stylesheets provides class name shortening. However, incorporating all of these and at the same time providing an alternative build for debugging required a lot of work due to lack of support and community tooling.
+This project came out from the experience I have had with developing several Javascript apps,
+ as frontend projects, browser extensions, and userscripts injected into client's browsers. In many cases "content script" are `eval`ed, so the source holds a string form of a JS code, so there was a rather strong motivation for squizing bundle size as much as one can in order to reduce client's memory footprint. Closure tools, albeit not "trendy", was the best tool for it -- the compiler is simply the best, Closure Templates directly compiles into JS and required runtime libraries are extremely small, and Closure Stylesheets provides class name shortening. However, incorporating all of these and at the same time providing an alternative build for debugging required a lot of work due to lack of support and community tooling.
 
 On the other hand, currently most of available tooling using tsickle and closure compiler is limited to angular community. Tsickle is integrated into Angular's compiler and it provides some angular-specific code transformations (they are not enabled in TSCC). However, after all tsickle is a general-purpose transpiler. It seemed a pity that such a great tooling cannot benefit much broader audiences.
 
