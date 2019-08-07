@@ -8,7 +8,7 @@
 		"tree-shaking",
 		"minify-javascript"
 	],
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"main": "./dist/tscc.js",
 	"bin": {
 		"tscc": "./dist/main.js"
@@ -37,15 +37,15 @@
 		"magic-string": "^0.25.3"
 	},
 	"optionalDependencies": {
-		"google-closure-compiler-linux": "^20190709.0.0",
-		"google-closure-compiler-osx": "^20190709.0.0",
+		"google-closure-compiler-linux": "^20190729.0.0",
+		"google-closure-compiler-osx": "^20190729.0.0",
 		"google-closure-compiler-windows": "^20190709.0.0"
 	},
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.2.2",
 		"chalk": "^2.4.2",
 		"fs-extra": "^8.0.1",
-		"google-closure-compiler-java": "20190709.0.0",
+		"google-closure-compiler-java": "20190729.0.0",
 		"minimist": "^1.2.0",
 		"ora": "^3.4.0",
 		"resolve-from": "^5.0.0",
