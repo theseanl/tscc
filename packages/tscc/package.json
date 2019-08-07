@@ -8,7 +8,7 @@
 		"tree-shaking",
 		"minify-javascript"
 	],
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"main": "./dist/tscc.js",
 	"bin": {
 		"tscc": "./dist/main.js"
