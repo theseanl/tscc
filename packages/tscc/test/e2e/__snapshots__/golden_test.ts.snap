@@ -2,16 +2,10 @@
 
 exports[`tscc e2e case_1: case_1 1`] = `
 Array [
-  "$weak$.js",
   "a.js",
   "b.js",
   "c.js",
 ]
-`;
-
-exports[`tscc e2e case_1: case_1/$weak$.js 1`] = `
-"
-"
 `;
 
 exports[`tscc e2e case_1: case_1/a.js 1`] = `
