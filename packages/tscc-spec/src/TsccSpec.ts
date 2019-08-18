@@ -3,6 +3,7 @@ import ITsccSpecJSON, {IModule, INamedModuleSpecs, IDebugOptions} from './ITsccS
 import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
 import fs = require('fs');
+import {readJsonSync} from 'fs-extra';
 import fg = require('fast-glob');
 
 export interface IInputTsccSpecJSON extends ITsccSpecJSON {
@@ -31,7 +32,7 @@ export default class TsccSpec implements ITsccSpec {
 				typeof tsccSpecJSONOrItsPath === 'object' ?
 					typeof tsccSpecJSONOrItsPath.specFile === 'string' ?
 						TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile) :
-						process.cwd() + "/tscc.spec.json" : // Just a dummy path
+						path.join(process.cwd(), "tscc.spec.json") : // Just a dummy path
 					TsccSpec.resolveTsccSpec(process.cwd());
 
 		if (typeof tsccSpecJSONPath === 'undefined') {
@@ -43,10 +44,17 @@ export default class TsccSpec implements ITsccSpec {
 				typeof tsccSpecJSONOrItsPath.specFile === 'string' ?
 					Object.assign(
 						tsccSpecJSONOrItsPath,
-						require(TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile))
+						readJsonSync(
+							TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile),
+							{throws: false}
+						)
 					) :
 					tsccSpecJSONOrItsPath :
-				<ITsccSpecJSON>require(tsccSpecJSONPath);
+				<ITsccSpecJSON>readJsonSync(tsccSpecJSONPath, {throws: false});
+
+		if (tsccSpecJSON === null) {
+			throw new TsccSpecError(`Spec file is an invalid JSON: ${tsccSpecJSONOrItsPath || "cwd"}`);
+		}
 
 		return {tsccSpecJSON, tsccSpecJSONPath};
 	}
