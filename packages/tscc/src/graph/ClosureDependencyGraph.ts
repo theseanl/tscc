@@ -64,7 +64,9 @@ export default class ClosureDependencyGraph {
 		let sourceNode = this.moduleNameToNode.get(moduleName);
 
 		if (!sourceNode) {
-			throw new ClosureDepsError(`Module name ${moduleName} was not provided in source glob`);
+			throw new ClosureDepsError(
+				`Module name ${moduleName} was not provided as a closure compilation source`
+			);
 		} else {
 			return sourceNode;
 		}
@@ -126,7 +128,7 @@ export default class ClosureDependencyGraph {
 			[] :
 			riffle("--chunk", sortedFileNames.map((depsOfAModule, index) => {
 				let entryPoint = entryPoints[index];
-				const args:(string|number)[]=[entryPoint.moduleName, depsOfAModule.length];
+				const args: (string | number)[] = [entryPoint.moduleName, depsOfAModule.length];
 				if (index !== 0) {
 					// Do not specify dependencies for the very first (root) chunk.
 					args.push(...entryPoint.dependencies);
