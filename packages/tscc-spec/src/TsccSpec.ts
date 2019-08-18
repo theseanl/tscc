@@ -3,14 +3,26 @@ import ITsccSpecJSON, {IModule, INamedModuleSpecs, IDebugOptions} from './ITsccS
 import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
 import fs = require('fs');
+import {readJsonSync} from 'fs-extra';
 import fg = require('fast-glob');
 
-export interface IInputTsccSpecJSON extends ITsccSpecJSON {
+// "modules" key is no longer required
+interface IInputTsccSpecJSONWithSpecFile extends Partial<ITsccSpecJSON> {
 	/**
 	 * If exists, the plugin will first load the spec from the specified path,
 	 * and then override it with properties provided in this object.
 	 */
+	specFile: string
+}
+
+interface IInputTsccSpecJSONWithOptionalSpecFile extends ITsccSpecJSON {
 	specFile?: string
+}
+
+export type IInputTsccSpecJSON = IInputTsccSpecJSONWithOptionalSpecFile | IInputTsccSpecJSONWithSpecFile;
+
+function hasSpecFileKey(json: IInputTsccSpecJSON): json is IInputTsccSpecJSONWithSpecFile {
+	return typeof json.specFile === 'string';
 }
 
 export default class TsccSpec implements ITsccSpec {
@@ -29,24 +41,33 @@ export default class TsccSpec implements ITsccSpec {
 			typeof tsccSpecJSONOrItsPath === 'string' ?
 				TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath) :
 				typeof tsccSpecJSONOrItsPath === 'object' ?
-					typeof tsccSpecJSONOrItsPath.specFile === 'string' ?
+					hasSpecFileKey(tsccSpecJSONOrItsPath) ?
 						TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile) :
-						process.cwd() + "/tscc.spec.json" : // Just a dummy path
+						path.join(process.cwd(), "tscc.spec.json") : // Just a dummy path
 					TsccSpec.resolveTsccSpec(process.cwd());
 
 		if (typeof tsccSpecJSONPath === 'undefined') {
-			throw new TsccSpecError(`No spec file was found from directory ${tsccSpecJSONOrItsPath || "cwd"}`)
+			throw new TsccSpecError(
+				`No spec file was found from directory ${tsccSpecJSONOrItsPath || "cwd"}`
+			)
 		}
+
+		const readSpecJSON = (): ITsccSpecJSON => {
+			try {
+				return readJsonSync(tsccSpecJSONPath);
+			} catch (e) {
+				throw new TsccSpecError(
+					`Spec file is an invalid JSON: ${tsccSpecJSONOrItsPath || "cwd"}`
+				);
+			}
+		};
 
 		const tsccSpecJSON: ITsccSpecJSON =
 			typeof tsccSpecJSONOrItsPath === 'object' ?
-				typeof tsccSpecJSONOrItsPath.specFile === 'string' ?
-					Object.assign(
-						tsccSpecJSONOrItsPath,
-						require(TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile))
-					) :
+				hasSpecFileKey(tsccSpecJSONOrItsPath) ?
+					Object.assign(readSpecJSON(), tsccSpecJSONOrItsPath) :
 					tsccSpecJSONOrItsPath :
-				<ITsccSpecJSON>require(tsccSpecJSONPath);
+				readSpecJSON();
 
 		return {tsccSpecJSON, tsccSpecJSONPath};
 	}
