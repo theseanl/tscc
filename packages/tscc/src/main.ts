@@ -82,53 +82,29 @@ export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: 
 		)
 		.describe(
 			'-',
-			`Any flags after the first "--" and before the second "--" (if exists)` +
-			`are treated as flags to be passed to typescript compiler.`
+			`Any flags after the first "--" and before the second "--" (if exists) ` +
+			`will be provided to the typescript compiler.`
 		)
 		.describe(
 			'{2}',
-			`Any flags after the second "--" are treated as flags to be passed to closure compiler.`
+			`Any flags after the second "--" will be provided to the closure compiler.`
+		)
+		.epilogue(
+			`For more information or bug reports, please visit https://github.com/theseanl/tscc.`
 		)
 		.alias({
 			"spec": "s",
-			"help": "h",
-			"version": "v",
+			"h": "help",
+			"v": "version",
 		})
 		.parserConfiguration({
 			'populate--': true,
 			'camel-case-expansion': false
 		})
 		.strict(strict)
-		.help()
+		.help('h')
 		.version()
 		.parse(args);
-}
-
-if (require.main === module) {
-	const tsccWarning = new Logger(chalk.green('TSCC: '));
-	const tsWarning = new Logger(chalk.blue('TS: '));
-
-	const parsedArgs = parseTsccCommandLineArgs(process.argv.slice(2));
-
-	main(parsedArgs)
-		.then(code => process.exit(code))
-		.catch(e => {
-			if (e instanceof TsccSpecError) {
-				tsccWarning.log(chalk.red(e.message));
-			} else if (e instanceof TsError) {
-				tsWarning.log(chalk.red(e.message));
-			} else if (e instanceof ClosureDepsError) {
-				tsccWarning.log(chalk.red(e.message));
-			} else if (e instanceof CcError) {
-				tsccWarning.log(chalk.red(e.message));
-			} else {
-				tsccWarning.log(chalk.red(`The compilation has terminated with an unexpected error.`));
-				tsccWarning.log(e.stack);
-				return process.exit(1);
-			}
-			tsccWarning.log(`The compilation has terminated with an error.`)
-			return process.exit(1);
-		})
 }
 
 export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
@@ -198,5 +174,32 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	}
 
 	return {tsccSpecJSON: <IInputTsccSpecJSON>out, tsArgs}
+}
+
+if (require.main === module) {
+	const tsccWarning = new Logger(chalk.green('TSCC: '));
+	const tsWarning = new Logger(chalk.blue('TS: '));
+
+	const parsedArgs = parseTsccCommandLineArgs(process.argv.slice(2));
+
+	main(parsedArgs)
+		.then(code => process.exit(code))
+		.catch(e => {
+			if (e instanceof TsccSpecError) {
+				tsccWarning.log(chalk.red(e.message));
+			} else if (e instanceof TsError) {
+				tsWarning.log(chalk.red(e.message));
+			} else if (e instanceof ClosureDepsError) {
+				tsccWarning.log(chalk.red(e.message));
+			} else if (e instanceof CcError) {
+				tsccWarning.log(chalk.red(e.message));
+			} else {
+				tsccWarning.log(chalk.red(`The compilation has terminated with an unexpected error.`));
+				tsccWarning.log(e.stack);
+				return process.exit(1);
+			}
+			tsccWarning.log(`The compilation has terminated with an error.`)
+			return process.exit(1);
+		});
 }
 
