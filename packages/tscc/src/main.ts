@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import minimist = require('minimist');
+import yargs = require('yargs');
 import chalk from 'chalk';
 import tscc, {TEMP_DIR, CcError} from './tscc';
 import {TsError} from './spec/TsccSpecWithTS'
-import {IInputTsccSpecJSON, INamedModuleSpecs, TsccSpecError} from '@tscc/tscc-spec'
+import {IInputTsccSpecJSON, INamedModuleSpecs, TsccSpecError, primitives} from '@tscc/tscc-spec'
 import {ClosureDepsError} from './graph/ClosureDependencyGraph'
 import Logger from './log/Logger';
 import console = require('console');
@@ -12,15 +12,7 @@ import console = require('console');
 /**
  * example: tscc -s src/tscc.spec.json -- --experimentalDecorators -- --assume_function_wrapper
  */
-async function main(args: minimist.ParsedArgs) {
-	if (args.version) {
-		printVersion();
-		return 0;
-	}
-	if (args.help) {
-		printHelp();
-		return 0;
-	}
+async function main(args) {
 	if (args.clean) {
 		require('rimraf').sync(TEMP_DIR);
 		console.log(`Removed ${TEMP_DIR}.`);
@@ -38,39 +30,87 @@ async function main(args: minimist.ParsedArgs) {
 	return 0;
 }
 
-if (require.main === module) {
-	const tsccWarning = new Logger(chalk.green('TSCC: '));
-	const tsWarning = new Logger(chalk.blue('TS: '));
-	main(minimist(process.argv.slice(2), {
-		string: [
-			"spec",
-			"module",
-			"external",
-			"prefix",
-			"prefix.cc",
-			"prefix.rollup",
-			"debug.ignoreWarningsPath"
-		],
-		boolean: [
-			"clean",
-			"help",
-			"version",
-			"debug.persistArtifacts"
-		],
-		alias: {
+export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: string]: primitives | primitives[]} {
+	return <any>yargs
+		.scriptName('tscc')
+		.usage(`tscc [--help] [--clean] [--spec <spec_file_path>] [-- <typescript_flags> [-- <closure_compiler_flags>]]`)
+		.describe(
+			'spec',
+			`Perform compilation with tscc spec file at the specified path. ` +
+			`Defaults to the current working directory.`
+		)
+		.string('spec')
+		.describe(
+			'module',
+			`Module spec descriptions. ` +
+			`Format: <name>:<entry_file>[:<dependency_name>[,<dependency2_name>[...]][:<extra_source>[,...]]]`
+		)
+		.string('module')
+		.array('module')
+		.describe(
+			'external',
+			'External module descriptions. Format: <module_name>:<global_name>'
+		)
+		.string('external')
+		.array('external')
+		.describe(
+			'prefix',
+			`Directory names to emit outputs in, or prefixes for output file names. ` +
+			`It will just be prepended to module names, so if its last character is not a path separator, ` +
+			`it will modify the output file's name. Sub-flags --prefix.cc and --prefix.rollup are available.`
+		)
+		.describe(
+			'prefix.cc',
+			`Prefix to be used only by closure compiler build.`
+		)
+		.describe(
+			'prefix.rollup',
+			`Prefix to be used only by rollup build.`
+		)
+		.describe(
+			'debug.persistArtifacts',
+			`Writes intermediate tsickle outputs to .tscc_temp directory.`
+		)
+		.describe(
+			'debug.ignoreWarningsPath',
+			`Prevents tsickle warnings for files whose path contains substrings provided by this flag.`
+		)
+		.array('debug.ignoreWarningsPath')
+		.describe(
+			'clean',
+			`Clear temporary files in .tscc_temp directory.`
+		)
+		.describe(
+			'-',
+			`Any flags after the first "--" and before the second "--" (if exists)` +
+			`are treated as flags to be passed to typescript compiler.`
+		)
+		.describe(
+			'{2}',
+			`Any flags after the second "--" are treated as flags to be passed to closure compiler.`
+		)
+		.alias({
 			"spec": "s",
 			"help": "h",
 			"version": "v",
-			"project": "p"
-		},
-		unknown: (arg) => {
-			tsccWarning.log(`Unknown argument: ${arg}`);
-			printHelp();
-			process.exit(1);
-			return false;
-		},
-		'--': true
-	}))
+		})
+		.parserConfiguration({
+			'populate--': true,
+			'camel-case-expansion': false
+		})
+		.strict(strict)
+		.help()
+		.version()
+		.parse(args);
+}
+
+if (require.main === module) {
+	const tsccWarning = new Logger(chalk.green('TSCC: '));
+	const tsWarning = new Logger(chalk.blue('TS: '));
+
+	const parsedArgs = parseTsccCommandLineArgs(process.argv.slice(2));
+
+	main(parsedArgs)
 		.then(code => process.exit(code))
 		.catch(e => {
 			if (e instanceof TsccSpecError) {
@@ -91,48 +131,11 @@ if (require.main === module) {
 		})
 }
 
-function printHelp() {
-	printVersion();
-	console.log(`
-Usage: tscc --spec VAL                 : Compile with tscc spec file at the path.
-                                         Defaults to the current working directory.
-                                         alias: -s
-            --module VAL               : Module spec descriptions. Format: <name>:<entry_file>[:
-                                         <dependency_name>[,<dependency2_name>[...]]
-                                         [:<extra_source>[,...]]]
-            --external VAL             : External module descriptions.
-                                         Format: <module_name>:<global_name>
-            --prefix VAL               : Directory names to emit outputs in, or prefixes for output
-                                         file names. It will just be prepended to module names,
-                                         so if its last character is not a path separator, it will
-                                         modify the output file's name. Sub-flags --prefix.cc and
-                                         --prefix.rollup are available.
-                    .cc     VAL        : Prefix to be only used by closure compiler build.
-                    .rollup VAL        : Prefix to be only used by rollup build.
-
-            --debug
-                   .persistArtifacts   : Writes intermediate tsickle outputs to .tscc_temp directory.
-                   .ignoreWarningsPath : Prevents tsickle warnings for files whose path contains
-                                         substrings provided by this flag.
-
-            --                         : Any flags after the first "--" and the second "--" (if exists)
-                                         are treated as flags to be passed to typescript compiler.
-            --                         : Any flags after the second "--" are treated as flags to be
-                                         passed to closure compiler.
-
-       tscc --clean                    : Clear temporary files in .tscc_temp.
-       tscc --version                  : Prints version. alias: -v
-       tscc --help                     : Prints this. alias: -h
-`.trim())
-}
-
-function printVersion() {
-	console.log(`tscc ` + require('../package.json').version);
-}
-
-export function buildTsccSpecJSONAndTsArgsFromArgs(args: minimist.ParsedArgs) {
+export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	const tsArgs = <string[]>args["--"] || [];
-	const closureCompilerArgs = minimist(tsArgs, {'--': true})["--"] || [];
+	const closureCompilerArgs: string[] = (<any>yargs
+		.parserConfiguration({'populate--': true})
+		.parse(tsArgs))["--"] || [];
 
 	let i = tsArgs.indexOf('--');
 	if (i !== -1) {
@@ -143,9 +146,8 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args: minimist.ParsedArgs) {
 
 	// module flags
 	// Using "--module" instead of "--modules" looks more natural for a command line interface.
-	let moduleFlags: string | string[] = args["module"];
+	let moduleFlags: string[] = args["module"];
 	if (moduleFlags) {
-		if (typeof moduleFlags === 'string') moduleFlags = [moduleFlags];
 		const moduleFlagValue: INamedModuleSpecs[] = [];
 		for (let moduleFlag of moduleFlags) {
 			// --modules chunk2:./src/chunk2.ts:chunk0,chunk1:css_renaming_map.js
@@ -160,10 +162,9 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args: minimist.ParsedArgs) {
 
 	// external flags
 	// --external react-dom:ReactDOM
-	let external: string | string[] = args["external"]
+	let external: string[] = args["external"]
 	if (external) {
 		const externalValue: {[moduleName: string]: string} = {};
-		if (typeof external === 'string') external = [external];
 		for (let externalEntry of external) {
 			let [moduleName, globalName] = externalEntry.split(':');
 			externalValue[moduleName] = globalName;
@@ -178,15 +179,16 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args: minimist.ParsedArgs) {
 
 	// compilerFlags flags
 	if (closureCompilerArgs.length) {
-		let compilerFlags = minimist(closureCompilerArgs);
-		delete compilerFlags["_"]; // delete special arg produced by minimist
-		out.compilerFlags = compilerFlags;
+		let compilerFlags = yargs.parse(closureCompilerArgs);
+		// delete special args produced by yargs
+		delete compilerFlags["_"];
+		delete compilerFlags["$0"];
+		out.compilerFlags = <any>compilerFlags;
 	}
 
 	// debug flags
 	let debugArgs = args["debug"];
 	if (debugArgs && typeof debugArgs === 'object') {
-		ensureArray(debugArgs, "ignoreWarningsPath");
 		out.debug = debugArgs;
 	}
 
@@ -196,12 +198,5 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args: minimist.ParsedArgs) {
 	}
 
 	return {tsccSpecJSON: <IInputTsccSpecJSON>out, tsArgs}
-}
-
-function ensureArray(obj: object, prop: string): void {
-	let val = obj[prop];
-	if (typeof val !== 'undefined' && !Array.isArray(val)) {
-		obj[prop] = [val];
-	}
 }
 
