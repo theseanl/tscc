@@ -19,7 +19,7 @@ async function main(args) {
 		return 0;
 	}
 
-	if (args['module'] === args['spec'] === undefined) {
+	if (args['module'] === undefined && args['spec'] === undefined) {
 		// Assumes that --spec was set to the current working directory implicitly.
 		args['spec'] = '.';
 	}
