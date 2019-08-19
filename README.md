@@ -256,6 +256,10 @@ Best practice is to provide them as a separate script tag instead of bundling it
     ```
     tsickle writes module-scoped externs to certain mangled namespace like this, so I am grabbing that namespace to create externs like this. To my understanding, this will provide the required information to Closure, please correct me if I'm wrong.
 
+#### Importing typescript sources in node_modules
+
+In order for typescript sources in node_modules directory to be compiled, you need to explicitly include those files in your `tsconfig.json`. This is a rule imposed by the typescript compiler; it has some special handling for files in node_modules directory, it won't transpile such files unlike usual transitive dependencies (that is, files not explicitly included in `tsconfig.json` via `"files"` or `"includes"` keys, but is referenced via `import` or `///<reference path="..." />` from a file that is included in `tsconfig.json`). In order to have them compiled, you need to explicitly mention those files in node_modules directory. For instance, if you are using a package `my_package` that contains typescript sources, you can add a key `{"includes": ["node_modules/my_package/**/*.ts"]}` to your tsconfig.
+
 ### Things to know
 
 #### Closure compiler handles modern javascript natively
