@@ -348,7 +348,6 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		transformDecorators: true,
 		transformTypesToClosure: true,
 		typeBlackListPaths: new Set(resolvedExternalModuleTypeRefs),
-		enableAutoQuoting: false,
 		untyped: false,
 		logWarning(warning) {
 			if (warning.file) {
