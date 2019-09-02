@@ -6158,9 +6158,9 @@ stream-each@^1.1.0:
     stream-shift "^1.0.0"
 
 stream-json@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/stream-json/-/stream-json-1.3.0.tgz#c7c0f40a808ce91181c15018fc3dbcd09bcd6cf8"
-  integrity sha512-3qLDv/xnwmleb5kssgmKbGPqcLou2tbFIgj3CM3fy5PxKaAmeCv103Zp4LKIALdE30zMHTJn09yVwxq773btaw==
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/stream-json/-/stream-json-1.3.1.tgz#37d1ee11beadfee5810086feff21581f24919dca"
+  integrity sha512-xjOods6LE/M86hr3M2dpFUYobcD3pVWzmM9ZNZf+/B8va55sW4CNK1J9uGlUKM3LLvm3wleaa4mrnE9Ok6qveQ==
   dependencies:
     stream-chain "^2.1.0"
 
