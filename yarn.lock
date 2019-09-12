@@ -1218,10 +1218,10 @@
   resolved "https://registry.yarnpkg.com/@types/jest-diff/-/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
   integrity sha512-yALhelO3i0hqZwhjtcr6dYyaLoCHbAMshwtj6cGxTvHZAKXHsYGdff6E8EPw3xLKY0ELUTQ69Q1rQiJENnccMA==
 
-"@types/jest@^24.0.15":
-  version "24.0.17"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.17.tgz#b66ea026efb746eb5db1356ee28518aaff7af416"
-  integrity sha512-1cy3xkOAfSYn78dsBWy4M3h/QF/HeWPchNFDjysVtp3GHeTdSmtluNnELfCmfNRRHo0OWEcpf+NsEJQvwQfdqQ==
+"@types/jest@^24.0.18":
+  version "24.0.18"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.18.tgz#9c7858d450c59e2164a8a9df0905fc5091944498"
+  integrity sha512-jcDDXdjTcrQzdN06+TSVsPPqxvsZA/5QkYfIZlq1JMw7FdP5AZylbOc+6B/cuDurctRe+MziUMtQ3xQdrbjqyQ==
   dependencies:
     "@types/jest-diff" "*"
 
@@ -1235,10 +1235,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.2.tgz#c4e63af5e8823ce9cc3f0b34f7b998c2171f0c44"
   integrity sha512-dyYO+f6ihZEtNPDcWNR1fkoTDf3zAK3lAABDze3mz6POyIercH0lEUawUFXlG8xaQZmm1yEBON/4TsYv/laDYg==
 
-"@types/node@^12.7.2":
-  version "12.7.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.3.tgz#27b3f40addaf2f580459fdb405222685542f907a"
-  integrity sha512-3SiLAIBkDWDg6vFo0+5YJyHPWU9uwu40Qe+v+0MH8wRKYBimHvvAOyk3EzMrD/TrIlLYfXrqDqrg913PynrMJQ==
+"@types/node@^12.7.4":
+  version "12.7.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.5.tgz#e19436e7f8e9b4601005d73673b6dc4784ffcc2f"
+  integrity sha512-9fq4jZVhPNW8r+UYKnxF1e2HkDWOWKM5bC2/7c9wPV835I0aOrVbS/Hw/pWPk2uKrNXQqg9Z959Kz+IYDd5p3w==
 
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
@@ -3029,20 +3029,20 @@ globby@^9.2.0:
     pify "^4.0.1"
     slash "^2.0.0"
 
-google-closure-compiler-java@^20190819.0.0:
-  version "20190819.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20190819.0.0.tgz#75d4a74a93441c44b2aecfb6e1278f5dd2e0d7d7"
-  integrity sha512-i8KzPJZBEF0aZWSn2vlkH0JCeQGIxBVfQaUwc2fCjPbm/v5YfpZzkj38LoMDbE95BlYsq2cPveHUNC4w85UgGw==
+google-closure-compiler-java@^20190909.0.0:
+  version "20190909.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20190909.0.0.tgz#de0211e706186631b6e419840559f8026fb08dcf"
+  integrity sha512-Cz58+hW7XxFQ8KHenfP9eH2FqvGJ1ikcSebHihgqAg1Pfy8ZzxWUBZYEwOGqV0Kzcbb1NN79n0UMd2ZNfWb19w==
 
-google-closure-compiler-linux@^20190819.0.0:
-  version "20190819.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-linux/-/google-closure-compiler-linux-20190819.0.0.tgz#9ad56625f84514b8f095bdabd6b6c7ebe8ae1c31"
-  integrity sha512-+ia89Ot4dPyRioLlxvkfYiISwJO+2NV7SY0Zp/KfTt9x+eJaGQ9GRIQage50d1mGkUyPmFfxsdPUePpT1QlpaA==
+google-closure-compiler-linux@^20190909.0.0:
+  version "20190909.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-linux/-/google-closure-compiler-linux-20190909.0.0.tgz#4c447a41da0d7fc317af785b023916ee231eef73"
+  integrity sha512-4mTUVhrkjS4d4LREqOWIwPT4lfbUJAs5nh9gTJ7vHtBxa8aE08ynGPz4zhO9gYpRb3mDVYd7BHA2dvJWtFRiDw==
 
-google-closure-compiler-osx@^20190819.0.0:
-  version "20190819.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-osx/-/google-closure-compiler-osx-20190819.0.0.tgz#57046952a3f520b942a35d2edaf0379b44b0c84c"
-  integrity sha512-woANg+oA2zjFebtdYTA4lLtqbOVO9yE9yy8ibGjt76FNlw0bAyxTO4z2ab4CwUNNpOeRoxZyGt9CejlCmNpxJg==
+google-closure-compiler-osx@^20190909.0.0:
+  version "20190909.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-osx/-/google-closure-compiler-osx-20190909.0.0.tgz#521b2ed7571c054739803d13a7785b764aab6239"
+  integrity sha512-DvIr6gd7BfIpptSfLihEGwCHKlcwssHC+pt1duagRPfmgezp8GeJvAvbZIS/+Ud77zRFz+wcwQWsTvwyZSwklQ==
 
 google-closure-compiler-windows@^20190819.0.0:
   version "20190819.0.0"
@@ -3804,10 +3804,10 @@ jest-jasmine2@^24.9.0:
     pretty-format "^24.9.0"
     throat "^4.0.0"
 
-jest-junit@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/jest-junit/-/jest-junit-7.0.0.tgz#e2ab2dc3f4eb2768f3e4c43e4e4cd841133a8c0e"
-  integrity sha512-ljUdO0hLyu0A92xk7R2Wet3kj99fmazTo+ZFYQP6b7AGOBxJUj8ZkJWzJ632ajpXko2Y5oNoGR2kvOwiDdu6hg==
+jest-junit@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/jest-junit/-/jest-junit-8.0.0.tgz#d4f7ff67e292a5426dc60bc38694c9f77cb94178"
+  integrity sha512-cuD2XM2youMjrOxOu/7H2pLfsO8LfAG4D3WsBxd9fFyI9U0uPpmr/CORH64kbIyZ47X5x1Rbzb9ovUkAEvhEEA==
   dependencies:
     jest-validate "^24.0.0"
     mkdirp "^0.5.1"
@@ -5796,13 +5796,13 @@ rollup-plugin-virtual@^1.0.1:
   resolved "https://registry.yarnpkg.com/rollup-plugin-virtual/-/rollup-plugin-virtual-1.0.1.tgz#8227c94c605b981adfe433ea74de3551e42ffeb4"
   integrity sha512-HCTBpV8MwP5lNzZrHD2moVxHIToHU1EkzkKGVj6Z0DcgUfxrxrZmeQirQeLz2yhnkJqRjwiVywK9CS8jDYakrw==
 
-rollup@^1.20.3:
-  version "1.20.3"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.20.3.tgz#6243f6c118ca05f56b2d9433112400cd834a1eb8"
-  integrity sha512-/OMCkY0c6E8tleeVm4vQVDz24CkVgvueK3r8zTYu2AQNpjrcaPwO9hE+pWj5LTFrvvkaxt4MYIp2zha4y0lRvg==
+rollup@^1.21.2:
+  version "1.21.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.21.2.tgz#eaabd07d0bd309587ad8bebf731fca6fcb96f4d0"
+  integrity sha512-sCAHlcQ/PExU5t/kRwkEWHdhGmQrZ2IgdQzbjPVNfhWbKHMMZGYqkASVTpQqRPLtQKg15xzEscc+BnIK/TE7/Q==
   dependencies:
     "@types/estree" "0.0.39"
-    "@types/node" "^12.7.2"
+    "@types/node" "^12.7.4"
     acorn "^7.0.0"
 
 rsvp@^4.8.4:
@@ -6157,10 +6157,10 @@ stream-each@^1.1.0:
     end-of-stream "^1.1.0"
     stream-shift "^1.0.0"
 
-stream-json@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/stream-json/-/stream-json-1.3.0.tgz#c7c0f40a808ce91181c15018fc3dbcd09bcd6cf8"
-  integrity sha512-3qLDv/xnwmleb5kssgmKbGPqcLou2tbFIgj3CM3fy5PxKaAmeCv103Zp4LKIALdE30zMHTJn09yVwxq773btaw==
+stream-json@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/stream-json/-/stream-json-1.3.1.tgz#37d1ee11beadfee5810086feff21581f24919dca"
+  integrity sha512-xjOods6LE/M86hr3M2dpFUYobcD3pVWzmM9ZNZf+/B8va55sW4CNK1J9uGlUKM3LLvm3wleaa4mrnE9Ok6qveQ==
   dependencies:
     stream-chain "^2.1.0"
 
