@@ -11,7 +11,7 @@ const SOURCE_MAP = 'sourceMap'
 
 /**
  * JSON file format that Closure Compiler accepts.
- * See `AbstractCommandLineRUnner.JsonFileSpec`
+ * See `AbstractCommandLineRunner#JsonFileSpec`
  */
 export declare interface IClosureCompilerInputJson {
 	path: string,

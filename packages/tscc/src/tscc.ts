@@ -79,7 +79,6 @@ export default async function tscc(
 	 * Ideally, the dependency graph should be determined from ts sourceFiles, and the compiler
 	 * process can be spawned asynchronously before calling tsickle.
 	 * Then, we will be able to set `tsickleHost.shouldSkipTsickleProcessing` and the order of
-	 * Then, we will be able to set `tsickleHost.shouldSkipTsickleProcessing` and the order of
 	 * files that are transpiled by tsickle. This has an advantage in that we can stream JSONs
 	 * in order that they came out from tsickle, cuz Closure compiler requires JSON files to be
 	 * sorted exactly as how js files would be sorted.
@@ -298,9 +297,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 	const options = tsccSpec.getCompilerOptions();
 	const compilerHost = tsccSpec.getCompilerHost();
 
-	// For the part where replacing fileNames to absolute paths, it is just following
-	// what tsickle does, it's unclear what TS will give us!
-	// Apparently, TS seems to be giving fileNames relative to process.cwd().
+	// Non-absolute file names are resolved from the TS project root.
 	const fileNamesSet = tsccSpec.getAbsoluteFileNamesSet();
 
 	const externalModuleNames = tsccSpec.getExternalModuleNames();
