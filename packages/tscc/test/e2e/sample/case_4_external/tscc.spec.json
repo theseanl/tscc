@@ -1,0 +1,10 @@
+{
+	"modules": {
+		"a": "./a.ts"
+	},
+	"external": {
+		"an-external-module": "anExternalModule",
+		"another-external-module": "CollidesWithGlobalName"
+	},
+	"prefix": ".tscc_temp/case_4_external/"
+}
