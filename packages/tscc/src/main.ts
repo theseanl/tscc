@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import yargs = require('yargs');
+import yargs = require('yargs/yargs');
 import chalk from 'chalk';
 import tscc, {TEMP_DIR, CcError} from './tscc';
 import {TsError} from './spec/TsccSpecWithTS'
@@ -31,7 +31,7 @@ async function main(args) {
 }
 
 export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: string]: primitives | primitives[]} {
-	return <any>yargs
+	return <any>yargs()
 		.scriptName('tscc')
 		.usage(`tscc [--help] [--clean] [--spec <spec_file_path>] [-- <typescript_flags> [-- <closure_compiler_flags>]]`)
 		.describe(
@@ -66,6 +66,10 @@ export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: 
 		.describe(
 			'prefix.rollup',
 			`Prefix to be used only by rollup build.`
+		)
+		.describe(
+			'debug',
+			`A namespace for debugging options.`
 		)
 		.describe(
 			'debug.persistArtifacts',
@@ -109,7 +113,7 @@ export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: 
 
 export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	const tsArgs = <string[]>args["--"] || [];
-	const closureCompilerArgs: string[] = (<any>yargs
+	const closureCompilerArgs: string[] = (<any>yargs()
 		.parserConfiguration({'populate--': true})
 		.parse(tsArgs))["--"] || [];
 
@@ -155,7 +159,7 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 
 	// compilerFlags flags
 	if (closureCompilerArgs.length) {
-		let compilerFlags = yargs.parse(closureCompilerArgs);
+		let compilerFlags = yargs().parse(closureCompilerArgs);
 		// delete special args produced by yargs
 		delete compilerFlags["_"];
 		delete compilerFlags["$0"];
