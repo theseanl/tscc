@@ -3,7 +3,6 @@ import chalk from 'chalk';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import * as tsickle from "tsickle";
 import * as ts from "typescript";
-import {patchTypeTranslator, registerTypeBlacklistedModuleName} from './blacklist_symbol_type';
 import getDefaultLibs from './default_libs';
 import {Cache, FSCacheAccessor} from './graph/Cache';
 import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
@@ -18,7 +17,7 @@ import spawnCompiler from './spawn_compiler';
 import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
 import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
 import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer';
-import externalModuleTransformer, {getExternsForExternalModules} from './transformer/externalModuleTransformer';
+import {getExternsForExternalModules, getGluingModules} from './external_module_support';
 import fs = require('fs');
 import path = require('path');
 import stream = require('stream');
@@ -42,19 +41,19 @@ export default async function tscc(
 	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
 	tsConfigPathOrTsArgs?: string,
 	compilerOptionsOverride?: object
-):Promise<void>
+): Promise<void>
 /** @internal */
 export default async function tscc(
 	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
 	tsConfigPathOrTsArgs: string[],
 	compilerOptionsOverride?: object
-):Promise<void>
+): Promise<void>
 /** @internal */
 export default async function tscc(
 	tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON,
 	tsConfigPathOrTsArgs?: string | string[],
 	compilerOptionsOverride?: object
-):Promise<void> {
+): Promise<void> {
 	const tsccLogger = new Logger(chalk.green("TSCC: "), process.stderr);
 	const tsLogger = new Logger(chalk.blue("TS: "), process.stderr);
 
@@ -115,11 +114,16 @@ export default async function tscc(
 		writeFile(path, fs.readFileSync(path, 'utf8'))
 	})
 
+	// Manually push gluing modules
+	getGluingModules(tsccSpec, transformerHost).forEach(({path, content}) => {
+		writeFile(path, content)
+	})
+
 	patchTsickleResolveModule(); // check comments in its source - required to generate proper externs
 	const result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
 		afterTs: [
 			decoratorPropertyTransformer(transformerHost),
-			externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
+			//externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
 		]
 	});
 	// If tsickle errors, print diagnostics and exit.
@@ -303,26 +307,17 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 	const externalModuleNames = tsccSpec.getExternalModuleNames();
 	const resolvedExternalModuleTypeRefs: string[] = [];
 
-	let hasTypeBlacklistedSymbols = false;
-	for (let i = 0, l = externalModuleNames.length; i < l; i++) {
-		let name = externalModuleNames[i];
+	for (let name of externalModuleNames) {
 		let typeRefFileName = tsccSpec.resolveExternalModuleTypeReference(name);
 		if (typeRefFileName) {
 			resolvedExternalModuleTypeRefs.push(typeRefFileName);
-		} else {
-			// Can't achieve blacklisting via TsickleHost.typeBlacklistPaths API
-			hasTypeBlacklistedSymbols = true;
-			registerTypeBlacklistedModuleName(name);
 		}
-	}
-	if (hasTypeBlacklistedSymbols) {
-		patchTypeTranslator();
 	}
 
 	const externalModuleRoots = resolvedExternalModuleTypeRefs
 		.map(getPackageBoundary);
 
-	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules"];
+	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules/"];
 
 	const transformerHost: tsickle.TsickleHost = {
 		shouldSkipTsickleProcessing(fileName: string) {
@@ -344,7 +339,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		googmodule: true,
 		transformDecorators: true,
 		transformTypesToClosure: true,
-		typeBlackListPaths: new Set(resolvedExternalModuleTypeRefs),
+		typeBlackListPaths: new Set(),
 		untyped: false,
 		logWarning(warning) {
 			if (warning.file) {
@@ -369,6 +364,11 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 		 * deterministic output based on a single file.
 		 */
 		pathToModuleName: (context: string, fileName: string) => {
+			// Module names specified as external are not resolved, which in effect cause
+			// googmodule transformer to emit module names verbatim in `goog.require()`.
+			if (externalModuleNames.includes(fileName)) return fileName;
+			// 'tslib' is always considered as an external module.
+			if (fileName === 'tslib') return fileName;
 			// Resolve module via ts API
 			const resolved = ts.resolveModuleName(fileName, context, options, compilerHost);
 			if (resolved && resolved.resolvedModule) {

@@ -74,6 +74,6 @@ Array [
 `;
 
 exports[`tscc e2e case_4_external: case_4_external/a.js 1`] = `
-"anExternalModule.a();CollidesWithGlobalName.b();
+"var a=CollidesWithGlobalName;anExternalModule.a();window.this_should_survive=!0;a.b();
 "
 `;

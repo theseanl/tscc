@@ -6,7 +6,7 @@ thing.a();
 (function() {
 	// Shadowed variable, just in case
 	var thing = {
-		a: function() {}
+		a: function() { window["this_should_survive"] = true; }
 	};
 	thing.a();
 })();
