@@ -23,7 +23,6 @@
 		"clean": "rm -rf dist"
 	},
 	"devDependencies": {
-		"rollup": "^1.21.2",
 		"rollup-plugin-virtual": "^1.0.1"
 	},
 	"publishConfig": {
@@ -32,6 +31,6 @@
 	"gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.3.0",
-		"rollup": "^1.21.2"
+		"rollup": "^1.21.4"
 	}
 }

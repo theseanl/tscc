@@ -17,7 +17,7 @@
 		"jest-junit": "^8.0.0",
 		"lerna": "^3.14.1",
 		"prettier": "^1.18.2",
-		"ts-jest": "^24.0.2",
+		"ts-jest": "^24.1.0",
 		"typescript": "~3.5.3"
 	},
 	"dependencies": {}
