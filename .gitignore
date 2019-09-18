@@ -1,7 +1,7 @@
-node_modules
+/node_modules
+/packages/*/node_modules
 dist
 lerna-debug.log
 junit.xml
 .tscc_temp
 yarn-error.log
-
