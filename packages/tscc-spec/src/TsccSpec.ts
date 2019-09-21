@@ -3,6 +3,7 @@ import ITsccSpecJSON, {IModule, INamedModuleSpecs, IDebugOptions} from './ITsccS
 import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
 import fs = require('fs');
+import process = require('process');
 import {readJsonSync} from 'fs-extra';
 import fg = require('fast-glob');
 
@@ -26,13 +27,55 @@ function hasSpecFileKey(json: IInputTsccSpecJSON): json is IInputTsccSpecJSONWit
 }
 
 export default class TsccSpec implements ITsccSpec {
+	protected static readonly SPEC_FILE = 'tscc.spec.json';
+	/**
+	 * Follows the behavior of Typescript CLI.
+	 * 1. If --project argument is supplied,
+	 *   1-1. If it is a file, use it.
+	 *   1-2. If it is a directory, use directory/tsconfig.json.
+	 *   1-3. If it is not a file nor a directory, throw an error.
+	 * 2. If it is not supplied (and file arguments are not supplied which is always the case for tscc)
+	 *    it calls ts.findConfigFile to search for tsconfig.json from the current working directory.
+	 */
+	protected static resolveSpecFile(
+		searchPath: string | undefined,
+		specFileName: string,
+		defaultLocation?: string
+	): string {
+		if (typeof searchPath === 'string') { // 1
+			try {
+				let stat = fs.statSync(searchPath); // Throws if does not exist
+				if (stat.isFile()) return path.resolve(searchPath); // 1-1;
+				if (stat.isDirectory()) { // 1-2;
+					let specPath = path.resolve(searchPath, specFileName);
+					let specStat = fs.statSync(specPath); // Throws if does not exist
+					if (specStat.isFile()) return specPath;
+				}
+			} catch (e) {}
+			return; // 1-3
+		}
+		// Search ancestor directories starting from defaultLocation, similar to ts.findConfigFile
+		let nextPath = defaultLocation;
+		while (nextPath !== searchPath) {
+			searchPath = nextPath;
+			try {
+				let specPath = path.resolve(searchPath, specFileName);
+				if (TsccSpec.resolveFile(specPath)) return specPath;
+			} catch (e) {}
+			nextPath = path.dirname(searchPath);
+		}
+		return;
+	}
+	// Returns the resolved file path if the file exists, returns undefined otherwise. 
+	private static resolveFile(searchPath: string): string {
+		try {
+			let stat = fs.statSync(searchPath);
+			if (stat.isFile()) return path.resolve(searchPath);
+		} catch (e) {}
+		return;
+	}
 	private static resolveTsccSpec(root: string): string {
-		if (!fs.existsSync(root)) return;
-		if (fs.lstatSync(root).isFile()) return path.resolve(root);
-		let specPath = path.resolve(root, 'tscc.spec.js');
-		if (fs.existsSync(specPath)) return specPath;
-		specPath = path.resolve(root, 'tscc.spec.json');
-		if (fs.existsSync(specPath)) return specPath;
+		return TsccSpec.resolveSpecFile(root, TsccSpec.SPEC_FILE, process.cwd());
 	}
 	protected static loadSpecRaw(
 		tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON
@@ -42,9 +85,9 @@ export default class TsccSpec implements ITsccSpec {
 				TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath) :
 				typeof tsccSpecJSONOrItsPath === 'object' ?
 					hasSpecFileKey(tsccSpecJSONOrItsPath) ?
-						TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile) :
-						path.join(process.cwd(), "tscc.spec.json") : // Just a dummy path
-					TsccSpec.resolveTsccSpec(process.cwd());
+						TsccSpec.resolveFile(tsccSpecJSONOrItsPath.specFile) :
+						path.join(process.cwd(), TsccSpec.SPEC_FILE) : // Just a dummy path
+					TsccSpec.resolveTsccSpec(undefined); // Searches in ancestor directories
 
 		if (typeof tsccSpecJSONPath === 'undefined') {
 			throw new TsccSpecError(

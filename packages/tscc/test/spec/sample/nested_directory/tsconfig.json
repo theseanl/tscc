@@ -1,0 +1,7 @@
+{
+
+		"target": "ES5",
+		"moduleResolution": "Node",
+		"downlevelIteration": true
+	}
+}
