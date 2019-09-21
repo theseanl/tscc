@@ -12,6 +12,11 @@ describe(`TsccSpec`, () => {
 			expect(spec.getOrderedModuleSpecs().length).toBe(1);
 		});
 
+		test(`loads spec from a directory specified via specFile key`, () => {
+			const spec = TsccSpec.loadSpec({ specFile: testSpecDir });
+			expect(spec.getOrderedModuleSpecs().length).toBe(1);
+		});
+
 		test(`loads spec by searching on ancestor directories starting from CWD`, () => {
 			const done = mockCurrentWorkingDirectory(path.join(testSpecDir, 'nested_directory'));
 

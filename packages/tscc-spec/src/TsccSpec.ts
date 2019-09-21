@@ -85,7 +85,7 @@ export default class TsccSpec implements ITsccSpec {
 				TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath) :
 				typeof tsccSpecJSONOrItsPath === 'object' ?
 					hasSpecFileKey(tsccSpecJSONOrItsPath) ?
-						TsccSpec.resolveFile(tsccSpecJSONOrItsPath.specFile) :
+						TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile) :
 						path.join(process.cwd(), TsccSpec.SPEC_FILE) : // Just a dummy path
 					TsccSpec.resolveTsccSpec(undefined); // Searches in ancestor directories
 
