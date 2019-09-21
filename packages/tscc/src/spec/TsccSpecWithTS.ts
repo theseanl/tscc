@@ -1,7 +1,6 @@
 import {IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
 import * as ts from 'typescript';
 import ITsccSpecWithTS from './ITsccSpecWithTS';
-import fs = require('fs');
 import path = require('path');
 
 export class TsError extends Error {
@@ -29,18 +28,13 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		// I think this is a more reasonable behavior, since many users will just put spec.json and
 		// tsconfig.json at the same directory, they will otherwise have to provide the same information
 		// twice, once for tscc and once for tsc.
-		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(options.project || specRoot);
+		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(options.project, specRoot);
 		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
 	}
 	// compilerOptions is a JSON object in the form of tsconfig.json's compilerOption value.
 	// Its value will override compiler options.
-	static loadTsConfigFromPath(tsConfigPath: string, compilerOptions?: object) {
-		if (!fs.existsSync(tsConfigPath)) {
-			throw new TsccSpecError(`No file or directory found at ${tsConfigPath}`);
-		}
-		const configFileName = fs.lstatSync(tsConfigPath).isFile() ?
-			path.resolve(tsConfigPath) :
-			TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath);
+	static loadTsConfigFromPath(tsConfigPath: string, specRoot?: string, compilerOptions?: object) {
+		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath, specRoot);
 		let options: ts.CompilerOptions = {}, errors: ts.Diagnostic[];
 		if (compilerOptions) {
 			({options, errors} = ts.convertCompilerOptionsFromJson(
@@ -52,10 +46,11 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		}
 		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
 	}
-	private static findConfigFileAndThrow(searchLocation: string) {
-		const configFileName = ts.findConfigFile(searchLocation, fs.existsSync);
+	private static findConfigFileAndThrow(searchPath: string, defaultLocation: string) {
+		const configFileName =
+			TsccSpecWithTS.resolveSpecFile(searchPath, 'tsconfig.json', defaultLocation);
 		if (configFileName === undefined) {
-			throw new TsccSpecError(`Cannot find tsconfig.json at ${searchLocation}.`)
+			throw new TsccSpecError(`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath)}.`)
 		}
 		return configFileName;
 	}
@@ -78,7 +73,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		let specRoot = path.dirname(tsccSpecJSONPath);
 		let {projectRoot, parsedConfig} = Array.isArray(tsConfigPathOrTsArgs) ?
 			TsccSpecWithTS.loadTsConfigFromArgs(tsConfigPathOrTsArgs, specRoot, onTsccWarning) :
-			TsccSpecWithTS.loadTsConfigFromPath(tsConfigPathOrTsArgs || specRoot, compilerOptionsOverride);
+			TsccSpecWithTS.loadTsConfigFromPath(tsConfigPathOrTsArgs, specRoot, compilerOptionsOverride);
 
 		TsccSpecWithTS.pruneCompilerOptions(parsedConfig.options, onTsccWarning);
 		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath, parsedConfig, projectRoot);
