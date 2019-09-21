@@ -5,12 +5,12 @@ import path = require('path');
 
 describe(`TsccSpecWithTS`, () => {
 	describe(`loadTsConfigFromArgs`, () => {
-		test(`searches tsconfig from a directory provided by --project flag`,  () => {
+		test(`searches tsconfig from a directory provided by --project flag`, () => {
 			const projectInNestedDirectory = path.join(__dirname, 'sample/nested_directory');
 			const {projectRoot, parsedConfig} = TsccSpecWithTS.loadTsConfigFromArgs(
 				['--project', projectInNestedDirectory],
 				undefined,
-				()=>{}
+				() => {}
 			);
 			expect(projectRoot).toBe(projectInNestedDirectory);
 			expect(parsedConfig.options.moduleResolution).toBe(ts.ModuleResolutionKind.NodeJs);

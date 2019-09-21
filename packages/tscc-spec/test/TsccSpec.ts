@@ -6,7 +6,6 @@ import process = require('process');
 describe(`TsccSpec`, () => {
 	describe(`loadSpec`, () => {
 		const testSpecDir = path.join(__dirname, 'sample');
-		const testSpecPath = path.join(testSpecDir, 'tscc.spec.json');
 
 		test(`loads spec file from a specified directory`, () => {
 			const spec = TsccSpec.loadSpec(testSpecDir);
@@ -14,13 +13,28 @@ describe(`TsccSpec`, () => {
 		});
 
 		test(`loads spec by searching on ancestor directories starting from CWD`, () => {
-			const spy = jest.spyOn(process, 'cwd');
-			spy.mockReturnValue(path.join(testSpecDir, 'nested_directory'));
+			const done = mockCurrentWorkingDirectory(path.join(testSpecDir, 'nested_directory'));
 
 			const spec = TsccSpec.loadSpec(undefined);
 			expect(spec.getOrderedModuleSpecs().length).toBe(1);
 
-			spy.mockRestore();
+			done();
+		});
+
+		test(`ancestor directory search stops at the root directory`, () => {
+			const nonExistentPath = path.sep + new Array(5).fill(1).map(() => {
+				return Math.random().toString(36).substring(2);
+			}).join(path.sep);
+
+			const done = mockCurrentWorkingDirectory(nonExistentPath);
+
+			expect(() => {
+				TsccSpec.loadSpec(undefined)
+			}).toThrow(TsccSpecError);
+			// ancestor directory search eventually stops at and throws
+			// a not found error.
+
+			done();
 		});
 
 		const invalidSpecJSONPath = path.join(__dirname, 'sample/invalid_json.json');
@@ -30,6 +44,7 @@ describe(`TsccSpec`, () => {
 				TsccSpec.loadSpec(invalidSpecJSONPath)
 			}).toThrowError(TsccSpecError);
 		});
+
 		test(`throws when the spec file referenced via "specFile" key is an invalid JSON.`, () => {
 			expect(() => {
 				TsccSpec.loadSpec({specFile: invalidSpecJSONPath})
@@ -38,3 +53,8 @@ describe(`TsccSpec`, () => {
 	})
 });
 
+function mockCurrentWorkingDirectory(mockValue: string) {
+	const spy = jest.spyOn(process, 'cwd');
+	spy.mockReturnValue(mockValue);
+	return () => {spy.mockRestore();}
+}
