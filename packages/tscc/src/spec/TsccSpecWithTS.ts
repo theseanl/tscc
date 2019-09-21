@@ -1,7 +1,6 @@
 import {IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
 import * as ts from 'typescript';
 import ITsccSpecWithTS from './ITsccSpecWithTS';
-import fs = require('fs');
 import path = require('path');
 
 export class TsError extends Error {
@@ -34,7 +33,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	}
 	// compilerOptions is a JSON object in the form of tsconfig.json's compilerOption value.
 	// Its value will override compiler options.
-	static loadTsConfigFromPath(tsConfigPath: string, specRoot: string, compilerOptions?: object) {
+	static loadTsConfigFromPath(tsConfigPath: string, specRoot?: string, compilerOptions?: object) {
 		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath, specRoot);
 		let options: ts.CompilerOptions = {}, errors: ts.Diagnostic[];
 		if (compilerOptions) {
@@ -51,7 +50,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		const configFileName =
 			TsccSpecWithTS.resolveSpecFile(searchPath, 'tsconfig.json', defaultLocation);
 		if (configFileName === undefined) {
-			throw new TsccSpecError(`Cannot find tsconfig at ${searchPath}.`)
+			throw new TsccSpecError(`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath)}.`)
 		}
 		return configFileName;
 	}

@@ -28,6 +28,8 @@ function hasSpecFileKey(json: IInputTsccSpecJSON): json is IInputTsccSpecJSONWit
 
 export default class TsccSpec implements ITsccSpec {
 	protected static readonly SPEC_FILE = 'tscc.spec.json';
+	private static readonly RE_DOT_PATH = /^[\.]{1,2}\//;
+	private static isDotPath(p:string) { return TsccSpec.RE_DOT_PATH.test(p); }
 	/**
 	 * Follows the behavior of Typescript CLI.
 	 * 1. If --project argument is supplied,
@@ -67,10 +69,18 @@ export default class TsccSpec implements ITsccSpec {
 		}
 		return;
 	}
+	// A helper function for creating path strings to display in terminal environments
+	protected static toDisplayedPath(p: string): string {
+		const relPath = path.relative('.', p);
+		if (TsccSpec.isDotPath(relPath)) return path.resolve(p); // use an absolute path
+		if (relPath === '.') return "the current working directory";
+		return relPath;
+	}
 	private static findTsccSpecAndThrow(root: string): string {
 		const specPath = TsccSpec.resolveSpecFile(root, TsccSpec.SPEC_FILE, process.cwd());
 		if (specPath === undefined) {
-			throw new TsccSpecError(`No spec file was found from directory ${root || "cwd"}`);
+			let displayedPath = TsccSpec.toDisplayedPath(root || process.cwd());
+			throw new TsccSpecError(`No spec file was found from ${displayedPath}.`);
 		}
 		return specPath;
 	}
@@ -91,7 +101,7 @@ export default class TsccSpec implements ITsccSpec {
 				return readJsonSync(tsccSpecJSONPath);
 			} catch (e) {
 				throw new TsccSpecError(
-					`Spec file is an invalid JSON: ${tsccSpecJSONOrItsPath || "cwd"}`
+					`Spec file is an invalid JSON: ${TsccSpec.toDisplayedPath(tsccSpecJSONPath)}.`
 				);
 			}
 		};
@@ -179,7 +189,7 @@ export default class TsccSpec implements ITsccSpec {
 		if (path.isAbsolute(filePath)) return filePath;
 		// Special handling for '' - treat it as if it ends with a separator
 		let endsWithSep = filePath.endsWith(path.sep) || filePath.length === 0;
-		let base = /^[\.]{1,2}\//.test(filePath) ?
+		let base = TsccSpec.isDotPath(filePath) ?
 			path.dirname(this.basePath) :
 			process.cwd();
 		// path.resolve trims trailing separators.

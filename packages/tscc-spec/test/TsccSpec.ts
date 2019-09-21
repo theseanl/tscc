@@ -50,7 +50,7 @@ describe(`TsccSpec`, () => {
 				errorThrown = e;
 			}
 			expect(errorThrown).toBeTruthy();
-			expect(errorThrown.message).toBe(`No spec file was found from directory /`);
+			expect(errorThrown.message).toBe(`No spec file was found from /.`);
 		});
 
 		const invalidSpecJSONPath = path.join(__dirname, 'sample/invalid_json.json');
