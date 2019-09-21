@@ -60,40 +60,31 @@ export default class TsccSpec implements ITsccSpec {
 			searchPath = nextPath;
 			try {
 				let specPath = path.resolve(searchPath, specFileName);
-				if (TsccSpec.resolveFile(specPath)) return specPath;
+				let stat = fs.statSync(specPath);
+				if (stat.isFile()) return specPath;
 			} catch (e) {}
 			nextPath = path.dirname(searchPath);
 		}
 		return;
 	}
-	// Returns the resolved file path if the file exists, returns undefined otherwise. 
-	private static resolveFile(searchPath: string): string {
-		try {
-			let stat = fs.statSync(searchPath);
-			if (stat.isFile()) return path.resolve(searchPath);
-		} catch (e) {}
-		return;
-	}
-	private static resolveTsccSpec(root: string): string {
-		return TsccSpec.resolveSpecFile(root, TsccSpec.SPEC_FILE, process.cwd());
+	private static findTsccSpecAndThrow(root: string): string {
+		const specPath = TsccSpec.resolveSpecFile(root, TsccSpec.SPEC_FILE, process.cwd());
+		if (specPath === undefined) {
+			throw new TsccSpecError(`No spec file was found from directory ${root || "cwd"}`);
+		}
+		return specPath;
 	}
 	protected static loadSpecRaw(
 		tsccSpecJSONOrItsPath: string | IInputTsccSpecJSON
 	) {
 		const tsccSpecJSONPath: string =
 			typeof tsccSpecJSONOrItsPath === 'string' ?
-				TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath) :
+				TsccSpec.findTsccSpecAndThrow(tsccSpecJSONOrItsPath) :
 				typeof tsccSpecJSONOrItsPath === 'object' ?
 					hasSpecFileKey(tsccSpecJSONOrItsPath) ?
-						TsccSpec.resolveTsccSpec(tsccSpecJSONOrItsPath.specFile) :
+						TsccSpec.findTsccSpecAndThrow(tsccSpecJSONOrItsPath.specFile) :
 						path.join(process.cwd(), TsccSpec.SPEC_FILE) : // Just a dummy path
-					TsccSpec.resolveTsccSpec(undefined); // Searches in ancestor directories
-
-		if (typeof tsccSpecJSONPath === 'undefined') {
-			throw new TsccSpecError(
-				`No spec file was found from directory ${tsccSpecJSONOrItsPath || "cwd"}`
-			)
-		}
+					TsccSpec.findTsccSpecAndThrow(undefined); // Searches in ancestor directories
 
 		const readSpecJSON = (): ITsccSpecJSON => {
 			try {

@@ -13,7 +13,7 @@ describe(`TsccSpec`, () => {
 		});
 
 		test(`loads spec from a directory specified via specFile key`, () => {
-			const spec = TsccSpec.loadSpec({ specFile: testSpecDir });
+			const spec = TsccSpec.loadSpec({specFile: testSpecDir});
 			expect(spec.getOrderedModuleSpecs().length).toBe(1);
 		});
 
@@ -40,6 +40,17 @@ describe(`TsccSpec`, () => {
 			// a not found error.
 
 			done();
+		});
+
+		test(`when it cannot find a spec file at a path referenced via specFile key, throws an error with meaningful error message`, () => {
+			let errorThrown: Error;
+			try {
+				TsccSpec.loadSpec({specFile: '/'});
+			} catch (e) {
+				errorThrown = e;
+			}
+			expect(errorThrown).toBeTruthy();
+			expect(errorThrown.message).toBe(`No spec file was found from directory /`);
 		});
 
 		const invalidSpecJSONPath = path.join(__dirname, 'sample/invalid_json.json');
