@@ -168,6 +168,10 @@ var o = (_a = {
     _a[Math.random() > .5 ? \\"foo\\" : \\"bar\\"] = {},
     _a);
 var a = o.a, c = o.c, d = o.d, foo = o.foo, rest = tslib_1.__rest(o, [tscc_goog_reflect_injected.objectProperty(\\"a\\", o), tscc_goog_reflect_injected.objectProperty(\\"c\\", o), tscc_goog_reflect_injected.objectProperty(\\"d\\", o), tscc_goog_reflect_injected.objectProperty(\\"foo\\", o)]);
+function A(a, _a) {
+    var b = _a.b, c = _a.c, d = tslib_1.__rest(_a, [tscc_goog_reflect_injected.objectProperty(\\"b\\", _a), tscc_goog_reflect_injected.objectProperty(\\"c\\", _a)]);
+    console.log(d);
+}
 // From what's new in Typescript 2.1
 (function () {
     var original = { a: {}, b: {}, c: {} };
@@ -205,6 +209,10 @@ var o = (_a = {
     _a[Math.random() > .5 ? \\"foo\\" : \\"bar\\"] = {},
     _a);
 var a = o.a, c = o.c, d = o.d, foo = o.foo, rest = tslib_1.__rest(o, [tscc_goog_reflect_injected.objectProperty(\\"a\\", o), tscc_goog_reflect_injected.objectProperty(\\"c\\", o), tscc_goog_reflect_injected.objectProperty(\\"d\\", o), tscc_goog_reflect_injected.objectProperty(\\"foo\\", o)]);
+function A(a, _a) {
+    var b = _a.b, c = _a.c, d = tslib_1.__rest(_a, [tscc_goog_reflect_injected.objectProperty(\\"b\\", _a), tscc_goog_reflect_injected.objectProperty(\\"c\\", _a)]);
+    console.log(d);
+}
 // From what's new in Typescript 2.1
 (function () {
     var original = { a: {}, b: {}, c: {} };
@@ -240,6 +248,10 @@ var o = {
     [Math.random() > .5 ? \\"foo\\" : \\"bar\\"]: {}
 };
 var { a, c, d, foo } = o, rest = tslib_1.__rest(o, [tscc_goog_reflect_injected.objectProperty(\\"a\\", o), tscc_goog_reflect_injected.objectProperty(\\"c\\", o), tscc_goog_reflect_injected.objectProperty(\\"d\\", o), tscc_goog_reflect_injected.objectProperty(\\"foo\\", o)]);
+function A(a, _a) {
+    var { b, c } = _a, d = tslib_1.__rest(_a, [tscc_goog_reflect_injected.objectProperty(\\"b\\", _a), tscc_goog_reflect_injected.objectProperty(\\"c\\", _a)]);
+    console.log(d);
+}
 // From what's new in Typescript 2.1
 (function () {
     var original = { a: {}, b: {}, c: {} };
