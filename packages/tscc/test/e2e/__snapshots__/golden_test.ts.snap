@@ -77,3 +77,33 @@ exports[`tscc e2e case_4_external: case_4_external/a.js 1`] = `
 "var a=CollidesWithGlobalName;anExternalModule.a();window.this_should_survive=!0;a.b();
 "
 `;
+
+exports[`tscc e2e case_5_object_spread: case_5_object_spread 1`] = `
+Array [
+  "a.js",
+  "a.js.map",
+]
+`;
+
+exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js 1`] = `
+"/*
+ Copyright (c) Microsoft Corporation. All rights reserved.
+ Licensed under the Apache License, Version 2.0 (the \\"License\\"); you may not use
+ this file except in compliance with the License. You may obtain a copy of the
+ License at http://www.apache.org/licenses/LICENSE-2.0
+
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+ MERCHANTABLITY OR NON-INFRINGEMENT.
+
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+*/
+function h(a,b){var e={},c;for(c in a)Object.prototype.hasOwnProperty.call(a,c)&&0>b.indexOf(c)&&(e[c]=a[c]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(c=Object.getOwnPropertySymbols(a);f<c.length;f++)0>b.indexOf(c[f])&&(e[c[f]]=a[c[f]])}return e};function k(){}k.prototype.b=function(a,b){a=b.a;h(b,[\\"a\\"]);b=h(a,[\\"d\\"]);console.log(b)};
+(function(a,b,e,c){var f=arguments.length,g=3>f?b:null===c?c=Object.getOwnPropertyDescriptor(b,e):c,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,b,e,c);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(b,e,g):l(b,e))||g;return 3<f&&g&&Object.defineProperty(b,e,g),g})([function(a,b,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"b\\",null);(new k).b({},{a:{c:{},d:{}},e:{},g:{},h:{}});var n={f:{},a:{},c:{}},p=h(n,[\\"c\\"]);
+window.d=p;
+"
+`;
+
+exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js.map 1`] = `"{\\"version\\":3,\\"sources\\":[\\"../../../../third_party/tsickle/third_party/tslib/tslib.js\\",\\"a.ts\\"],\\"names\\":[\\"exports.__rest\\",\\"s\\",\\"e\\",\\"t\\",\\"p\\",\\"Object\\",\\"prototype\\",\\"hasOwnProperty\\",\\"call\\",\\"indexOf\\",\\"getOwnPropertySymbols\\",\\"i\\",\\"length\\",\\"A\\",\\"myMethod\\",\\"exports.__decorate\\",\\"decorators\\",\\"target\\",\\"key\\",\\"desc\\",\\"c\\",\\"arguments\\",\\"r\\",\\"getOwnPropertyDescriptor\\",\\"d\\",\\"Reflect\\",\\"defineProperty\\",\\"myDecorator\\",\\"prop\\",\\"rest\\",\\"module$exports$tslib.__rest\\",\\"console\\",\\"log\\",\\"value\\",\\"window\\",\\"_a\\",\\"a\\",\\"b\\"],\\"mappings\\":\\"A;;;;;;;;;;;;;;AAuDiBA,QAAA,EAAS,CAACC,CAAD,CAAIC,CAAJ,CAAO,CAC7B,IAAIC,EAAI,EAAR,CACSC,CAAT,KAASA,CAAT,GAAcH,EAAd,CAAqBI,MAAAC,UAAAC,eAAAC,KAAA,CAAqCP,CAArC,CAAwCG,CAAxC,CAAJ,EAAiE,CAAjE,CAAkDF,CAAAO,QAAA,CAAUL,CAAV,CAAlD,GACbD,CAAA,CAAEC,CAAF,CADa,CACNH,CAAA,CAAEG,CAAF,CADM,CAEjB,IAAS,IAAT,EAAIH,CAAJ,EAAyD,UAAzD,GAAiB,MAAOI,OAAAK,sBAAxB,CACI,CAAA,IAASC,EAAI,CAAb,KAAgBP,CAAhB,CAAoBC,MAAAK,sBAAA,CAA6BT,CAA7B,CAApB,CAAqDU,CAArD,CAAyDP,CAAAQ,OAAzD,CAAmED,CAAA,EAAnE,CAA8F,CAAtB,CAAIT,CAAAO,QAAA,CAAUL,CAAA,CAAEO,CAAF,CAAV,CAAJ,GACpER,CAAA,CAAEC,CAAA,CAAEO,CAAF,CAAF,CADoE,CAC1DV,CAAA,CAAEG,CAAA,CAAEO,CAAF,CAAF,CAD0D,CAAxE,CAEJ,MAAOR,EAPsB,C,CCjDjC,QAAMU,EAAN,EAAA,EAEQ,CAAA,UAAA,EAAAC,CAAAA,QAAQ,EAAA,EDiEKC,UAAS,CAACC,CAAD,CAAaC,CAAb,CAAqBC,CAArB,CAA0BC,CAA1B,CAAgC,CAAA,IACtDC,EAAIC,SAAAT,OADkD,CAChCU,EAAQ,CAAJ,CAAAF,CAAA,CAAQH,CAAR,CAA0B,IAAT,GAAAE,CAAA,CAAgBA,CAAhB,CAAuBd,MAAAkB,yBAAA,CAAgCN,CAAhC,CAAwCC,CAAxC,CAAvB,CAAsEC,CAD3D,CACiEK,CAG3H,IAAuB,QAAvB,GAAI,MAAOC,QAAX,EAAmCA,OAAnC,EAA6E,UAA7E,GAA8C,MAAOA,QAAA,SAArD,CAAyFH,CAAA,CAAIG,OAAA,SAAA,CAAoBT,CAApB,CAAgCC,CAAhC,CAAwCC,CAAxC,CAA6CC,CAA7C,CAA7F,KACK,KAAK,IAAIR,EAAIK,CAAAJ,OAAJD,CAAwB,CAAjC,CAAyC,CAAzC,EAAoCA,CAApC,CAA4CA,CAAA,EAA5C,CAAiD,GAAIa,CAAJ,CAAQR,CAAA,CAAWL,CAAX,CAAR,CAAuBW,CAAA,EAAS,CAAJ,CAAAF,CAAA,CAAQI,CAAA,CAAEF,CAAF,CAAR,CAAmB,CAAJ,CAAAF,CAAA,CAAQI,CAAA,CAAEP,CAAF,CAAUC,CAAV,CAAeI,CAAf,CAAR,CAA4BE,CAAA,CAAEP,CAAF,CAAUC,CAAV,CAAhD,GAAmEI,CAChJ,OAAW,EAAJ,CAAAF,CAAA,EAASE,CAAT,EAAcjB,MAAAqB,eAAA,CAAsBT,CAAtB,CAA8BC,CAA9B,CAAmCI,CAAnC,CAAd,CAAqDA,CANF,CAAzCP,CChEpB,CAAA,CATDY,QAAoB,CAACV,CAAD,CAASW,CAAT,CAAeT,CAAf,CAAmB,CAC1BU,CAAAA,CAAAC,CAAA,CAAAX,CAAA,CAAA,CAAA,OAAA,CAAA,CACZY,QAAAC,IAAA,CAAYH,CAAZ,CACAV,EAAAc,MAAA,CAAa,EAHyB,CAStC,CAAA,CAFYpB,CAAAP,UAEZ,CAFY,GAEZ,CAFY,IAEZ,CAGD4B,OAAA,EAAA,CAAc,IAAA,EAAa;IACrBC,EAAA,CAAAC,EAAA,EAAA,CAAAC,EAAA,EAAA,CAAAjB,EAAA,EAAA,CADqB,CACjBS,EAAAC,CAAA,CAAAK,CAAA,CAAA,CAAA,GAAA,CAAA,CACVD,OAAA,EAAA,CAAcL\\",\\"file\\":\\".tscc_temp/case_5_object_spread/a.js\\"}"`;

@@ -17,6 +17,7 @@ import spawnCompiler from './spawn_compiler';
 import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
 import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
 import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer';
+import restPropertyTransformer from './transformer/restPropertyTransformer';
 import {getExternsForExternalModules, getGluingModules} from './external_module_support';
 import fs = require('fs');
 import path = require('path');
@@ -123,7 +124,7 @@ export default async function tscc(
 	const result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
 		afterTs: [
 			decoratorPropertyTransformer(transformerHost),
-			//externalModuleTransformer(tsccSpec, transformerHost, program.getTypeChecker())
+			restPropertyTransformer(transformerHost)
 		]
 	});
 	// If tsickle errors, print diagnostics and exit.
