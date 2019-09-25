@@ -77,3 +77,30 @@ exports[`tscc e2e case_4_external: case_4_external/a.js 1`] = `
 "var a=CollidesWithGlobalName;anExternalModule.a();window.this_should_survive=!0;a.b();
 "
 `;
+
+exports[`tscc e2e case_5_object_spread: case_5_object_spread 1`] = `
+Array [
+  "a.js",
+]
+`;
+
+exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js 1`] = `
+"/*
+ Copyright (c) Microsoft Corporation. All rights reserved.
+ Licensed under the Apache License, Version 2.0 (the \\"License\\"); you may not use
+ this file except in compliance with the License. You may obtain a copy of the
+ License at http://www.apache.org/licenses/LICENSE-2.0
+
+ THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+ MERCHANTABLITY OR NON-INFRINGEMENT.
+
+ See the Apache Version 2.0 License for specific language governing permissions
+ and limitations under the License.
+*/
+function h(a,b){var e={},c;for(c in a)Object.prototype.hasOwnProperty.call(a,c)&&0>b.indexOf(c)&&(e[c]=a[c]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(c=Object.getOwnPropertySymbols(a);f<c.length;f++)0>b.indexOf(c[f])&&(e[c[f]]=a[c[f]])}return e};function k(){}k.prototype.b=function(a,b){a=b.a;h(b,[\\"a\\"]);b=h(a,[\\"d\\"]);console.log(b)};
+(function(a,b,e,c){var f=arguments.length,g=3>f?b:null===c?c=Object.getOwnPropertyDescriptor(b,e):c,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,b,e,c);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(b,e,g):l(b,e))||g;return 3<f&&g&&Object.defineProperty(b,e,g),g})([function(a,b,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"b\\",null);(new k).b({},{a:{c:{},d:{}},e:{},g:{},h:{}});var n={f:{},a:{},c:{}},p=h(n,[\\"c\\"]);
+window.d=p;
+"
+`;
