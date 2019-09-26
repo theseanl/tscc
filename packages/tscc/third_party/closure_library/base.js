@@ -169,7 +169,7 @@ goog.exportPath_ = function(name, opt_object, opt_objectToExportTo) {
   }
 
   for (var part; parts.length && (part = parts.shift());) {
-    if (!parts.length && goog.isDef(opt_object)) {
+    if (!parts.length && opt_object !== undefined) {
       // last part and we have an object; use it
       cur[part] = opt_object;
     } else if (cur[part] && cur[part] !== Object.prototype[part]) {
@@ -478,7 +478,7 @@ goog.VALID_MODULE_RE_ = /^[a-zA-Z_$][a-zA-Z0-9._$]*$/;
  * @return {void}
  */
 goog.module = function(name) {
-  if (!goog.isString(name) || !name ||
+  if (typeof name !== 'string' || !name ||
       name.search(goog.VALID_MODULE_RE_) == -1) {
     throw new Error('Invalid module identifier');
   }
@@ -519,7 +519,6 @@ goog.module = function(name) {
  * @suppress {missingProvide}
  */
 goog.module.get = function(name) {
-
   return goog.module.getInternal_(name);
 };
 
@@ -746,8 +745,7 @@ if (!COMPILED) {
    */
   goog.isProvided_ = function(name) {
     return (name in goog.loadedModules_) ||
-        (!goog.implicitNamespaces_[name] &&
-         goog.isDefAndNotNull(goog.getObjectByName(name)));
+        (!goog.implicitNamespaces_[name] && goog.getObjectByName(name) != null);
   };
 
   /**
@@ -783,7 +781,7 @@ goog.getObjectByName = function(name, opt_obj) {
   var cur = opt_obj || goog.global;
   for (var i = 0; i < parts.length; i++) {
     cur = cur[parts[i]];
-    if (!goog.isDefAndNotNull(cur)) {
+    if (cur == null) {
       return null;
     }
   }
@@ -988,6 +986,9 @@ goog.nullFunction = function() {};
  *
  * @type {!Function}
  * @throws {Error} when invoked to indicate the method should be overridden.
+ * @deprecated Use "@abstract" annotation instead of goog.abstractMethod in new
+ *     code. See
+ *     https://github.com/google/closure-compiler/wiki/@abstract-classes-and-methods
  */
 goog.abstractMethod = function() {
   throw new Error('unimplemented abstract method');
@@ -1174,7 +1175,7 @@ goog.loadModule = function(moduleDef) {
     var exports;
     if (goog.isFunction(moduleDef)) {
       exports = moduleDef.call(undefined, {});
-    } else if (goog.isString(moduleDef)) {
+    } else if (typeof moduleDef === 'string') {
       if (goog.useSafari10Workaround()) {
         moduleDef = goog.workaroundSafari10EvalBug(moduleDef);
       }
@@ -1185,7 +1186,7 @@ goog.loadModule = function(moduleDef) {
     }
 
     var moduleName = goog.moduleLoaderState_.moduleName;
-    if (goog.isString(moduleName) && moduleName) {
+    if (typeof moduleName === 'string' && moduleName) {
       // Don't seal legacy namespaces as they may be used as a parent of
       // another namespace
       if (goog.moduleLoaderState_.declareLegacyNamespace) {
@@ -1778,8 +1779,16 @@ goog.partial = function(fn, var_args) {
  * Copies all the members of a source object to a target object. This method
  * does not work on all browsers for all objects that contain keys such as
  * toString or hasOwnProperty. Use goog.object.extend for this purpose.
+ *
+ * NOTE: Some have advocated for the use of goog.mixin to setup classes
+ * with multiple inheritence (traits, mixins, etc).  However, as it simply
+ * uses "for in", this is not compatible with ES6 classes whose methods are
+ * non-enumerable.  Changing this, would break cases where non-enumerable
+ * properties are not expected.
+ *
  * @param {Object} target Target.
  * @param {Object} source Source.
+ * @deprecated Prefer Object.assign
  */
 goog.mixin = function(target, source) {
   for (var x in source) {
@@ -1797,6 +1806,7 @@ goog.mixin = function(target, source) {
 /**
  * @return {number} An integer value representing the number of milliseconds
  *     between midnight, January 1, 1970 and the current time.
+ * @deprecated Use Date.now
  */
 goog.now = (goog.TRUSTED_SITE && Date.now) || (function() {
              // Unary plus operator converts its operand to a number which in
@@ -1841,7 +1851,7 @@ goog.globalEval = function(script) {
       /** @type {!Document} */
       var doc = goog.global.document;
       var scriptElt =
-          /** @type {!HTMLScriptElement} */ (doc.createElement('SCRIPT'));
+          /** @type {!HTMLScriptElement} */ (doc.createElement('script'));
       scriptElt.type = 'text/javascript';
       scriptElt.defer = false;
       // Note(user): can't use .innerHTML since "t('<test>')" will fail and
@@ -2542,9 +2552,9 @@ if (!COMPILED && goog.DEPENDENCIES_ENABLED) {
    * @private
    */
   goog.findBasePath_ = function() {
-    if (goog.isDef(goog.global.CLOSURE_BASE_PATH) &&
+    if (goog.global.CLOSURE_BASE_PATH != undefined &&
         // Anti DOM-clobbering runtime check (b/37736576).
-        goog.isString(goog.global.CLOSURE_BASE_PATH)) {
+        typeof goog.global.CLOSURE_BASE_PATH === 'string') {
       goog.basePath = goog.global.CLOSURE_BASE_PATH;
       return;
     } else if (!goog.inHtmlDocument_()) {
@@ -3954,7 +3964,7 @@ if (!COMPILED && goog.DEPENDENCIES_ENABLED) {
       contents = this.transpiler_.transpile(contents, this.getPathName());
     }
 
-    if (!goog.LOAD_MODULE_USING_EVAL || !goog.isDef(goog.global.JSON)) {
+    if (!goog.LOAD_MODULE_USING_EVAL || goog.global.JSON === undefined) {
       return '' +
           'goog.loadModule(function(exports) {' +
           '"use strict";' + contents +
@@ -4147,7 +4157,9 @@ goog.identity_ = function(s) {
  */
 goog.createTrustedTypesPolicy = function(name) {
   var policy = null;
-  if (typeof TrustedTypes === 'undefined' || !TrustedTypes.createPolicy) {
+  // TODO(koto): Remove window.TrustedTypes variant when the newer API ships.
+  var policyFactory = goog.global.trustedTypes || goog.global.TrustedTypes;
+  if (!policyFactory || !policyFactory.createPolicy) {
     return policy;
   }
   // TrustedTypes.createPolicy throws if called with a name that is already
@@ -4156,7 +4168,7 @@ goog.createTrustedTypesPolicy = function(name) {
   // will fall back to using regular Safe Types.
   // TODO(koto): Remove catching once createPolicy API stops throwing.
   try {
-    policy = TrustedTypes.createPolicy(name, {
+    policy = policyFactory.createPolicy(name, {
       createHTML: goog.identity_,
       createScript: goog.identity_,
       createScriptURL: goog.identity_,
