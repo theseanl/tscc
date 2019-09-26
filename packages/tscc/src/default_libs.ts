@@ -20,7 +20,9 @@ function resolveTSCCAssets(relPath: string, projectRoot: string): string {
 	return path.resolve(__dirname, '..', relPath);
 }
 
-const tsLibDir = 'third_party/tsickle/third_party/tslib';
+const tsickleDir = 'third_party/tsickle';
+const tsickleExternsPath = path.join(tsickleDir, 'closure_externs.js');
+const tsLibDir = path.join(tsickleDir, 'third_party/tslib');
 const tsLibPath = path.join(tsLibDir, 'tslib.js');
 const tslibExternsPath = path.join(tsLibDir, 'externs.js');
 
@@ -35,7 +37,8 @@ export default function (projectRoot: string) {
 		{id: "goog.reflect", path: resolveTSCCAssets(googReflectPath, projectRoot)}
 	];
 	const externs = [
-		resolveTSCCAssets(tslibExternsPath, projectRoot)
+		resolveTSCCAssets(tslibExternsPath, projectRoot),
+		resolveTSCCAssets(tsickleExternsPath, projectRoot)
 	]
 	return {libs, externs};
 }
