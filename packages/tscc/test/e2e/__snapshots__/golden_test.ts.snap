@@ -99,8 +99,8 @@ exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js 1`] = `
  See the Apache Version 2.0 License for specific language governing permissions
  and limitations under the License.
 */
-function h(a,b){var e={},c;for(c in a)Object.prototype.hasOwnProperty.call(a,c)&&0>b.indexOf(c)&&(e[c]=a[c]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(c=Object.getOwnPropertySymbols(a);f<c.length;f++)0>b.indexOf(c[f])&&(e[c[f]]=a[c[f]])}return e};function k(){}k.prototype.b=function(a,b){a=b.a;h(b,[\\"a\\"]);b=h(a,[\\"d\\"]);console.log(b)};
-(function(a,b,e,c){var f=arguments.length,g=3>f?b:null===c?c=Object.getOwnPropertyDescriptor(b,e):c,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,b,e,c);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(b,e,g):l(b,e))||g;return 3<f&&g&&Object.defineProperty(b,e,g),g})([function(a,b,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"b\\",null);(new k).b({},{a:{c:{},d:{}},e:{},g:{},h:{}});var n={f:{},a:{},c:{}},p=h(n,[\\"c\\"]);
+function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};function k(){}k.prototype.b=function(a,c){a=c.a;h(c,[\\"a\\"]);c=h(a,[\\"d\\"]);console.log(c)};
+(function(a,c,e,b){var f=arguments.length,g=3>f?c:null===b?b=Object.getOwnPropertyDescriptor(c,e):b,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,c,e,b);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(c,e,g):l(c,e))||g;return 3<f&&g&&Object.defineProperty(c,e,g),g})([function(a,c,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"b\\",null);(new k).b({},{a:{c:{},d:{}},e:{},g:{},h:{}});var n={f:{},a:{},c:{}},p=h(n,[\\"c\\"]);
 window.d=p;
 "
 `;

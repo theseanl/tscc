@@ -1,4 +1,4 @@
-.PHONY: fetch_tslib clean fetch_closure_lib
+.PHONY: fetch_tslib clean fetch_closure_lib fetch_tsickle_externs
 
 all: $(shell find dist) fetch_tslib
 
@@ -21,6 +21,8 @@ fetch_closure_lib:
 fetch_tsickle_externs:
 	${WGET} ${GH_USER_CONTENT}angular/tsickle/master/src/closure_externs.js \
 		-O ${THIRD_PARTY}tsickle/closure_externs.js
+
+upd_3rd_party: fetch_tslib fetch_tsickle_externs fetch_closure_lib
 
 local_install: $(shell find dist) 
 	npm i -g .
