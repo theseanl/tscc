@@ -156,22 +156,6 @@ export default async function tscc(
 		const ccLogger = new Logger(chalk.redBright("ClosureCompiler: "), process.stderr);
 		ccLogger.startTask("Closure Compiler");
 
-		const onCompilerProcessClose = (code) => {
-			if (code === 0) {
-				ccLogger.succeed();
-				ccLogger.unstick();
-				tsccLogger.log(`Compilation success.`)
-				if (tsccSpec.debug().persistArtifacts) {
-					tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
-				}
-			} else {
-				ccLogger.fail(`Closure compiler error`);
-				ccLogger.unstick();
-				ccLogger.log(`Exited with code ${code}.`);
-				reject(new CcError(String(code)));
-			}
-		};
-
 		const compilerProcess = spawnCompiler([
 			...tsccSpec.getBaseCompilerFlags(),
 			...flags,
@@ -179,6 +163,29 @@ export default async function tscc(
 			'--externs', externPath,
 			...riffle('--externs', defaultLibsProvider.externs)
 		], ccLogger, onCompilerProcessClose, tsccSpec.debug().persistArtifacts);
+
+		// Checks whether the compiler process streamed any data to stdout. 
+		// If not, the end of process is the end of the compilation, no 'end' emit
+		// event will be fired from above streams.
+		let compilerProcessStreamedAnyData = false;
+		compilerProcess.stdout.on('data', () => {compilerProcessStreamedAnyData = true;})
+
+		function onCompilerProcessClose(code) {
+			if (code === 0) {
+				ccLogger.succeed();
+				ccLogger.unstick();
+				tsccLogger.log(`Compilation success.`)
+				if (tsccSpec.debug().persistArtifacts) {
+					tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
+				}
+				if (!compilerProcessStreamedAnyData) resolve();
+			} else {
+				ccLogger.fail(`Closure compiler error`);
+				ccLogger.unstick();
+				ccLogger.log(`Exited with code ${code}.`);
+				reject(new CcError(String(code)));
+			}
+		};
 
 		stdInStream
 			.pipe(compilerProcess.stdin);
@@ -191,7 +198,8 @@ export default async function tscc(
 			.pipe(new ClosureJsonToVinyl(useSourceMap, tsccLogger))
 			.pipe(new RemoveTempGlobalAssignments(tsccLogger))
 			.pipe(vfs.dest('.', {sourcemaps: '.'})) // Can we remove dependency on vinyl-fs?
-			.on('end', resolve)
+			.on('end', resolve);
+
 	});
 }
 
