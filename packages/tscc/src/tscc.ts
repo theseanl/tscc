@@ -237,7 +237,10 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 		// On the contrary, "file" property of sourcemaps are relative path from ts project root.
 		// For consistency, we convert absolute paths here to path relative to ts project root.
 		if (spec.debug().persistArtifacts) {
-			fsExtra.outputFileSync(path.join(tempFileDir, filePath), contents);
+			// filePath may contain colons which are not allowed in the middle of a path
+			// such colons are a part of 'root', we are merely stripping it out.
+			let filePathMinusRoot = filePath.substring(path.parse(filePath).root.length);
+			fsExtra.outputFileSync(path.join(tempFileDir, filePathMinusRoot), contents);
 		}
 		switch (path.extname(filePath)) {
 			case '.js': {
