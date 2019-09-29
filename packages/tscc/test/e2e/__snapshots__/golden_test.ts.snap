@@ -104,3 +104,20 @@ function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&
 window.d=p;
 "
 `;
+
+exports[`tscc e2e case_6_type_only_references: case_6_type_only_references 1`] = `
+Array [
+  "1.js",
+  "2.js",
+]
+`;
+
+exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/1.js 1`] = `
+"window.b=function(c){c({a:function(){}})};
+"
+`;
+
+exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/2.js 1`] = `
+"function a(){}a.prototype.a=function(){console.log(\\"boo\\")};(new a).a();
+"
+`;

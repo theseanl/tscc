@@ -8,8 +8,8 @@ describe("sourceNodeFactory", function () {
 		const node = await sourceNodeFactory(sample("goog_module.js"));
 		expect(node.fileName).toBe(sample("goog_module.js"));
 		expect(node.provides).toEqual(["this.is.a.goog.module"]);
-		expect(node.required.sort()).toEqual(["another.module", "goog"]);
-		expect(node.forwardDeclared.sort()).toEqual(["another.module", "type.only.module"]);
+		expect(node.required.slice().sort()).toEqual(["another.module", "goog"]);
+		expect(node.forwardDeclared.slice().sort()).toEqual(["another.module", "type.only.module"]);
 	})
 })
 
@@ -18,8 +18,8 @@ describe("sourceNodeFactoryFromContent", function () {
 		const node = sourceNodeFactoryFromContent(sample("goog_module.js"), readSample("goog_module.js"));
 		expect(node.fileName).toBe(sample("goog_module.js"));
 		expect(node.provides).toEqual(["this.is.a.goog.module"]);
-		expect(node.required.sort()).toEqual(["another.module", "goog"]);
-		expect(node.forwardDeclared.sort()).toEqual(["another.module", "type.only.module"]);
+		expect(node.required.slice().sort()).toEqual(["another.module", "goog"]);
+		expect(node.forwardDeclared.slice().sort()).toEqual(["another.module", "type.only.module"]);
 	});
 	test(`produces goog base from @provideGoog`, function () {
 		const content1 = `

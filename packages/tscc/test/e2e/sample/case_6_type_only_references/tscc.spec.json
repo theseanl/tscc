@@ -1,0 +1,10 @@
+{
+	"modules": {
+		"1": "./c.ts",
+		"2": {
+			"entry": "./d.ts",
+			"dependencies": ["1"]
+		}
+	},
+	"prefix": ".tscc_temp/case_6_type_only_references/"
+}

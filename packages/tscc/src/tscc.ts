@@ -278,7 +278,7 @@ function pushToStream(stream: stream.Readable, ...args: string[]) {
 }
 
 function pushTsickleOutputToStream(
-	src: string[], // file names, ordered to be pushed to compiler sequentially
+	src: ReadonlyArray<string>, // file names, ordered to be pushed to compiler sequentially
 	tsccSpec: ITsccSpecWithTS,
 	tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJson>,
 	stdInStream: stream.Readable,

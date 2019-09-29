@@ -31,7 +31,7 @@ export default class ClosureDependencyGraph {
 			} else throw e;
 		}
 	}
-	private addSourceNode(sourceNode: ISourceNode) {
+	addSourceNode(sourceNode: ISourceNode) {
 		// Raise error on duplicate module names.
 		for (let provided of sourceNode.provides) {
 			if (this.moduleNameToNode.has(provided)) {
@@ -74,7 +74,8 @@ export default class ClosureDependencyGraph {
 	// Walks the graph, marking type-required nodes and required nodes
 	// (with DepsSorter#forwardDeclared, DepsSorter#required Sets)
 	// required-marker has precedence over type-required-marker.
-	private *getReferencedNode(node: string | ISourceNode): IterableIterator<ISourceNode> {
+	// yields sources which are required by the source it is called with.
+	private *getRequiredNodes(node: string | ISourceNode): IterableIterator<ISourceNode> {
 		if (typeof node === 'string') {
 			node = this.getSourceNode(node);
 		}
@@ -89,29 +90,41 @@ export default class ClosureDependencyGraph {
 
 		yield node;
 
+		// TODO perf improvement: do not visit forwardDeclared nodes which are known to be required.
 		for (let forwardDeclared of node.forwardDeclared) {
 			let fwdNode = this.getSourceNode(forwardDeclared);
-			if (!this.required.has(fwdNode)) {
-				this.forwardDeclared.add(fwdNode);
-			}
+			// Mark this node and its transitive dependencies as 'forwardDeclare'd.
+			this.walkTypeRequiredNodes(fwdNode);
 		}
 
 		for (let required of node.required) {
 			let reqNode = this.getSourceNode(required);
-			yield* this.getReferencedNode(reqNode);
+			yield* this.getRequiredNodes(reqNode);
 		}
 	}
+	// Walks the graph marking required/type-required nodes as forwardDeclared.
+	private walkTypeRequiredNodes(node: ISourceNode): IterableIterator<ISourceNode> {
+		if (this.forwardDeclared.has(node) || this.required.has(node)) return;
+
+		this.forwardDeclared.add(node);
+
+		for (let forwardDeclared of node.forwardDeclared) {
+			let fwdNode = this.getSourceNode(forwardDeclared);
+			this.walkTypeRequiredNodes(fwdNode);
+		}
+	}
+
 	private static getFileName(sourceNode: ISourceNode) {
 		return sourceNode.fileName;
 	}
-	getSortedFilesAndFlags(entryPoints: INamedModuleSpecsWithId[]): {src: string[], flags: string[]} {
+	getSortedFilesAndFlags(entryPoints: Omit<INamedModuleSpecsWithId, 'entry'>[]):IFilesAndFlags {
 		let sortedFileNames = entryPoints.map(entryPoint => {
 			let deps: string[];
 			if (entryPoint.moduleId === null) {
 				// For empty chunks included to allow code motion moving into it
 				deps = [];
 			} else {
-				deps = [...this.getReferencedNode(entryPoint.moduleId)].map(ClosureDependencyGraph.getFileName);
+				deps = [...this.getRequiredNodes(entryPoint.moduleId)].map(ClosureDependencyGraph.getFileName);
 			}
 			if (entryPoint.extraSources) {
 				deps.push(...entryPoint.extraSources);
@@ -138,6 +151,11 @@ export default class ClosureDependencyGraph {
 
 		return {src: flatten(sortedFileNames), flags}
 	}
+}
+
+interface IFilesAndFlags {
+	readonly src: ReadonlyArray<string>,
+	readonly flags: ReadonlyArray<string>
 }
 
 export class ClosureDepsError extends Error {};
