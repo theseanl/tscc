@@ -58,7 +58,11 @@ export default class Logger {
 		this.spinner = ora({
 			text,
 			stream: this.out,
-			spinner: "dots12"
+			spinner: "dots12",
+			// See https://github.com/theseanl/tscc/issues/70
+			// If this option is not set, it can lead to very strange behaviors.
+			// 'discarding stdin' does it by overriding globals and it is badly done. 
+			discardStdin: false
 		});
 		this.spinner.start();
 		const start = Date.now();

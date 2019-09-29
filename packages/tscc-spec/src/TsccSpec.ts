@@ -28,8 +28,14 @@ function hasSpecFileKey(json: IInputTsccSpecJSON): json is IInputTsccSpecJSONWit
 
 export default class TsccSpec implements ITsccSpec {
 	protected static readonly SPEC_FILE = 'tscc.spec.json';
-	private static readonly RE_DOT_PATH = /^[\.]{1,2}\//;
-	private static isDotPath(p:string) { return TsccSpec.RE_DOT_PATH.test(p); }
+
+	private static PATH_SEP = '[\\\/' +
+		(path.sep === '/' ? '' : '\\\\') + // backword-slashes are path separators in win32
+		']';
+	private static readonly RE_DOT_PATH = new RegExp('^[\\.]{1,2}' + TsccSpec.PATH_SEP);
+	private static readonly RE_ENDS_WITH_SEP = new RegExp(TsccSpec.PATH_SEP + '$');
+	private static isDotPath(p: string) {return TsccSpec.RE_DOT_PATH.test(p);}
+	private static endsWithSep(p:string){return TsccSpec.RE_ENDS_WITH_SEP.test(p);}
 	/**
 	 * Follows the behavior of Typescript CLI.
 	 * 1. If --project argument is supplied,
@@ -186,9 +192,9 @@ export default class TsccSpec implements ITsccSpec {
 	 *  in closure compiler's 'chunk_output_path_prefix' option.
 	 */
 	protected absolute(filePath: string): string {
-		if (path.isAbsolute(filePath)) return filePath;
+		if (path.isAbsolute(filePath)) return path.normalize(filePath);
 		// Special handling for '' - treat it as if it ends with a separator
-		let endsWithSep = filePath.endsWith(path.sep) || filePath.length === 0;
+		let endsWithSep = TsccSpec.endsWithSep(filePath) || filePath.length === 0;
 		let base = TsccSpec.isDotPath(filePath) ?
 			path.dirname(this.basePath) :
 			process.cwd();
