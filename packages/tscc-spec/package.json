@@ -8,6 +8,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "fast-glob": "^3.0.4"
+    "fast-glob": "^3.1.0"
   }
 }

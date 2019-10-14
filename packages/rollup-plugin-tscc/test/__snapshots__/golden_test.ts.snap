@@ -13,6 +13,7 @@ exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
 	}
 
 	var _ = ({
+		__proto__: null,
 		a: sort,
 		s: swap
 	});

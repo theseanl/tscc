@@ -33,35 +33,37 @@ describe(`mergeChunk`, function() {
 
 		expect(mergedChunk.name).toBe("entry");
 		expect(mergedChunk.code).toMatchInlineSnapshot(`
-										"var entry = (function (exports) {
-											'use strict';
+		"var entry = (function (exports) {
+			'use strict';
 
-											const a = 'c'; const b = 'd';
+			const a = 'c'; const b = 'd';
 
-											var chunk0 = ({
-												a: a,
-												b: b
-											});
+			var chunk0 = ({
+				__proto__: null,
+				a: a,
+				b: b
+			});
 
-											const a$1 = 'e'; const b$1 = 'f';
+			const a$1 = 'e'; const b$1 = 'f';
 
-											var chunk1 = ({
-												a: a$1,
-												b: b$1
-											});
+			var chunk1 = ({
+				__proto__: null,
+				a: a$1,
+				b: b$1
+			});
 
-											const a$2 = 'a'; const b$2 = 'b';
+			const a$2 = 'a'; const b$2 = 'b';
 
-											exports.$0 = chunk0;
-											exports.$1 = chunk1;
-											exports.a = a$2;
-											exports.b = b$2;
+			exports.$0 = chunk0;
+			exports.$1 = chunk1;
+			exports.a = a$2;
+			exports.b = b$2;
 
-											return exports;
+			return exports;
 
-										}({}));
-										"
-					`);
+		}({}));
+		"
+	`);
 		expect(mergedChunk.exports).toEqual(["$0", "$1", "a", "b"]);
 		expect(mergedChunk.fileName).toBe(entry);
 	});
@@ -94,36 +96,38 @@ describe(`mergeChunk`, function() {
 
 		expect(mergedChunk.name).toBe("entry");
 		expect(mergedChunk.code).toMatchInlineSnapshot(`
-								"var entry = (function (exports) {
-									'use strict';
+		"var entry = (function (exports) {
+			'use strict';
 
-									const a = 'e'; const b = 'f';
+			const a = 'e'; const b = 'f';
 
-									var chunk1 = ({
-										a: a,
-										b: b
-									});
+			var chunk1 = ({
+				__proto__: null,
+				a: a,
+				b: b
+			});
 
-									const a$1 = 'c'; const b$1 = b;
+			const a$1 = 'c'; const b$1 = b;
 
-									var chunk0 = ({
-										a: a$1,
-										b: b$1
-									});
+			var chunk0 = ({
+				__proto__: null,
+				a: a$1,
+				b: b$1
+			});
 
-									const a$2 = a$1; const b$2 = 'b'; const $0 = 'c';
+			const a$2 = a$1; const b$2 = 'b'; const $0 = 'c';
 
-									exports.$0 = $0;
-									exports.$1 = chunk0;
-									exports.$2 = chunk1;
-									exports.a = a$2;
-									exports.b = b$2;
+			exports.$0 = $0;
+			exports.$1 = chunk0;
+			exports.$2 = chunk1;
+			exports.a = a$2;
+			exports.b = b$2;
 
-									return exports;
+			return exports;
 
-								}({}));
-								"
-				`);
+		}({}));
+		"
+	`);
 		expect(mergedChunk.exports).toEqual(["$0", "$1", "$2", "a", "b"]);
 		expect(mergedChunk.fileName).toBe(entry);
 	});
@@ -199,6 +203,7 @@ describe(`mergeChunk`, function() {
 			const a = 'c'; const b = 'd';
 
 			var chunk0 = ({
+				__proto__: null,
 				a: a,
 				b: b,
 				c: chunk2_js.a
@@ -207,6 +212,7 @@ describe(`mergeChunk`, function() {
 			const a$1 = 'e'; const b$1 = 'f';
 
 			var chunk1 = ({
+				__proto__: null,
 				a: a$1,
 				b: b$1
 			});
@@ -232,6 +238,7 @@ describe(`mergeChunk`, function() {
 			const a = 'm'; const b = 'n';
 
 			var chunk4 = ({
+				__proto__: null,
 				a: a,
 				b: b
 			});
@@ -239,6 +246,7 @@ describe(`mergeChunk`, function() {
 			const a$1 = 'i'; const b$1 = a;
 
 			var chunk2 = ({
+				__proto__: null,
 				a: a$1,
 				b: b$1
 			});
@@ -246,6 +254,7 @@ describe(`mergeChunk`, function() {
 			const a$2 = 'k'; const b$2 = 'l';
 
 			var chunk3 = ({
+				__proto__: null,
 				a: a$2,
 				b: b$2
 			});
