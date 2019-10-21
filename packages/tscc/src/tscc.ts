@@ -233,6 +233,9 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 		return fileName.slice(0, -ext.length) + '.js';
 	});
 	const writeFile = (filePath: string, contents: string) => {
+		// Typescript calls writeFile with not normalized path. 'spec.getAbsoluteFileNamesSet' returns
+		// normalized paths. Fixes GH issue #81.
+		filePath = path.normalize(filePath);
 		// Typescript calls writeFileCallback with absolute path.
 		// On the contrary, "file" property of sourcemaps are relative path from ts project root.
 		// For consistency, we convert absolute paths here to path relative to ts project root.
