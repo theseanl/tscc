@@ -41,7 +41,7 @@ export default function computeChunkAllocation(
 
 	for (let chunkName of chunkMap.keys()) {
 		let infimum = leafGraph.getInfimum(chunkGraph.getLeafsOfNode(chunkName));
-		if (infimum === undefined) { throw new Error(`Cannot find a common root of a chunk`); }	
+		if (infimum === undefined) { throw new ChunkSortError(`Cannot find a common root of a chunk`); }
 		leafToDependents.add(infimum, chunkName);
 	}
 	for (let entry of entryMap.keys()) {
@@ -54,3 +54,4 @@ export default function computeChunkAllocation(
 	return leafToDependents;
 }
 
+export class ChunkSortError extends Error { }

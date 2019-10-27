@@ -2,9 +2,8 @@ import * as rollup from 'rollup';
 import {IInputTsccSpecJSON} from '@tscc/tscc-spec';
 import TsccSpecRollupFacade from './spec/TsccSpecRollupFacade';
 import ITsccSpecRollupFacade from './spec/ITsccSpecRollupFacade';
-import MultiMap from './MultiMap';
-import computeChunkAllocation from './sort_chunks';
-import mergeChunks from './merge_chunks';
+import computeChunkAllocation, {ChunkSortError} from './sort_chunks';
+import mergeChunks, {ChunkMergeError} from './merge_chunks';
 import path = require('path');
 
 const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
@@ -50,7 +49,9 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			return Promise.resolve('');
 		}
 	};
-	const generateBundle: rollup.Plugin["generateBundle"] = async (options, bundle, isWrite) => {
+	const generateBundle = handleError<rollup.Plugin["generateBundle"]>(async function (
+		this: rollup.PluginContext, options, bundle, isWrite
+	) {
 		// Quick path for single-module builds
 		if (spec.getOrderedModuleSpecs.length === 1) return;
 
@@ -83,13 +84,28 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			// 2. Add the merged bundle object
 			bundle[entry] = mergedBundle;
 		}));
-	};
+	});
 
 	return {name, generateBundle, options, outputOptions, resolveId, load};
 };
 
 function isChunk(output: rollup.OutputChunk | rollup.OutputAsset): output is rollup.OutputChunk {
 	return (output as rollup.OutputAsset).isAsset !== true;
+}
+
+function handleError<H extends (this: rollup.PluginContext, ..._: unknown[]) => unknown>(hook: H): H {
+	return <H>async function () {
+		try {
+			return await Reflect.apply(hook, this, arguments);
+		} catch (e) {
+			// Handle known type of errors
+			if (e instanceof ChunkSortError || e instanceof ChunkMergeError) {
+				this.error(e.message);
+			} else {
+				throw e;
+			}
+		}
+	}
 }
 
 export default pluginImpl;
