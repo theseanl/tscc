@@ -74,4 +74,20 @@ describe(`computeChunkAllocation`, function () {
 			"entry-2.js": ["chunk-2.js", "entry-2.js"]
 		});
 	})
+	test(`Does not drop entry points that are refrenced in no edge`, function () {
+		const entryDep = MultiMap.fromObject(({
+			"root.js": [],
+			"1.js": []
+		}));
+		const chunkDep = {
+			"root.js": [],
+			"1.js": ["root.js"]
+		};
+		const computedAlloc = MultiMap.toObject(computeChunkAllocation(chunkDep, entryDep));
+		expect(computedAlloc).toEqual({
+			"root.js": ["root.js"],
+			"1.js": ["1.js"]
+		});
+
+	})
 })

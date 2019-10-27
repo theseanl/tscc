@@ -62,6 +62,10 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		// Get chunk dependency from rollup.OutputBundle
 		const chunkDeps = {};
 		for (let [fileName, chunkInfo] of Object.entries(bundle)) {
+			// TODO This is a possible source of conflicts with other rollup plugins.
+			// Some plugins may add unexpected chunks. In general, it is not clear what TSCC should do
+			// in such cases. A safe way would be to strip out such chunks and deal only with chunks
+			// that are expected to be emitted. We may trim such chunks here.
 			if (!isChunk(chunkInfo)) continue;
 			chunkDeps[fileName] = [];
 			for (let imported of chunkInfo.imports) {

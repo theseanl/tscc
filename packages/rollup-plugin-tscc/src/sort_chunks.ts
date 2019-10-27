@@ -19,6 +19,9 @@ export default function computeChunkAllocation(
 	// ChunkGraph is a directed tree where there is an edge from module A to a module B 
 	// iff B imports A.
 	const chunkGraph = new DirectedTreeWithLeafs<string>();
+	for (let chunkName of chunkMap.keys()) {
+		chunkGraph.addNodeById(chunkName); // Make sure that chunks without dependencies get added
+	}
 	for (let [chunkName, importedName] of chunkMap) {
 		// Skip dependencies among entry modules
 		if (entryMap.findKey(chunkName) && entryMap.findKey(importedName)) continue;
