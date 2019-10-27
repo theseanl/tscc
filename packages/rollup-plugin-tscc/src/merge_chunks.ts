@@ -6,8 +6,9 @@ export default async function mergeChunks(
 	entry: string,
 	chunkAllocation: MultiMap<string, string>,
 	bundle: rollup.OutputBundle,
+	globals?: {[id: string]: string}
 ) {
-	return await new ChunkMerger(entry, chunkAllocation, bundle).getBundleOutput();
+	return await new ChunkMerger(entry, chunkAllocation, bundle, globals).getBundleOutput();
 }
 
 // Merge chunks to their allocated entry chunk.
@@ -23,8 +24,14 @@ class ChunkMerger {
 	constructor(
 		private entry: string,
 		private chunkAllocation: MultiMap<string, string>,
-		private bundle: Readonly<rollup.OutputBundle>
+		private bundle: Readonly<rollup.OutputBundle>,
+		private globals?: {[id: string]: string}
 	) {}
+	private resolveGlobalForMainBuild(id:string) {
+		if (typeof this.globals !== 'object') return;
+		if (!this.globals.hasOwnProperty(id)) return;
+		return this.globals[id];
+	}
 	private populateEntryModuleNamespaces() {
 		this.entryModuleNamespaces = new Map();
 		for (let entry of this.chunkAllocation.keys()) {
@@ -72,6 +79,7 @@ class ChunkMerger {
 		const {bundle} = this;
 		const resolveId: rollup.ResolveIdHook = (id, importer) => {
 			if (id === ChunkMerger.FACADE_MODULE_ID) return id;
+			if (this.resolveGlobalForMainBuild(id)) {return {id, external: true}}
 			if (this.chunkAllocation.find(this.entry, id)) return id;
 			if (importer) {
 				const resolved = path.resolve(path.dirname(importer), id);
@@ -101,6 +109,7 @@ class ChunkMerger {
 		return {name, resolveId, load};
 	}
 	private resolveGlobal(id: string) {
+		if (this.resolveGlobalForMainBuild(id)) return this.globals[id];
 		if (path.isAbsolute(id)) {
 			id = this.unresolveChunk.get(id);
 		}
@@ -156,7 +165,7 @@ export class ChunkMergeError extends Error {}
 /**
  * Converts SourceMap type used by OutputChunk type to ExistingRawSourceMap type used by load hooks.
  */
-function toInputSourceMap(sourcemap: rollup.SourceMap): rollup.ExistingRawSourceMap{
+function toInputSourceMap(sourcemap: rollup.SourceMap): rollup.ExistingRawSourceMap {
 	if (!sourcemap) return;
 	return {...sourcemap};
 }

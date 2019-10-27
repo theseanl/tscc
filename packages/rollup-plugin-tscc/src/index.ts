@@ -10,6 +10,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(pluginOptions);
 
 	const isManyModuleBuild = spec.getOrderedModuleSpecs().length > 1;
+	const globals = spec.getExternalModuleNamesToGlobalsMap();
 
 	// virtual modules, see https://rollupjs.org/guide/en#conventions 
 	const EMPTY_BUNDLE_ID = "\0empty_bundle_id";
@@ -26,7 +27,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		outputOptions.dir = '.';
 		outputOptions.entryFileNames = "[name].js";
 		outputOptions.chunkFileNames = "_"; // rollup makes these unique anyway.
-		outputOptions.globals = spec.getExternalModuleNamesToGlobalsMap();
+		outputOptions.globals = globals;
 		if (isManyModuleBuild) {
 			// For many-module build, currently only iife builds are available.
 			// Intermediate build format is 'es'.
@@ -76,7 +77,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		 */
 		await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
 			// 0. Merge bundles that ought to be merged with this entry point
-			const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle);
+			const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle, globals);
 			// 1. Delete keys for chunks that are included in this merged chunks
 			for (let chunk of chunkAllocation.get(entry)) {
 				delete bundle[chunk];
