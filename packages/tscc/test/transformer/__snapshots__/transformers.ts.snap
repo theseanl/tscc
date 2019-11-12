@@ -179,11 +179,11 @@ function A(a, _a) {
 })();
 (function () {
     var foo = {}, bar = {}, baz = {};
-    var merged = tslib_1.__assign({}, foo, bar, baz);
+    var merged = tslib_1.__assign(tslib_1.__assign(tslib_1.__assign({}, foo), bar), baz);
 })();
 (function () {
     var obj = { x: 1, y: \\"string\\" };
-    var newObj = tslib_1.__assign({}, obj, { z: 3, y: 4 }); // { x: number, y: number, z: number }
+    var newObj = tslib_1.__assign(tslib_1.__assign({}, obj), { z: 3, y: 4 }); // { x: number, y: number, z: number }
 })();
 (function () {
     var obj = { x: 1, y: 1, z: 1 };
@@ -220,11 +220,11 @@ function A(a, _a) {
 })();
 (function () {
     var foo = {}, bar = {}, baz = {};
-    var merged = tslib_1.__assign({}, foo, bar, baz);
+    var merged = tslib_1.__assign(tslib_1.__assign(tslib_1.__assign({}, foo), bar), baz);
 })();
 (function () {
     var obj = { x: 1, y: \\"string\\" };
-    var newObj = tslib_1.__assign({}, obj, { z: 3, y: 4 }); // { x: number, y: number, z: number }
+    var newObj = tslib_1.__assign(tslib_1.__assign({}, obj), { z: 3, y: 4 }); // { x: number, y: number, z: number }
 })();
 (function () {
     var obj = { x: 1, y: 1, z: 1 };
@@ -259,11 +259,11 @@ function A(a, _a) {
 })();
 (function () {
     var foo = {}, bar = {}, baz = {};
-    let merged = Object.assign({}, foo, bar, baz);
+    let merged = Object.assign(Object.assign(Object.assign({}, foo), bar), baz);
 })();
 (function () {
     let obj = { x: 1, y: \\"string\\" };
-    var newObj = Object.assign({}, obj, { z: 3, y: 4 }); // { x: number, y: number, z: number }
+    var newObj = Object.assign(Object.assign({}, obj), { z: 3, y: 4 }); // { x: number, y: number, z: number }
 })();
 (function () {
     let obj = { x: 1, y: 1, z: 1 };
