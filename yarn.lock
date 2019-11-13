@@ -5716,9 +5716,9 @@ rollup-plugin-virtual@^1.0.1:
   integrity sha512-HCTBpV8MwP5lNzZrHD2moVxHIToHU1EkzkKGVj6Z0DcgUfxrxrZmeQirQeLz2yhnkJqRjwiVywK9CS8jDYakrw==
 
 rollup@^1.25.2:
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.26.0.tgz#cf40fd5e1edc4d7f3d4235a0a43f1c2be1cf294b"
-  integrity sha512-5HljNYn9icFvXX+Oe97qY5TWvnWhKqgGT0HGeWWqFPx7w7+Anzg7dfHMtUif7YYy6QxAgynDSwK6uxbgcrVUxw==
+  version "1.27.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.27.0.tgz#7afe0da89c967cec5ccea7e919da6c89a1a68666"
+  integrity sha512-yaMna4MJ8LLEHhHl1ilgHakylf0LKeQctDxhngZLQ+W57GnXa5vtH7XKaK8zlAhNEhlWiH5YFVFt+QCDPUmNkw==
   dependencies:
     "@types/estree" "*"
     "@types/node" "*"
