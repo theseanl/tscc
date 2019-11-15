@@ -3018,10 +3018,10 @@ google-closure-compiler-osx@^20191027.0.0:
   resolved "https://registry.yarnpkg.com/google-closure-compiler-osx/-/google-closure-compiler-osx-20191027.0.0.tgz#4d7cf9176c8e89ec6ab56aa5d4a42996fe52294f"
   integrity sha512-Ko/+43oeMD8u6MhKMGPhx61B5e2lR5+C9pzlhnibQwuXuDVcp2ruFbblhWBXiT2FrStTX65SZzFvza0bRVYikA==
 
-google-closure-compiler-windows@^20191027.0.0:
-  version "20191027.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-windows/-/google-closure-compiler-windows-20191027.0.0.tgz#d87ce36bd83b47d77bb42c30500587fee25acbd5"
-  integrity sha512-kAzGFGaeAL9qsieotjb5qq5SsYD2Vwtl7aCeIVUnzWyNfhz7WZCmAMSGwGdtaShfM+4uzOwG1mahtPWasTaBxg==
+google-closure-compiler-windows@^20191111.0.0:
+  version "20191111.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-windows/-/google-closure-compiler-windows-20191111.0.0.tgz#da49d1814261fffbbe7bde1efc49c35eb533e89e"
+  integrity sha512-iKdz2bWrrM4zLv3USCRtWX4kLWzZhbj/afh/W6giLxg5XQzbNg+UpVF+2G6f/LEYK9UNBgS2TdyNTuw8mod+Mg==
 
 graceful-fs@^4.0.0, graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   version "4.2.2"
