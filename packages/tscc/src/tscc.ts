@@ -1,5 +1,4 @@
 import {IInputTsccSpecJSON} from '@tscc/tscc-spec';
-import chalk from 'chalk';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import * as tsickle from "tsickle";
 import * as ts from "typescript";
@@ -24,7 +23,8 @@ import path = require('path');
 import stream = require('stream');
 import fsExtra = require('fs-extra');
 import vfs = require('vinyl-fs');
-import * as upath from 'upath';
+import upath = require('upath');
+import chalk = require('chalk');
 
 export const TEMP_DIR = ".tscc_temp";
 

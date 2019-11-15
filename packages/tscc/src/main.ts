@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import yargs = require('yargs/yargs');
-import chalk from 'chalk';
+import chalk = require('chalk');
 import tscc, {TEMP_DIR, CcError} from './tscc';
 import {TsError} from './spec/TsccSpecWithTS'
 import {IInputTsccSpecJSON, INamedModuleSpecs, TsccSpecError, primitives} from '@tscc/tscc-spec'

@@ -12,11 +12,11 @@
 		"refresh": "yarn lerna clean; yarn clean; yarn lerna bootstrap; yarn tsc; cd packages/tscc; npm remove -g .; npm i -g .; rm -rf node_modules/@tscc; yarn link @tscc/tscc-spec"
 	},
 	"devDependencies": {
-		"@types/jest": "^24.0.21",
+		"@types/jest": "^24.0.23",
 		"jest": "^24.8.0",
 		"jest-junit": "^9.0.0",
-		"lerna": "^3.18.3",
-		"prettier": "^1.18.2",
+		"lerna": "^3.18.4",
+		"prettier": "^1.19.1",
 		"ts-jest": "^24.1.0",
 		"typescript": "~3.6.4"
 	},

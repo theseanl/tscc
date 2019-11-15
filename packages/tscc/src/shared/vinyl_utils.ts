@@ -1,7 +1,7 @@
 import stream = require('stream')
 import Vinyl = require('vinyl');
 import Logger from '../log/Logger';
-import chalk from 'chalk';
+import chalk = require('chalk');
 import spliceSourceMap, {splitWithRegex} from './sourcemap_splice';
 
 import {RawSourceMap} from 'source-map';
@@ -43,7 +43,7 @@ abstract class LoggingTransformStream extends stream.Transform {
 	abstract _rawTransform(data: any, encoding: string): any
 	constructor(
 		protected logger: Logger
-	) { super({ objectMode: true }); }
+	) {super({objectMode: true});}
 	async _transform(data: any, encoding: string, callback: stream.TransformCallback) {
 		try {
 			callback(null, await this._rawTransform(data, encoding));
@@ -59,7 +59,7 @@ export class ClosureJsonToVinyl extends LoggingTransformStream {
 	constructor(
 		private applySourceMap: boolean,
 		logger: Logger
-	) { super(logger) }
+	) {super(logger)}
 	_rawTransform(data: ArrayStreamItem<IClosureCompilerOutputJson>, encoding) {
 		if (!data) return data;
 		const json = data.value;
@@ -85,7 +85,7 @@ export class RemoveTempGlobalAssignments extends LoggingTransformStream {
 			data.contents = Buffer.from(origContents.replace(RemoveTempGlobalAssignments.reCcExport, ''));
 		} else { // Perform sourcemap-aware replace
 			const origMap: RawSourceMap = data[SOURCE_MAP];
-			const {contents: replacedContents, intervals} 
+			const {contents: replacedContents, intervals}
 				= splitWithRegex(origContents, RemoveTempGlobalAssignments.reCcExport);
 			const replacedMap = await spliceSourceMap(origContents, origMap, intervals);
 			// Modify data

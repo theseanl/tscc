@@ -31,22 +31,22 @@
 	"devDependencies": {
 		"@types/fs-extra": "^8.0.1",
 		"@types/stream-json": "^1.0.0",
-		"@types/vinyl": "^2.0.3",
+		"@types/vinyl": "^2.0.4",
 		"@types/vinyl-fs": "^2.4.11",
 		"@types/yargs": "^13.0.3",
 		"magic-string": "^0.25.4"
 	},
 	"optionalDependencies": {
-		"google-closure-compiler-linux": "^20191027.0.0",
-		"google-closure-compiler-osx": "^20191027.0.0",
-		"google-closure-compiler-windows": "^20191027.0.0"
+		"google-closure-compiler-linux": "^20191111.0.0",
+		"google-closure-compiler-osx": "^20191111.0.0",
+		"google-closure-compiler-windows": "^20191111.0.0"
 	},
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.4.4",
-		"chalk": "^2.4.2",
+		"chalk": "^3.0.0",
 		"fs-extra": "^8.0.1",
-		"google-closure-compiler-java": "^20191027.0.0",
-		"ora": "^4.0.2",
+		"google-closure-compiler-java": "^20191111.0.0",
+		"ora": "^4.0.3",
 		"resolve-from": "^5.0.0",
 		"rimraf": "^3.0.0",
 		"source-map": "^0.7.3",
