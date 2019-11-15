@@ -8,7 +8,7 @@
 		"tree-shaking",
 		"minify-javascript"
 	],
-	"version": "0.4.6",
+	"version": "0.4.7",
 	"main": "./dist/tscc.js",
 	"bin": {
 		"tscc": "./dist/main.js"
@@ -42,7 +42,7 @@
 		"google-closure-compiler-windows": "^20191111.0.0"
 	},
 	"dependencies": {
-		"@tscc/tscc-spec": "^0.4.4",
+		"@tscc/tscc-spec": "^0.4.7",
 		"chalk": "^3.0.0",
 		"fs-extra": "^8.0.1",
 		"google-closure-compiler-java": "^20191111.0.0",
