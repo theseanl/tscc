@@ -1239,11 +1239,10 @@
     "@types/node" "*"
 
 "@types/stream-json@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/stream-json/-/stream-json-1.0.0.tgz#10f8703c731633b14c644f6aa81d0ede41732bcb"
-  integrity sha512-W9B6R5GPbTq72Oz/oJZ8qSl3+6g2xbBK0et+pK/LwGpoSWsHh2AVEYLuQUBUzg+ps4xZGdYJP5nqsW17DFbxzQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/stream-json/-/stream-json-1.0.1.tgz#668b471b952b2176b558e48becb9483d4a202de3"
+  integrity sha512-RbvtL2EHmMDuIKjf5vvv0buHUc1aU9dJ2ovoxcbtqUCWENpwDXDQVY6hN8dUxqHelDHRdW122plF7KsCLNMm6Q==
   dependencies:
-    "@types/events" "*"
     "@types/node" "*"
     "@types/stream-chain" "*"
 
