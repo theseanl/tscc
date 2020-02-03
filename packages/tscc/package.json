@@ -33,7 +33,7 @@
 		"@types/stream-json": "^1.0.0",
 		"@types/vinyl": "^2.0.4",
 		"@types/vinyl-fs": "^2.4.11",
-		"@types/yargs": "^13.0.3",
+		"@types/yargs": "^15.0.3",
 		"magic-string": "^0.25.4"
 	},
 	"optionalDependencies": {
