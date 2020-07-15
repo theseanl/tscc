@@ -8,7 +8,8 @@ import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
 import {ISourceNode} from './graph/ISourceNode';
 import {sourceNodeFactory} from './graph/source_node_factory';
 import Logger from './log/Logger';
-import patchTsickleResolveModule, {getPackageBoundary} from './patch_tsickle_module_resolver';
+import patchTsickleResolveModule, {getPackageBoundary} from './tsickle_patches/patch_tsickle_module_resolver';
+import patchTsickleDecoratorTransformer from './tsickle_patches/patch_tsickle_decorator_transformer'
 import {riffle} from './shared/array_utils';
 import PartialMap from './shared/PartialMap';
 import {ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignments} from './shared/vinyl_utils';
@@ -122,6 +123,7 @@ export default async function tscc(
 	})
 
 	patchTsickleResolveModule(); // check comments in its source - required to generate proper externs
+	patchTsickleDecoratorTransformer(); // check comments there as well
 	const result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
 		afterTs: [
 			decoratorPropertyTransformer(transformerHost),
@@ -165,7 +167,7 @@ export default async function tscc(
 			...riffle('--externs', defaultLibsProvider.externs)
 		], ccLogger, onCompilerProcessClose, tsccSpec.debug().persistArtifacts);
 
-		// Checks whether the compiler process streamed any data to stdout. 
+		// Checks whether the compiler process streamed any data to stdout.
 		// If not, the end of process is the end of the compilation, no 'end' emit
 		// event will be fired from above streams.
 		let compilerProcessStreamedAnyData = false;

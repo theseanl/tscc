@@ -3,7 +3,7 @@ import fs = require('fs');
 import readline = require('readline');
 
 /**
- * Uses fast regex search instead of parsing AST, as done in 
+ * Uses fast regex search instead of parsing AST, as done in
  * https://github.com/google/closure-library/blob/master/closure/bin/build/source.py
  */
 export async function sourceNodeFactory(closureSourcePath: string): Promise<ISourceNode> {
@@ -91,7 +91,7 @@ class ClosureSourceLineParser {
 function toGoogPrimitiveRegex(name: string, assignment: boolean = false) {
 	let src = `goog\\.${name}\\(['"](.*)['"]\\)`
 	if (assignment) {
-		src = `(?:(?:var|let|const)\\s+[a-zA-Z0-9$_,:\\{\\}\\s]*\\s*=\\s*)` + src;
+		src = `(?:(?:var|let|const)\\s+[a-zA-Z0-9$_,:\\{\\}\\s]*\\s*=\\s*)?` + src;
 	}
 	return new RegExp(`^\\s*` + src);
 }

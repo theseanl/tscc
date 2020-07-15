@@ -8,14 +8,15 @@ dist/%.js: src/%.ts
 WGET=wget --no-check-certificate --content-disposition
 GH_USER_CONTENT=https://raw.githubusercontent.com/
 THIRD_PARTY=third_party/
+CLOSURE_VER=v20191111
 
 fetch_tslib:
 	svn export https://github.com/angular/tsickle/trunk/${THIRD_PARTY}tslib ${THIRD_PARTY}tsickle/third_party/tslib --force
 
 fetch_closure_lib:
-	${WGET} ${GH_USER_CONTENT}google/closure-library/master/closure/goog/base.js \
+	${WGET} ${GH_USER_CONTENT}google/closure-library/${CLOSURE_VER}/closure/goog/base.js \
 		-O ${THIRD_PARTY}closure_library/base.js
-	${WGET} ${GH_USER_CONTENT}google/closure-library/master/closure/goog/reflect/reflect.js \
+	${WGET} ${GH_USER_CONTENT}google/closure-library/${CLOSURE_VER}/closure/goog/reflect/reflect.js \
 		-O ${THIRD_PARTY}closure_library/reflect.js
 
 fetch_tsickle_externs:

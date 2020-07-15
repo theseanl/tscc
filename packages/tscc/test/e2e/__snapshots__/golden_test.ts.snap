@@ -46,26 +46,12 @@ Array [
 `;
 
 exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js 1`] = `
-"/*
- Copyright (c) Microsoft Corporation. All rights reserved.
- Licensed under the Apache License, Version 2.0 (the \\"License\\"); you may not use
- this file except in compliance with the License. You may obtain a copy of the
- License at http://www.apache.org/licenses/LICENSE-2.0
-
- THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
- WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
- MERCHANTABLITY OR NON-INFRINGEMENT.
-
- See the Apache Version 2.0 License for specific language governing permissions
- and limitations under the License.
-*/
-function d(){}d.prototype.a=function(){console.log(\\"a\\")};(function(e,b,c,f){var g=arguments.length,a=3>g?b:null===f?f=Object.getOwnPropertyDescriptor(b,c):f,h;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(e,b,c,f);else for(var k=e.length-1;0<=k;k--)if(h=e[k])a=(3>g?h(a):3<g?h(b,c,a):h(b,c))||a;return 3<g&&a&&Object.defineProperty(b,c,a),a})([function(e,b,c){return c}],d.prototype,\\"a\\",null);(new d).a();
+"function d(){}d.prototype.a=function(){console.log(\\"a\\")};(function(e,b,c,f){var g=arguments.length,a=3>g?b:null===f?f=Object.getOwnPropertyDescriptor(b,c):f,h;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(e,b,c,f);else for(var k=e.length-1;0<=k;k--)if(h=e[k])a=(3>g?h(a):3<g?h(b,c,a):h(b,c))||a;return 3<g&&a&&Object.defineProperty(b,c,a),a})([function(e,b,c){return c}],d.prototype,\\"a\\",null);(new d).a();
 //# sourceMappingURL=a.js.map
 "
 `;
 
-exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js.map 1`] = `"{\\"version\\":3,\\"sources\\":[\\"a.ts\\",\\"../../../../third_party/tsickle/third_party/tslib/tslib.js\\"],\\"names\\":[\\"module$exports$a.A\\",\\"b\\",\\"console\\",\\"log\\",\\"exports.__decorate\\",\\"decorators\\",\\"target\\",\\"key\\",\\"desc\\",\\"c\\",\\"arguments\\",\\"length\\",\\"r\\",\\"Object\\",\\"getOwnPropertyDescriptor\\",\\"d\\",\\"Reflect\\",\\"i\\",\\"defineProperty\\",\\"decorator\\",\\"prop\\",\\"prototype\\"],\\"mappings\\":\\"A;;;;;;;;;;;;;;AAIA,QAAA,EAAA,EAAA,EAECA,CAAA,UAAA,EAAAC,CAAAA,QAAC,EAAA,CAAIC,OAAAC,IAAA,CAAY,GAAZ,CAAJ,CCmEmBC,UAAS,CAACC,CAAD,CAAaC,CAAb,CAAqBC,CAArB,CAA0BC,CAA1B,CAAgC,CAAA,IACtDC,EAAIC,SAAAC,OADkD,CAChCC,EAAQ,CAAJ,CAAAH,CAAA,CAAQH,CAAR,CAA0B,IAAT,GAAAE,CAAA,CAAgBA,CAAhB,CAAuBK,MAAAC,yBAAA,CAAgCR,CAAhC,CAAwCC,CAAxC,CAAvB,CAAsEC,CAD3D,CACiEO,CAG3H,IAAuB,QAAvB,GAAI,MAAOC,QAAX,EAAmCA,OAAnC,EAA6E,UAA7E,GAA8C,MAAOA,QAAA,SAArD,CAAyFJ,CAAA,CAAII,OAAA,SAAA,CAAoBX,CAApB,CAAgCC,CAAhC,CAAwCC,CAAxC,CAA6CC,CAA7C,CAA7F,KACK,KAAK,IAAIS,EAAIZ,CAAAM,OAAJM,CAAwB,CAAjC,CAAyC,CAAzC,EAAoCA,CAApC,CAA4CA,CAAA,EAA5C,CAAiD,GAAIF,CAAJ,CAAQV,CAAA,CAAWY,CAAX,CAAR,CAAuBL,CAAA,EAAS,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAEH,CAAF,CAAR,CAAmB,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAeK,CAAf,CAAR,CAA4BG,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAhD,GAAmEK,CAChJ,OAAW,EAAJ,CAAAH,CAAA,EAASG,CAAT,EAAcC,MAAAK,eAAA,CAAsBZ,CAAtB,CAA8BC,CAA9B,CAAmCK,CAAnC,CAAd,CAAqDA,CANF,CAAzCR,CDlEpB,CAAA,CAPDe,QAAkB,CAACb,CAAD,CAASc,CAAT,CAA2BZ,CAA3B,CAAkD,CACnE,MAAOA,EAD4D,CAOnE,CAAA,CAFUR,CAAAqB,UAEV,CAFU,GAEV,CAFU,IAEV,CAEDpB,EAAC,IAAID,CAALC,GAAA\\",\\"file\\":\\".tscc_temp/case_3_sourcemaps_with_decorators/a.js\\"}"`;
+exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js.map 1`] = `"{\\"version\\":3,\\"sources\\":[\\"a.ts\\",\\"../../../../third_party/tsickle/third_party/tslib/tslib.js\\"],\\"names\\":[\\"module$exports$a.A\\",\\"b\\",\\"console\\",\\"log\\",\\"exports.__decorate\\",\\"decorators\\",\\"target\\",\\"key\\",\\"desc\\",\\"c\\",\\"arguments\\",\\"length\\",\\"r\\",\\"Object\\",\\"getOwnPropertyDescriptor\\",\\"d\\",\\"Reflect\\",\\"i\\",\\"defineProperty\\",\\"decorator\\",\\"prop\\",\\"prototype\\"],\\"mappings\\":\\"AAIA,QAAA,EAAA,EAAA,EAECA,CAAA,UAAA,EAAAC,CAAAA,QAAC,EAAA,CAAIC,OAAAC,IAAA,CAAY,GAAZ,CAAJ,CCoDmBC,UAAS,CAACC,CAAD,CAAaC,CAAb,CAAqBC,CAArB,CAA0BC,CAA1B,CAAgC,CAAA,IACtDC,EAAIC,SAAAC,OADkD,CAChCC,EAAQ,CAAJ,CAAAH,CAAA,CAAQH,CAAR,CAA0B,IAAT,GAAAE,CAAA,CAAgBA,CAAhB,CAAuBK,MAAAC,yBAAA,CAAgCR,CAAhC,CAAwCC,CAAxC,CAAvB,CAAsEC,CAD3D,CACiEO,CAG3H,IAAuB,QAAvB,GAAI,MAAOC,QAAX,EAAmCA,OAAnC,EAA6E,UAA7E,GAA8C,MAAOA,QAAA,SAArD,CAAyFJ,CAAA,CAAII,OAAA,SAAA,CAAoBX,CAApB,CAAgCC,CAAhC,CAAwCC,CAAxC,CAA6CC,CAA7C,CAA7F,KACK,KAAK,IAAIS,EAAIZ,CAAAM,OAAJM,CAAwB,CAAjC,CAAyC,CAAzC,EAAoCA,CAApC,CAA4CA,CAAA,EAA5C,CAAiD,GAAIF,CAAJ,CAAQV,CAAA,CAAWY,CAAX,CAAR,CAAuBL,CAAA,EAAS,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAEH,CAAF,CAAR,CAAmB,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAeK,CAAf,CAAR,CAA4BG,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAhD,GAAmEK,CAChJ,OAAW,EAAJ,CAAAH,CAAA,EAASG,CAAT,EAAcC,MAAAK,eAAA,CAAsBZ,CAAtB,CAA8BC,CAA9B,CAAmCK,CAAnC,CAAd,CAAqDA,CANF,CAAzCR,CDnDpB,CAAA,CAPDe,QAAkB,CAACb,CAAD,CAASc,CAAT,CAA2BZ,CAA3B,CAAkD,CACnE,MAAOA,EAD4D,CAOnE,CAAA,CAFUR,CAAAqB,UAEV,CAFU,GAEV,CAFU,IAEV,CAEDpB,EAAC,IAAID,CAALC,GAAA\\",\\"file\\":\\".tscc_temp/case_3_sourcemaps_with_decorators/a.js\\"}"`;
 
 exports[`tscc e2e case_4_external: case_4_external 1`] = `
 Array [
@@ -85,21 +71,7 @@ Array [
 `;
 
 exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js 1`] = `
-"/*
- Copyright (c) Microsoft Corporation. All rights reserved.
- Licensed under the Apache License, Version 2.0 (the \\"License\\"); you may not use
- this file except in compliance with the License. You may obtain a copy of the
- License at http://www.apache.org/licenses/LICENSE-2.0
-
- THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
- WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
- MERCHANTABLITY OR NON-INFRINGEMENT.
-
- See the Apache Version 2.0 License for specific language governing permissions
- and limitations under the License.
-*/
-function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};function k(){}k.prototype.b=function(a,c){a=c.a;h(c,[\\"a\\"]);c=h(a,[\\"d\\"]);console.log(c)};
+"function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};function k(){}k.prototype.b=function(a,c){a=c.a;h(c,[\\"a\\"]);c=h(a,[\\"d\\"]);console.log(c)};
 (function(a,c,e,b){var f=arguments.length,g=3>f?c:null===b?b=Object.getOwnPropertyDescriptor(c,e):b,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,c,e,b);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(c,e,g):l(c,e))||g;return 3<f&&g&&Object.defineProperty(c,e,g),g})([function(a,c,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"b\\",null);(new k).b({},{a:{c:{},d:{}},e:{},g:{},h:{}});var n={f:{},a:{},c:{}},p=h(n,[\\"c\\"]);
 window.d=p;
 "

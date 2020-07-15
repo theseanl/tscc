@@ -18,6 +18,14 @@
 /** @typedef {!IArrayLike} */
 var ArrayLike;
 
+/** @typedef {!IteratorIterable} */
+var IterableIterator;
+
+/** @typedef {!IIterableResult} */
+var IteratorYieldResult;
+/** @typedef {!IIterableResult} */
+var IteratorReturnResult;
+
 /** @typedef {!HTMLCollection} */
 var HTMLCollectionOf;
 
@@ -92,10 +100,18 @@ var GlobalFetch;
 
 /**
  * @interface
- * @extends{WorkerGlobalScope}
- * @extends{Window}
+ * @extends {WorkerGlobalScope}
+ * @extends {Window}
  */
 var WindowOrWorkerGlobalScope;
 
 /** @record */
 function CanvasDrawImage() {}
+
+/** @constructor */
+function CryptoKey() {};
+/** @constructor */
+function CryptoKeyPair() {};
+
+/** @typedef {!{handleEvent: function(Event):void}} */
+var EventListenerObject;
