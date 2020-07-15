@@ -20,7 +20,7 @@ var A = /** @class */ (function () {
         },
         set: function (v) {
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     A.prototype.aMethodWithParams = function (param) {
@@ -73,7 +73,7 @@ var A = /** @class */ (function () {
         },
         set: function (v) {
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     A.prototype.aMethodWithParams = function (param) {
