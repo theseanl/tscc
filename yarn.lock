@@ -1266,9 +1266,9 @@
     "@types/node" "*"
 
 "@types/stream-json@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/stream-json/-/stream-json-1.0.1.tgz#668b471b952b2176b558e48becb9483d4a202de3"
-  integrity sha512-RbvtL2EHmMDuIKjf5vvv0buHUc1aU9dJ2ovoxcbtqUCWENpwDXDQVY6hN8dUxqHelDHRdW122plF7KsCLNMm6Q==
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@types/stream-json/-/stream-json-1.5.1.tgz#ae8d1133f9f920e18c6e94b233cb57d014a47b8d"
+  integrity sha512-Blg6GJbKVEB1J/y/2Tv+WrYiMzPTIqyuZ+zWDJtAF8Mo8A2XQh/lkSX4EYiM+qtS+GY8ThdGi6gGA9h4sjvL+g==
   dependencies:
     "@types/node" "*"
     "@types/stream-chain" "*"
