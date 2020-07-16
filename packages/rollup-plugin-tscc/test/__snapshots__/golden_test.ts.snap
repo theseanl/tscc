@@ -12,16 +12,16 @@ exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
 		return a > b ? [a, b] : swap([a, b]);
 	}
 
-	var _ = ({
-		__proto__: null,
-		a: sort,
-		s: swap
-	});
-
 	const a = [1, 2];
 	const b = swap(a);
 
 	console.log(b);
+
+	var _ = {
+		__proto__: null,
+		b: b,
+		s: sort
+	};
 
 	exports.$0 = _;
 	exports.b = b;
@@ -33,11 +33,11 @@ exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
 `;
 
 exports[`Golden Tests: many-module-build/tscc.spec.json 2`] = `
-"(function (_, generated_entry_js) {
+"(function (_) {
 	'use strict';
 
-	console.log(_.a([1, generated_entry_js.b]));
+	console.log(_.s([1, _.b]));
 
-}(generated_entry.$0, generated_entry));
+}(generated_entry.$0));
 "
 `;

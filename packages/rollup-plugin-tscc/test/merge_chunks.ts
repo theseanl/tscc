@@ -38,19 +38,19 @@ describe(`mergeChunk`, function() {
 
 			const a = 'c'; const b = 'd';
 
-			var chunk0 = ({
+			var chunk0 = {
 				__proto__: null,
 				a: a,
 				b: b
-			});
+			};
 
 			const a$1 = 'e'; const b$1 = 'f';
 
-			var chunk1 = ({
+			var chunk1 = {
 				__proto__: null,
 				a: a$1,
 				b: b$1
-			});
+			};
 
 			const a$2 = 'a'; const b$2 = 'b';
 
@@ -101,19 +101,19 @@ describe(`mergeChunk`, function() {
 
 			const a = 'e'; const b = 'f';
 
-			var chunk1 = ({
+			var chunk1 = {
 				__proto__: null,
 				a: a,
 				b: b
-			});
+			};
 
 			const a$1 = 'c'; const b$1 = b;
 
-			var chunk0 = ({
+			var chunk0 = {
 				__proto__: null,
 				a: a$1,
 				b: b$1
-			});
+			};
 
 			const a$2 = a$1; const b$2 = 'b'; const $0 = 'c';
 
@@ -202,20 +202,20 @@ describe(`mergeChunk`, function() {
 
 			const a = 'c'; const b = 'd';
 
-			var chunk0 = ({
+			var chunk0 = {
 				__proto__: null,
 				a: a,
 				b: b,
 				c: chunk2_js.a
-			});
+			};
 
 			const a$1 = 'e'; const b$1 = 'f';
 
-			var chunk1 = ({
+			var chunk1 = {
 				__proto__: null,
 				a: a$1,
 				b: b$1
-			});
+			};
 
 			const a$2 = 'a'; const b$2 = 'b'; const c = chunk3_js.b; const d = chunk2_js.a;
 
@@ -237,27 +237,27 @@ describe(`mergeChunk`, function() {
 
 			const a = 'm'; const b = 'n';
 
-			var chunk4 = ({
+			var chunk4 = {
 				__proto__: null,
 				a: a,
 				b: b
-			});
+			};
 
 			const a$1 = 'i'; const b$1 = a;
 
-			var chunk2 = ({
+			var chunk2 = {
 				__proto__: null,
 				a: a$1,
 				b: b$1
-			});
+			};
 
 			const a$2 = 'k'; const b$2 = 'l';
 
-			var chunk3 = ({
+			var chunk3 = {
 				__proto__: null,
 				a: a$2,
 				b: b$2
-			});
+			};
 
 			const a$3 = 'g'; const b$3 = 'h'; const $0 = '$0';
 
