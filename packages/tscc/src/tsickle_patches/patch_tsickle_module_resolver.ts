@@ -45,12 +45,18 @@ function resolveModuleName(
 	return resolvedModule;
 }
 
-let patched = false;
-export default function patchTsickleResolveModule() {
-	if (!patched) {
+let original:typeof import('tsickle/src/googmodule').resolveModuleName;
+export function patchTsickleResolveModule() {
+	if (!original) {
 		const googmodule: typeof import('tsickle/src/googmodule') = require('tsickle/src/googmodule');
+		original = googmodule.resolveModuleName;
 		googmodule.resolveModuleName = resolveModuleName;
-		patched = true;
 	}
 }
 
+export function restoreTsickleResolveModule() {
+	if (original) {
+		require('tsickle/src/googmodule').resolveModuleName = original;
+		original = undefined;
+	}
+}

@@ -8,8 +8,8 @@ import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
 import {ISourceNode} from './graph/ISourceNode';
 import {sourceNodeFactory} from './graph/source_node_factory';
 import Logger from './log/Logger';
-import patchTsickleResolveModule, {getPackageBoundary} from './tsickle_patches/patch_tsickle_module_resolver';
-import patchTsickleDecoratorTransformer from './tsickle_patches/patch_tsickle_decorator_transformer'
+import {applyPatches, restorePatches} from './tsickle_patches/facade'
+import {getPackageBoundary} from './tsickle_patches/patch_tsickle_module_resolver';
 import {riffle} from './shared/array_utils';
 import PartialMap from './shared/PartialMap';
 import {ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignments} from './shared/vinyl_utils';
@@ -122,14 +122,19 @@ export default async function tscc(
 		writeFile(path, content)
 	})
 
-	patchTsickleResolveModule(); // check comments in its source - required to generate proper externs
-	patchTsickleDecoratorTransformer(); // check comments there as well
-	const result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
-		afterTs: [
-			decoratorPropertyTransformer(transformerHost),
-			restPropertyTransformer(transformerHost)
-		]
-	});
+	let result: tsickle.EmitResult;
+	try {
+		applyPatches();
+		result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
+			afterTs: [
+				decoratorPropertyTransformer(transformerHost),
+				restPropertyTransformer(transformerHost)
+			]
+		});
+	} finally {
+		restorePatches(); // Make sure that our patches are removed even if tsickle.emit throws.
+	}
+
 	// If tsickle errors, print diagnostics and exit.
 	if (result.diagnostics.length) throw new TsError(result.diagnostics);
 
