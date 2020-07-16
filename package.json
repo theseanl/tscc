@@ -16,7 +16,7 @@
 		"jest": "^24.8.0",
 		"jest-junit": "^10.0.0",
 		"lerna": "^3.18.4",
-		"prettier": "^1.19.1",
+		"prettier": "^2.0.5",
 		"ts-jest": "^24.1.0",
 		"typescript": "~3.9.5"
 	},
