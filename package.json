@@ -9,7 +9,7 @@
 	"scripts": {
 		"clean": "yarn lerna run clean",
 		"tsc": "yarn lerna exec -- -- tsc",
-		"refresh": "yarn lerna clean; yarn clean; yarn lerna bootstrap; yarn tsc; cd packages/tscc; npm remove -g .; npm i -g .; rm -rf node_modules/@tscc; yarn link @tscc/tscc-spec"
+		"refresh": "yarn lerna clean --yes; yarn clean; yarn lerna bootstrap; yarn tsc; cd packages/tscc; npm remove -g .; npm i -g .; rm -rf node_modules/@tscc; yarn link @tscc/tscc-spec"
 	},
 	"devDependencies": {
 		"@types/jest": "^26.0.4",
