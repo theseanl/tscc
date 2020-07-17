@@ -113,6 +113,17 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			// so enabling sourceMap in order not to break tsc.
 			options.sourceMap = true;
 		}
+		if (options.incremental) {
+			// Incremental compilation produces an additional .tsbuildinfo file. This triggers
+			// unrecognized file extension error, so we disable it.
+			// Currently I'm not sure that among typescript and closure compiler, which impacts the
+			// compilation time more. If it is closure compiler, there would not be much sense to
+			// support incremental compilation, for closure compiler does not support it. Otherwise,
+			// I may try to attempt implementing it. To do so, we have to write intermediate output
+			// like what we do with --debug.persistArtifacts.
+			onWarning(`Incremental compilation is not supported. incremental flag is unset.`);
+			options.incremental = false;
+		}
 	}
 	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig.options);
 	constructor(
