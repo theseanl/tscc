@@ -14,10 +14,10 @@
 	"devDependencies": {
 		"@types/jest": "^26.0.4",
 		"jest": "^24.8.0",
-		"jest-junit": "^10.0.0",
+		"jest-junit": "^11.1.0",
 		"lerna": "^3.18.4",
-		"prettier": "^1.19.1",
-		"ts-jest": "^24.1.0",
+		"prettier": "^2.0.5",
+		"ts-jest": "^24.3.0",
 		"typescript": "~3.9.5"
 	},
 	"dependencies": {}
