@@ -8,6 +8,7 @@ import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
 import {ISourceNode} from './graph/ISourceNode';
 import {sourceNodeFactory} from './graph/source_node_factory';
 import Logger from './log/Logger';
+import * as spinner from './log/spinner';
 import {applyPatches, restorePatches} from './tsickle_patches/facade'
 import {getPackageBoundary} from './tsickle_patches/patch_tsickle_module_resolver';
 import {riffle} from './shared/array_utils';
@@ -162,7 +163,7 @@ export default async function tscc(
 		 * Spawn compiler process with module dependency information
 		 */
 		const ccLogger = new Logger(chalk.redBright("ClosureCompiler: "), process.stderr);
-		ccLogger.startTask("Closure Compiler");
+		spinner.startTask("Closure Compiler");
 
 		const compilerProcess = spawnCompiler([
 			...tsccSpec.getBaseCompilerFlags(),
@@ -180,16 +181,16 @@ export default async function tscc(
 
 		function onCompilerProcessClose(code) {
 			if (code === 0) {
-				ccLogger.succeed();
-				ccLogger.unstick();
+				spinner.succeed();
+				spinner.unstick();
 				tsccLogger.log(`Compilation success.`)
 				if (tsccSpec.debug().persistArtifacts) {
 					tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
 				}
 				if (!compilerProcessStreamedAnyData) resolve();
 			} else {
-				ccLogger.fail(`Closure compiler error`);
-				ccLogger.unstick();
+				spinner.fail(`Closure compiler error`);
+				spinner.unstick();
 				ccLogger.log(`Exited with code ${code}.`);
 				reject(new CcError(String(code)));
 			}
