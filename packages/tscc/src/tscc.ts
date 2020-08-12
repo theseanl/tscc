@@ -23,6 +23,7 @@ import {getExternsForExternalModules, getGluingModules} from './external_module_
 import fs = require('fs');
 import path = require('path');
 import stream = require('stream');
+import {promisify} from 'util';
 import fsExtra = require('fs-extra');
 import vfs = require('vinyl-fs');
 import upath = require('upath');
@@ -158,27 +159,21 @@ export default async function tscc(
 	pushImmediately(null);
 	/// ----- end tsickle call -----
 
-	return new Promise((resolve, reject) => {
-		/**
-		 * Spawn compiler process with module dependency information
-		 */
-		const ccLogger = new Logger(chalk.redBright("ClosureCompiler: "), process.stderr);
-		spinner.startTask("Closure Compiler");
+	/**
+	 * Spawn compiler process with module dependency information
+	 */
+	const ccLogger = new Logger(chalk.redBright("ClosureCompiler: "), process.stderr);
+	spinner.startTask("Closure Compiler");
 
-		const compilerProcess = spawnCompiler([
-			...tsccSpec.getBaseCompilerFlags(),
-			...flags,
-			'--json_streams', "BOTH",
-			'--externs', externPath,
-			...riffle('--externs', defaultLibsProvider.externs)
-		], ccLogger, onCompilerProcessClose, tsccSpec.debug().persistArtifacts);
+	const compilerProcess = spawnCompiler([
+		...tsccSpec.getBaseCompilerFlags(),
+		...flags,
+		'--json_streams', "BOTH",
+		'--externs', externPath,
+		...riffle('--externs', defaultLibsProvider.externs)
+	], ccLogger, tsccSpec.debug().persistArtifacts);
 
-		// Checks whether the compiler process streamed any data to stdout.
-		// If not, the end of process is the end of the compilation, no 'end' emit
-		// event will be fired from above streams.
-		let compilerProcessStreamedAnyData = false;
-		compilerProcess.stdout.on('data', () => {compilerProcessStreamedAnyData = true;})
-
+	const compilerProcessClose = new Promise((resolve, reject) => {
 		function onCompilerProcessClose(code) {
 			if (code === 0) {
 				spinner.succeed();
@@ -187,29 +182,36 @@ export default async function tscc(
 				if (tsccSpec.debug().persistArtifacts) {
 					tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
 				}
-				if (!compilerProcessStreamedAnyData) resolve();
+				resolve();
 			} else {
 				spinner.fail(`Closure compiler error`);
 				spinner.unstick();
 				ccLogger.log(`Exited with code ${code}.`);
 				reject(new CcError(String(code)));
 			}
-		};
-
-		stdInStream
-			.pipe(compilerProcess.stdin);
-
-		// Use gulp-style transform streams to post-process cc output - see shared/vinyl_utils.ts.
-		// TODO support returning gulp stream directly
-		const useSourceMap: boolean = tsccSpec.getCompilerOptions().sourceMap;
-		compilerProcess.stdout
-			.pipe(StreamArray.withParser())
-			.pipe(new ClosureJsonToVinyl(useSourceMap, tsccLogger))
-			.pipe(new RemoveTempGlobalAssignments(tsccLogger))
-			.pipe(vfs.dest('.', {sourcemaps: '.'})) // Can we remove dependency on vinyl-fs?
-			.on('end', resolve);
-
+		}
+		compilerProcess.on("close", onCompilerProcessClose);
 	});
+
+	stdInStream
+		.pipe(compilerProcess.stdin);
+
+	// Use gulp-style transform streams to post-process cc output - see shared/vinyl_utils.ts.
+	// TODO support returning gulp stream directly
+	const useSourceMap: boolean = tsccSpec.getCompilerOptions().sourceMap;
+
+	const writeCompilationOutput = promisify(stream.pipeline)(
+		compilerProcess.stdout,
+		// jsonStreaming: true option makes the Parser of the stream-json package to fail gracefully
+		// when no data is streamed. Currently this is not included in @types/stream-json. TODO make a
+		// PR in Definitelytyped about this.
+		StreamArray.withParser(<any>{jsonStreaming: true}),
+		new ClosureJsonToVinyl(useSourceMap, tsccLogger),
+		new RemoveTempGlobalAssignments(tsccLogger),
+		vfs.dest('.', {sourcemaps: '.'})
+	);
+
+	await Promise.all([compilerProcessClose, writeCompilationOutput])
 }
 
 export class CcError extends Error {}

@@ -2,7 +2,7 @@ import Logger from './log/Logger';
 import chalk = require('chalk');
 import childProcess = require('child_process');
 
-export default function spawnCompiler(providedArgs: string[], logger: Logger, onClose: (code: number) => void, debug?: boolean) {
+export default function spawnCompiler(providedArgs: string[], logger: Logger, debug?: boolean) {
 	const {bin, args} = getSupportedCompiler();
 	args.push(...providedArgs);
 
@@ -18,7 +18,6 @@ export default function spawnCompiler(providedArgs: string[], logger: Logger, on
 		logger.log(chalk.red(`Closure compiler spawn error, Is java in your path?\n${err.message}`));
 		//	onClose(1);
 	});
-	compilerProcess.on('close', onClose);
 	return compilerProcess;
 }
 
