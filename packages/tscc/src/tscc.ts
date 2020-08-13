@@ -186,8 +186,7 @@ export default async function tscc(
 			} else {
 				spinner.fail(`Closure compiler error`);
 				spinner.unstick();
-				ccLogger.log(`Exited with code ${code}.`);
-				reject(new CcError(String(code)));
+				reject(new CcError(`Closure compiler has exited with code ${code}`));
 			}
 		}
 		compilerProcess.on("close", onCompilerProcessClose);
