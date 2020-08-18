@@ -1,7 +1,7 @@
 {
   "name": "@tscc/tscc-spec",
   "author": "theseanl",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
