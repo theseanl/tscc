@@ -214,6 +214,8 @@ export default async function tscc(
 }
 
 export class CcError extends Error {}
+export class TsccError extends Error {}
+class UnexpectedFileError extends TsccError {}
 
 /**
  * Remove `//# sourceMappingURL=...` from source TS output which typescript generates when
@@ -284,7 +286,7 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 				return;
 			}
 			default:
-				throw new Error(`Unrecognized file extension ${filePath}.`)
+				throw new UnexpectedFileError(`Unrecognized file emitted from tsc: ${filePath}.`)
 		}
 	}
 

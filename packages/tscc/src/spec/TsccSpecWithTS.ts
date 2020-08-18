@@ -124,6 +124,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			onWarning(`Incremental compilation is not supported. incremental flag is unset.`);
 			options.incremental = false;
 		}
+		if (options.declaration) {
+			// silently unset declaration flag
+			options.declaration = false;
+		}
 	}
 	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig.options);
 	constructor(

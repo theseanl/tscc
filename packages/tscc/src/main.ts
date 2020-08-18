@@ -2,7 +2,7 @@
 
 import yargs = require('yargs/yargs');
 import chalk = require('chalk');
-import tscc, {TEMP_DIR, CcError} from './tscc';
+import tscc, {TEMP_DIR, CcError, TsccError} from './tscc';
 import {TsError} from './spec/TsccSpecWithTS'
 import {IInputTsccSpecJSON, INamedModuleSpecs, TsccSpecError, primitives} from '@tscc/tscc-spec'
 import {ClosureDepsError} from './graph/ClosureDependencyGraph'
@@ -189,7 +189,7 @@ if (require.main === module) {
 	main(parsedArgs)
 		.then(code => process.exit(code))
 		.catch(e => {
-			if (e instanceof TsccSpecError) {
+			if (e instanceof TsccSpecError || e instanceof TsccError) {
 				tsccWarning.log(chalk.red(e.message));
 			} else if (e instanceof TsError) {
 				tsWarning.log(chalk.red(e.message));
