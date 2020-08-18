@@ -135,6 +135,7 @@ class ChunkMerger {
 			format: 'iife',
 			file: ChunkMerger.FACADE_MODULE_ID,
 			globals: (id) => this.resolveGlobal(id),
+			interop: "esModule",
 			freeze: false
 		});
 		if (output.length > 1) {
