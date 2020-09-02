@@ -46,7 +46,7 @@
 		"@tscc/tscc-spec": "^0.5.2",
 		"chalk": "^4.1.0",
 		"fs-extra": "^9.0.1",
-		"google-closure-compiler-java": "^20200719.0.0",
+		"google-closure-compiler-java": "^20200830.0.0",
 		"ora": "^5.0.0",
 		"resolve-from": "^5.0.0",
 		"rimraf": "^3.0.2",
