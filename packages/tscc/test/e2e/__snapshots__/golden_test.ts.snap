@@ -93,3 +93,14 @@ exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/2.js 
 "function a(){}a.prototype.a=function(){console.log(\\"boo\\")};(new a).a();
 "
 `;
+
+exports[`tscc e2e case_7_lodash_style_external_module_declaration: case_7_lodash_style_external_module_declaration 1`] = `
+Array [
+  "a.js",
+]
+`;
+
+exports[`tscc e2e case_7_lodash_style_external_module_declaration: case_7_lodash_style_external_module_declaration/a.js 1`] = `
+"var a=lodash;window.exported=a.exported;window.exported_from_augment=a.exported_from_augment;
+"
+`;

@@ -1,0 +1,9 @@
+{
+    "modules": {
+        "a": "./a.ts"
+    },
+    "external": {
+        "lodash_style_module": "lodash"
+    },
+    "prefix": ".tscc_temp/case_7_lodash_style_external_module_declaration/"
+}
