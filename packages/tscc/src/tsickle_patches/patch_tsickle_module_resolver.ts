@@ -9,10 +9,21 @@ import path = require('path');
 
 /**
  * From an absolute file name, extract its containing folder in node_modules.
+ * Maps
+ * /.../my-package/node_modules/external-package/a/b/c/d.js
+ * to /.../my-package/node_modules/external-package
  */
 export function getPackageBoundary(fileName: string): string {
 	let segments = path.normalize(fileName).split(path.sep);
 	let i = segments.lastIndexOf("node_modules");
+	let packageName = segments[i + 1];
+	if (typeof packageName === 'string' && packageName.startsWith("@")) {
+		/**
+		 * Scoped packages, see
+		 * {@link https://nodejs.org/api/modules.html#modules_all_together}, LOAD_PACKAGE_EXPORTS
+		 */
+		i++;
+	}
 	let moduleDir = segments.slice(0, i + 2).join(path.sep);
 	return moduleDir + path.sep; // Note that this becomes '/' when node_modules is not found.
 }
