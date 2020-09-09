@@ -17,8 +17,8 @@ import {ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignmen
 import spawnCompiler from './spawn_compiler';
 import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
 import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
-import decoratorPropertyTransformer from './transformer/decoratorPropertyTransformer';
-import restPropertyTransformer from './transformer/restPropertyTransformer';
+import decoratorPropertyTransformer from './transformer/decorator_property_transformer';
+import restPropertyTransformer from './transformer/rest_property_transformer';
 import {getExternsForExternalModules, getGluingModules} from './external_module_support';
 import fs = require('fs');
 import path = require('path');

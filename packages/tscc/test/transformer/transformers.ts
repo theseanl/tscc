@@ -2,8 +2,8 @@
 import * as ts from 'typescript';
 import * as tsickle from 'tsickle';
 import TsccSpecWithTS from '../../src/spec/TsccSpecWithTS';
-import decoratorPropertyTransformer from '../../src/transformer/decoratorPropertyTransformer';
-import restPropertyTransformer from '../../src/transformer/restPropertyTransformer';
+import decoratorPropertyTransformer from '../../src/transformer/decorator_property_transformer';
+import restPropertyTransformer from '../../src/transformer/rest_property_transformer';
 import path = require('path');
 
 const samplesRoot = path.resolve(__dirname, '../sample');
