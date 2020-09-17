@@ -5,20 +5,22 @@ import * as ts from "typescript";
 import getDefaultLibs from './default_libs';
 import {Cache, FSCacheAccessor} from './graph/Cache';
 import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
+import TypescriptDependencyGraph from './graph/TypescriptDependencyGraph';
 import {ISourceNode} from './graph/ISourceNode';
 import {sourceNodeFactory} from './graph/source_node_factory';
 import Logger from './log/Logger';
 import * as spinner from './log/spinner';
 import {applyPatches, restorePatches} from './tsickle_patches/facade'
-import {getPackageBoundary} from './tsickle_patches/patch_tsickle_module_resolver';
-import {riffle} from './shared/array_utils';
+import {riffle, union} from './shared/array_utils';
 import PartialMap from './shared/PartialMap';
 import {ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignments} from './shared/vinyl_utils';
+import {escapeGoogAdmissibleName} from './shared/escape_goog_identifier'
 import spawnCompiler from './spawn_compiler';
 import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
 import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
 import decoratorPropertyTransformer from './transformer/decorator_property_transformer';
 import restPropertyTransformer from './transformer/rest_property_transformer';
+import dtsRequireTypeTransformer from './transformer/dts_requiretype_transformer';
 import {getExternsForExternalModules, getGluingModules} from './external_module_support';
 import fs = require('fs');
 import path = require('path');
@@ -28,6 +30,7 @@ import fsExtra = require('fs-extra');
 import vfs = require('vinyl-fs');
 import upath = require('upath');
 import chalk = require('chalk');
+
 
 export const TEMP_DIR = ".tscc_temp";
 
@@ -77,7 +80,15 @@ export default async function tscc(
 	const diagnostics = ts.getPreEmitDiagnostics(program);
 	if (diagnostics.length) throw new TsError(diagnostics);
 
-	const transformerHost = getTsickleHost(tsccSpec, tsLogger);
+	const tsDepsGraph = new TypescriptDependencyGraph(program)
+	tsccSpec.getOrderedModuleSpecs().forEach(moduleSpec => tsDepsGraph.addRootFile(moduleSpec.entry));
+	union(tsccSpec.getExternalModuleNames(), tsccSpec.getCompilerOptions().types ?? [])
+		.map(tsccSpec.resolveExternalModuleTypeReference, tsccSpec)
+		.map(tsDepsGraph.addRootFile, tsDepsGraph);
+	// If user explicitly provided `types` compiler option, it is more likely that its type is actually
+	// used in user code.
+		tsccLogger.log(JSON.stringify([...tsDepsGraph.iterateFiles()]))
+	const transformerHost = getTsickleHost(tsccSpec, tsDepsGraph, tsLogger);
 
 	/**
 	 * Ideally, the dependency graph should be determined from ts sourceFiles, and the compiler
@@ -129,6 +140,7 @@ export default async function tscc(
 		applyPatches();
 		result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
 			afterTs: [
+				dtsRequireTypeTransformer(tsccSpec, transformerHost),
 				decoratorPropertyTransformer(transformerHost),
 				restPropertyTransformer(transformerHost)
 			]
@@ -333,38 +345,23 @@ function pushTsickleOutputToStream(
 	});
 }
 
-function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.TsickleHost {
+function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph:TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
 	const options = tsccSpec.getCompilerOptions();
 	const compilerHost = tsccSpec.getCompilerHost();
-
-	// Non-absolute file names are resolved from the TS project root.
-	const fileNamesSet = tsccSpec.getAbsoluteFileNamesSet();
-
 	const externalModuleNames = tsccSpec.getExternalModuleNames();
-	const resolvedExternalModuleTypeRefs: string[] = [];
-
-	for (let name of externalModuleNames) {
-		let typeRefFileName = tsccSpec.resolveExternalModuleTypeReference(name);
-		if (typeRefFileName) {
-			resolvedExternalModuleTypeRefs.push(typeRefFileName);
-		}
-	}
-
-	const externalModuleRoots = resolvedExternalModuleTypeRefs
-		.map(getPackageBoundary);
 
 	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules/"];
 
 	const transformerHost: tsickle.TsickleHost = {
 		shouldSkipTsickleProcessing(fileName: string) {
-			const absFileName = path.resolve(fileName);
-			if (fileNamesSet.has(absFileName)) return false;
-			// .d.ts files in node_modules for external modules are needed to generate
-			// externs file.
-			if (externalModuleRoots.findIndex(root => absFileName.startsWith(root)) !== -1) {
-				return false;
-			}
-			return true;
+			// Non-absolute files are resolved relative to a typescript project root.
+			const absFileName = path.resolve(tsccSpec.getTSRoot(), fileName);
+			// Previously, we've processed all files that are in the same node_modules directory of type
+			// declaration file for external modules. The current behavior with including transitive
+			// dependencies only will have the same effect on such files, because `ts.createProgram`
+			// anyway adds only such files to the program. So this update will in effect include strictly
+			// larger set of files.
+			return !tsDependencyGraph.hasFile(absFileName);
 		},
 		shouldIgnoreWarningsForPath(fileName: string) {
 			return true; // Just a stub, maybe add configuration later.
@@ -412,22 +409,9 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, logger: Logger): tsickle.Tsic
 			}
 			// resolve relative to the ts project root.
 			fileName = path.relative(tsccSpec.getTSRoot(), fileName);
-			return convertToGoogModuleAdmissibleName(fileName);
+			return escapeGoogAdmissibleName(fileName);
 		}
 	}
 
 	return transformerHost;
 }
-
-/**
- * A valid goog.module name must start with [a-zA-Z_$] end only contain [a-zA-Z0-9._$].
- * Maps path separators to ".",
- */
-function convertToGoogModuleAdmissibleName(modulePath: string): string {
-	return modulePath
-		.replace(/\.[tj]sx?$/, '') //remove file extension
-		.replace(/[\/\\]/g, '.')
-		.replace(/^[^a-zA-Z_$]/, '_')
-		.replace(/[^a-zA-Z0-9._$]/g, '_');
-}
-

@@ -13,12 +13,17 @@ function extractRequire(call: ts.CallExpression): string | null {
 	return getRequiredModuleName(call);
 }
 
-function extractGoogRequire(call: ts.CallExpression): string | null {
-	// Verify that the call is a call of a form goog.require(...).
+type TGoogRequireLike = "require" | "requireType";
+
+/**
+ * Verify that the call is a call of a form goog.require(...).
+ * @param requireLike require, requireType, provides, ...
+ */
+function extractGoogRequireLike(call: ts.CallExpression, requireLike:TGoogRequireLike): string | null {
 	let exp = call.expression;
 	if (!ts.isPropertyAccessExpression(exp)) return null;
 	if (!ts.isIdentifier(exp.expression) || exp.expression.escapedText !== 'goog') return null;
-	if (exp.name.escapedText !== 'require') return null;
+	if (exp.name.escapedText !== requireLike) return null;
 
 	return getRequiredModuleName(call);
 }
@@ -53,7 +58,7 @@ function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable {
 	return {importedUrl, newIdent: decl.name};
 }
 
-function isGoogRequireStatement(stmt: ts.Statement): IImportedVariable {
+export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike:TGoogRequireLike): IImportedVariable {
 	if (!ts.isVariableStatement(stmt)) return;
 	// Verify it's a single decl (and not "var x = ..., y = ...;").
 	if (stmt.declarationList.declarations.length !== 1) return;
@@ -64,7 +69,7 @@ function isGoogRequireStatement(stmt: ts.Statement): IImportedVariable {
 	if (!decl.initializer || !ts.isCallExpression(decl.initializer)) {
 		return;
 	}
-	const importedUrl = extractGoogRequire(decl.initializer);
+	const importedUrl = extractGoogRequireLike(decl.initializer, requireLike);
 	if (!importedUrl) return;
 	return {importedUrl, newIdent: decl.name};
 }
@@ -80,7 +85,7 @@ export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.
 
 export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier {
 	for (let stmt of sf.statements) {
-		let _ = isGoogRequireStatement(stmt);
+		let _ = isGoogRequireLikeStatement(stmt, "require");
 		if (!_) continue;
 		if (_.importedUrl !== moduleName) continue;
 		return _.newIdent;

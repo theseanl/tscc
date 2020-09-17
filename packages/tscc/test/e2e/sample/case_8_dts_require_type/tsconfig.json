@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es5",
-		"types": []
+		"moduleResolution": "node"
 	},
 	"include": [
 		"./*.ts"

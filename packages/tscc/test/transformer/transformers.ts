@@ -105,6 +105,10 @@ describe(`restPropertyTransformer`, function () {
 	})
 });
 
+describe(`dts_requiretype_transformer`, () => {
+	test.todo(`modifies requireType calls to a global variable`)
+});
+
 type EmitTransformerFactory = (host: tsickle.TsickleHost) => tsickle.EmitTransformers;
 
 function emit(tsconfigPath: string, files: string[], transformerFactory: EmitTransformerFactory, override: Partial<ts.CompilerOptions> = {}) {
