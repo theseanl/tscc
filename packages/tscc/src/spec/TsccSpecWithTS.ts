@@ -55,7 +55,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		return configFileName;
 	}
 	private static loadTsConfigFromResolvedPath(configFileName: string, options: ts.CompilerOptions) {
-		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, options, <any>ts.sys);
+		const compilerHost: ts.ParseConfigFileHost = Object.create(ts.sys);
+		compilerHost.onUnRecoverableConfigFileDiagnostic = (diagnostic) => {throw new TsError([diagnostic]);}
+		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, options, compilerHost);
 		if (parsedConfig.errors.length) {
 			throw new TsError(parsedConfig.errors);
 		}
