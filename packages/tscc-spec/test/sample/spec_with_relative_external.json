@@ -1,0 +1,9 @@
+{
+    "modules": {
+        "out": "index.ts"
+    },
+    "external": {
+        "non-relative": "nonRelative",
+        "./external/containing/relative/path": "relative"
+    }
+}

@@ -87,7 +87,7 @@ export default async function tscc(
 		.map(tsDepsGraph.addRootFile, tsDepsGraph);
 	// If user explicitly provided `types` compiler option, it is more likely that its type is actually
 	// used in user code.
-		tsccLogger.log(JSON.stringify([...tsDepsGraph.iterateFiles()]))
+
 	const transformerHost = getTsickleHost(tsccSpec, tsDepsGraph, tsLogger);
 
 	/**
@@ -345,10 +345,11 @@ function pushTsickleOutputToStream(
 	});
 }
 
-function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph:TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
+function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
 	const options = tsccSpec.getCompilerOptions();
 	const compilerHost = tsccSpec.getCompilerHost();
 	const externalModuleNames = tsccSpec.getExternalModuleNames();
+	const externalModuleData = tsccSpec.getExternalModuleDataMap();
 
 	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules/"];
 
@@ -385,7 +386,8 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph:TypescriptD
 		},
 		options,
 		/**
-		 * Supports import from './dir' that resolves to './dir/index.ts'
+		 * The name suggests that it supports import from './dir' that resolves to './dir/index.ts'.
+		 * In effect, enabling this make `pathToModuleName` to be fed with
 		 */
 		convertIndexImportShorthand: true,
 		moduleResolutionHost: compilerHost,
@@ -397,11 +399,14 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph:TypescriptD
 		 * deterministic output based on a single file.
 		 */
 		pathToModuleName: (context: string, fileName: string) => {
-			// Module names specified as external are not resolved, which in effect cause
-			// googmodule transformer to emit module names verbatim in `goog.require()`.
-			if (externalModuleNames.includes(fileName)) return fileName;
 			// 'tslib' is always considered as an external module.
 			if (fileName === 'tslib') return fileName;
+			if (externalModuleData.has(fileName)) {
+				let data = externalModuleData.get(fileName);
+				// Module names specified as external are not resolved, which in effect cause
+				// googmodule transformer to emit module names verbatim in `goog.require()`.
+				if (!data.isFilePath) return fileName;
+			}
 			// Resolve module via ts API
 			const resolved = ts.resolveModuleName(fileName, context, options, compilerHost);
 			if (resolved && resolved.resolvedModule) {

@@ -10,9 +10,9 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(pluginOptions);
 
 	const isManyModuleBuild = spec.getOrderedModuleSpecs().length > 1;
-	const globals = spec.getExternalModuleNamesToGlobalsMap();
+	const globals = spec.getRollupExternalModuleNamesToGlobalMap();
 
-	// virtual modules, see https://rollupjs.org/guide/en#conventions 
+	// virtual modules, see https://rollupjs.org/guide/en#conventions
 	const EMPTY_BUNDLE_ID = "\0empty_bundle_id";
 
 	/* Plugin methods start */
@@ -95,7 +95,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 };
 
 function isChunk(output: rollup.OutputChunk | rollup.OutputAsset): output is rollup.OutputChunk {
-	return (output as rollup.OutputAsset).isAsset !== true;
+	return output.type === 'chunk';
 }
 
 function handleError<H extends (this: rollup.PluginContext, ..._: unknown[]) => unknown>(hook: H): H {

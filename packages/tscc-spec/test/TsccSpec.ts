@@ -50,7 +50,7 @@ describe(`TsccSpec`, () => {
 				errorThrown = e;
 			}
 			expect(errorThrown).toBeTruthy();
-			expect(errorThrown.message).toBe(`No spec file was found from /.`);
+			expect(errorThrown.message).toMatch(/^No spec file was found from /);
 		});
 
 		const invalidSpecJSONPath = path.join(__dirname, 'sample/invalid_json.json');
@@ -66,6 +66,15 @@ describe(`TsccSpec`, () => {
 				TsccSpec.loadSpec({specFile: invalidSpecJSONPath})
 			}).toThrowError(TsccSpecError);
 		});
+	});
+	describe(`getExternalModulenames`, () => {
+		const externalModuleSpecPath = path.join(__dirname, 'sample/spec_with_relative_external.json');
+		test(`it resolves dot-path like external module names (those starting with ./ or ../) to an absolute path`, () => {
+			const spec = TsccSpec.loadSpec({specFile: externalModuleSpecPath});
+			expect(new Set(spec.getExternalModuleNames())).toEqual(
+				new Set(["non-relative", path.resolve(__dirname, "sample/external/containing/relative/path")])
+			);
+		})
 	})
 });
 

@@ -53,27 +53,27 @@ export default class TypescriptDependencyGraph {
 		private host: ts.ScriptReferenceHost
 	) {}
 	private visited: Set<string> = new Set();
-	private defaultLibDir = path.dirname(ts.getDefaultLibFilePath(this.host.getCompilerOptions()));
-
-	private isDefaultLib(fileName:string) {
+	private defaultLibDir = path.normalize(path.dirname(
+		ts.getDefaultLibFilePath(this.host.getCompilerOptions())
+	));
+	private isDefaultLib(fileName: string) {
 		return fileName.startsWith(this.defaultLibDir);
 	}
-	private isTslib(fileName:string) {
+	private isTslib(fileName: string) {
 		return getPackageBoundary(fileName).endsWith(path.sep + 'tslib' + path.sep);
 	}
 	private walk(fileName: string) {
 		if (typeof fileName !== 'string') return;
-
+		// Typescript may use unix-style path separators in internal APIs even on Windows environment.
+		// We should normalize it because we use string === match on file names, for example in
+		// shouldSkipTsickleProcessing.
+		fileName = path.normalize(fileName);
 		// Default libraries (lib.*.d.ts) files and tslib.d.ts are not processed by tsickle.
-		if (this.isDefaultLib(fileName)) return;
-		if (this.isTslib(fileName)) return;
-
-		// add file to visited
+		if (this.isDefaultLib(fileName) || this.isTslib(fileName)) return;
+		// add file to visited set
 		if (this.visited.has(fileName)) return;
 		this.visited.add(fileName);
-
 		const sf = <SourceFileWithInternalAPIs>this.host.getSourceFile(fileName);
-
 		/**
 		 * Files imported to the current file are available in `resolvedModules` property.
 		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processImportedModules`
@@ -110,10 +110,10 @@ export default class TypescriptDependencyGraph {
 			}
 		}
 	}
-	addRootFile(fileName:string) {
+	addRootFile(fileName: string) {
 		this.walk(fileName);
 	}
-	hasFile(fileName:string) {
+	hasFile(fileName: string) {
 		return this.visited.has(fileName);
 	}
 	// Currently this is only used in tests.

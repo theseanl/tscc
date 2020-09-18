@@ -8,24 +8,21 @@
 import path = require('path');
 
 function codePoint(char: string) {return char.codePointAt(0);}
-
+/**************************************************************************************************/
 const LOWERCASE_A_CODE_POINT = codePoint('a');
 const LOWERCASE_Z_CODE_POINT = codePoint('z');
 const UPPERCASE_A_CODE_POINT = codePoint('A');
 const UPPERCASE_Z_CODE_POINT = codePoint('Z');
-
 const PERIOD_CODE_POINT = codePoint('.');
 const LOWER_DASH_CODE_POINT = codePoint('_');
 const DOLLAR_SIGN_CODE_POINT = codePoint('$');
-
 const ZERO_CODE_POINT = codePoint('0');
 const NINE_CODE_POINT = codePoint('9');
-
-const SEP = path.sep
-
+const SEP = path.sep;
+/**************************************************************************************************/
 function isLatin(code: number) {
-	return (LOWERCASE_A_CODE_POINT <= code && code <= LOWERCASE_Z_CODE_POINT)
-		|| (UPPERCASE_A_CODE_POINT <= code && code <= UPPERCASE_Z_CODE_POINT);
+	return ((LOWERCASE_A_CODE_POINT <= code && code <= LOWERCASE_Z_CODE_POINT) ||
+		(UPPERCASE_A_CODE_POINT <= code && code <= UPPERCASE_Z_CODE_POINT));
 }
 function isNumber(code: number) {
 	return ZERO_CODE_POINT <= code && code <= NINE_CODE_POINT;
@@ -39,7 +36,7 @@ function isPeriod(code: number) {
 function isDollarSign(code: number) {
 	return code === DOLLAR_SIGN_CODE_POINT;
 }
-
+/**************************************************************************************************/
 /**
  *                   Latin  ⟹  Latin
  *                  number  ⟹  number
@@ -70,7 +67,6 @@ export function escapeGoogAdmissibleName(name: string): string {
 	}
 	return out;
 }
-
 export function unescapeGoogAdmissibleName(escapedName: string): string {
 	let out = "";
 	let i = 0;
@@ -91,14 +87,13 @@ export function unescapeGoogAdmissibleName(escapedName: string): string {
 			} else {
 				// Read next 4 chars
 				try {
-					let base32Codes = parseInt(escapedName.substr(i + 1, 4), 36)
+					let base32Codes = parseInt(escapedName.substr(i + 1, 4), 36);
 					out += String.fromCodePoint(base32Codes);
 					i += 5;
 				} catch (e) {
 					console.log(escapedName);
 					throw new RangeError(`Invalid characters between position ${i + 1} and ${i + 4}`);
 				}
-
 			}
 		} else {
 			throw new RangeError(`Invalid character at position ${i}`);
@@ -106,7 +101,6 @@ export function unescapeGoogAdmissibleName(escapedName: string): string {
 	}
 	return out;
 }
-
 export function escapedGoogNameIsDts(escapedName: string) {
 	return escapedName.endsWith("$.d$.ts");
 }

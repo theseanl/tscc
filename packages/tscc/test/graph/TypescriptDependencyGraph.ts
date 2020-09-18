@@ -11,7 +11,11 @@ describe(`TypescriptDependencyGraph`, () => {
 		graph.addRootFile(
 			path.join(testProjectRoot, 'entry.ts')
 		);
-		expect(new Set(graph.iterateFiles())).toEqual(new Set([
+		// Typescript seems to be using unix-style path separators internally even on windows,
+		// so we are normalizing those in order for the test meaning is invariant regardless of os.
+		expect(new Set(
+			[...graph.iterateFiles()].map(path.normalize)
+		)).toEqual(new Set([
 			"entry.ts",
 			"a.ts",
 			"node_modules/aa/types2.d.ts",
@@ -23,7 +27,7 @@ describe(`TypescriptDependencyGraph`, () => {
 			"node_modules/c/types.d.ts",
 			"node_modules/c/cb.d.ts",
 			"node_modules/c/node_modules/cc/cc.d.ts"
-		].map(relPath => path.normalize(path.join(testProjectRoot, relPath)))));
+		].map(relPath => path.join(testProjectRoot, relPath))));
 	});
 });
 
