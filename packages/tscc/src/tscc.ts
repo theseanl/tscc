@@ -348,7 +348,6 @@ function pushTsickleOutputToStream(
 function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
 	const options = tsccSpec.getCompilerOptions();
 	const compilerHost = tsccSpec.getCompilerHost();
-	const externalModuleNames = tsccSpec.getExternalModuleNames();
 	const externalModuleData = tsccSpec.getExternalModuleDataMap();
 
 	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules/"];

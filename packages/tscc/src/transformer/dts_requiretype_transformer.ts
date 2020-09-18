@@ -57,7 +57,6 @@ export default function dtsRequireTypeTransformer(spec: ITsccSpecWithTS, tsickle
 				// in tsickle/src/externs.js.
 				// This relies on the heuristic of tsickle, so must be carefully validated whenever tsickle updates.
 				let mangledNamespace = moduleNameAsIdentifier(tsickleHost, absoluteOrigUrl);
-				console.log("mangled " + mangledNamespace);
 				if (newIdent.escapedText === mangledNamespace) {
 					// Name of the introduced identifier coincides with the global identifier,
 					// no need to emit things.

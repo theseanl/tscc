@@ -6,8 +6,5 @@
         "external": "external",
         "./imported": "imported"
     },
-    "prefix": ".tscc_temp/case_8_dts_requiretype/",
-    "debug": {
-        "persistArtifacts": true
-    }
+    "prefix": ".tscc_temp/case_8_dts_requiretype/"
 }

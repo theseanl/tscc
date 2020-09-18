@@ -261,6 +261,17 @@ Best practice is to provide them as a separate script tag instead of bundling it
     ```
     tsickle writes module-scoped externs to certain mangled namespace like this, so by declaring a global variable to be a type of that namespace, this provides type information of the external module to Closure Compiler.
 
+#### How compilation source files are determined
+
+In order to generate externs for external modules, TSCC has to provide declaration files to tsickle. Which files are provided? Typescript compiler's default behavior is hidden in most of cases, because `.d.ts` files does not anyway affect the compilation output. However, `.d.ts` files are used to generate externs in TSCC, so sometimes you may need to know this for troubleshooting.
+
+The Typescript compiler's default behavior is to include every type declarations in `./node_modules/@types/`, `../node_modules/@types/`, `../../node_modules/@types/`, ..., and if you specify `"types": ["a", "b", ...]` in compiler options, it instead only includes files in `(../)node_modules/@types/a/` -- See official documentation on [`types`](https://www.typescriptlang.org/tsconfig#types) and [`typeRoots`](https://www.typescriptlang.org/tsconfig#typeRoots).
+
+In comparison, TSCC will only include a file when it is reachable from _root files_ via transitive `import`s, triple-slash reference directives `///<reference path="..."/>` and `///<reference types="..."/>`. Root files will be the following:
+ - module entry points designated in the spec file,
+ - external module's base type declaration files,
+ - modules included in tsconfig.json `types` key.
+
 #### Importing typescript sources in node_modules
 
 In order for typescript sources in node_modules directory to be compiled, you need to explicitly include those files in your `tsconfig.json`. This is a rule imposed by the typescript compiler; it has some special handling for files in node_modules directory, it won't transpile such files unlike usual transitive dependencies (that is, files not explicitly included in `tsconfig.json` via `"files"` or `"includes"` keys, but is referenced via `import` or `///<reference path="..." />` from a file that is included in `tsconfig.json`). In order to have them compiled, you need to explicitly mention those files in node_modules directory. For instance, if you are using a package `my_package` that contains typescript sources, you can add a key `{"includes": ["node_modules/my_package/**/*.ts"]}` to your tsconfig.
