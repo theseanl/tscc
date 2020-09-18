@@ -6085,9 +6085,9 @@ rollup-plugin-virtual@^1.0.1:
   integrity sha512-HCTBpV8MwP5lNzZrHD2moVxHIToHU1EkzkKGVj6Z0DcgUfxrxrZmeQirQeLz2yhnkJqRjwiVywK9CS8jDYakrw==
 
 rollup@^2.26.3:
-  version "2.26.3"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.26.3.tgz#502c755872a4590937cfa4e8f7eb99d3bc3c4025"
-  integrity sha512-Mlt39/kL2rA9egcbQbaZV1SNVplGqYYhDDMcGgHPPE0tvM3R4GrB+IEdYy2QtTrdzMQx57ZcqDFf/KWWm8F+uw==
+  version "2.27.1"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.27.1.tgz#372744e1d36eba0fd942d997600c2fc2ca266305"
+  integrity sha512-GiWHQvnmMgBktSpY/1+nrGpwPsTw4b9P28og2uedfeq4JZ16rzAmnQ5Pm/E0/BEmDNia1ZbY7+qu3nBgNa19Hg==
   optionalDependencies:
     fsevents "~2.1.2"
 
