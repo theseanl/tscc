@@ -4,6 +4,7 @@
 		"module": "commonjs",
 		"declaration": false,
 		"importHelpers": true,
-		"experimentalDecorators":true
+		"experimentalDecorators": true,
+		"types": []
 	}
 }
