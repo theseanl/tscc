@@ -3253,10 +3253,10 @@ google-closure-compiler-linux@^20200719.0.0:
   resolved "https://registry.yarnpkg.com/google-closure-compiler-linux/-/google-closure-compiler-linux-20200719.0.0.tgz#ae05cbda0cc4466fb59b9eabb4905132297d44d2"
   integrity sha512-hqPP8/7g7IMhcVle9xJ0aeiI4oRCucUGrWtQ12VwswKu2tyXTk2BDcXj5WqHae6TDPUONikQ8MCJSIENGLBC2Q==
 
-google-closure-compiler-osx@^20200719.0.0:
-  version "20200719.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-osx/-/google-closure-compiler-osx-20200719.0.0.tgz#47cbe26dbd04625081abf1d560b4e16ec6a03c74"
-  integrity sha512-Y0RDdOAJ7CLya0pMjmLahiqh7b9aJGybKBTxPywK2CiJj1+z+EtvXN+QsaM0aSE8yvuvIbAWHOX4FjEXMRiTmw==
+google-closure-compiler-osx@^20200920.0.0:
+  version "20200920.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-osx/-/google-closure-compiler-osx-20200920.0.0.tgz#6157a06e7d851d25d60de95c4bcd464d768278b1"
+  integrity sha512-2WY+HaUWVQNg9WZs9d4Op3zvS6yIVN2AIouU4grwYWXfFk+CMXZou0ASlsOURaYc2WZ22LW/G1w3vINDoCkSww==
 
 google-closure-compiler-windows@^20200719.0.0:
   version "20200719.0.0"
