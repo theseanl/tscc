@@ -38,7 +38,7 @@
 		"magic-string": "^0.25.4"
 	},
 	"optionalDependencies": {
-		"google-closure-compiler-linux": "^20200719.0.0",
+		"google-closure-compiler-linux": "^20200920.0.0",
 		"google-closure-compiler-osx": "^20200719.0.0",
 		"google-closure-compiler-windows": "^20200719.0.0"
 	},
