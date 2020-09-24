@@ -102,7 +102,7 @@ describe(`restPropertyTransformer`, function () {
 describe(`dts_requiretype_transformer`, () => {
 	test(`modifies requireType calls to a global variable`, () => {
 		const testFiles = [
-			"dts_requireType/entry.ts"
+			"dts_requiretype/entry.ts"
 		];
 		const mockSpec = <ITsccSpecWithTS>{
 			getTSRoot() {

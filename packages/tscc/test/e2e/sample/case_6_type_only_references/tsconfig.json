@@ -1,6 +1,3 @@
 {
-	"compilerOptions": {
-		"target": "es6",
-		"types": []
-	}
+	"extends": "../../../tsconfig.test_files.json"
 }

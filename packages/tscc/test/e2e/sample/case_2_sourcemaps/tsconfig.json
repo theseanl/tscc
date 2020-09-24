@@ -1,6 +1,6 @@
 {
+	"extends": "../../../tsconfig.test_files.json",
 	"compilerOptions": {
-		"sourceMap": true,
-		"types": []
+		"sourceMap": true
 	}
 }

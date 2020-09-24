@@ -1,0 +1,11 @@
+{
+	"compilerOptions": {
+		"types": [],
+		"target": "es6",
+		"module": "commonjs",
+		"declaration": false,
+		"importHelpers": true,
+		"moduleResolution": "node",
+		"forceConsistentCasingInFileNames": true
+	}
+}
