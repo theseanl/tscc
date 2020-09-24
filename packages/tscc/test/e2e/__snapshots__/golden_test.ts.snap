@@ -115,3 +115,14 @@ exports[`tscc e2e case_8_dts_requiretype: case_8_dts_requiretype/module.js 1`] =
 "var c=external;window.a=imported.b();window.b=c.a;
 "
 `;
+
+exports[`tscc e2e case_9_ts_in_node_modules: case_9_ts_in_node_modules 1`] = `
+Array [
+  "index.js",
+]
+`;
+
+exports[`tscc e2e case_9_ts_in_node_modules: case_9_ts_in_node_modules/index.js 1`] = `
+"console.log(1);
+"
+`;
