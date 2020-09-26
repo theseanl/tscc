@@ -1,0 +1,13 @@
+{
+	"modules": {
+		"entry": "./entry.js"
+	},
+	"external": {
+		"external": "externalInNodeModules",
+		"./external_with_file_paths": "externalWithFilePaths"
+	},
+	"prefix": {
+		"rollup": "./golden/generated_",
+		"cc": "."
+	}
+}

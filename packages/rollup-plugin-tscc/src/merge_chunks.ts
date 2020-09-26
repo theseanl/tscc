@@ -1,13 +1,14 @@
 import * as rollup from 'rollup';
 import MultiMap from './MultiMap';
 import path = require('path');
-
+let counter = 0;
 export default async function mergeChunks(
 	entry: string,
 	chunkAllocation: MultiMap<string, string>,
 	bundle: rollup.OutputBundle,
 	globals?: {[id: string]: string}
 ) {
+	require('console').log(bundle);
 	return await new ChunkMerger(entry, chunkAllocation, bundle, globals).getBundleOutput();
 }
 
@@ -27,7 +28,7 @@ class ChunkMerger {
 		private bundle: Readonly<rollup.OutputBundle>,
 		private globals?: {[id: string]: string}
 	) {}
-	private resolveGlobalForMainBuild(id:string) {
+	private resolveGlobalForMainBuild(id: string) {
 		if (typeof this.globals !== 'object') return;
 		if (!this.globals.hasOwnProperty(id)) return;
 		return this.globals[id];
@@ -121,7 +122,7 @@ class ChunkMerger {
 		if (allocated !== id) ns += '.' + this.chunkNamespaces.get(id);
 		return ns;
 	}
-	// TODO inherit outputOption provided by the caller
+	// TODO: inherit outputOption provided by the caller
 	async getBundleOutput(): Promise<rollup.OutputChunk> {
 		this.populateEntryModuleNamespaces();
 		this.populateChunkNamespaces();

@@ -5,7 +5,7 @@ import fg = require('fast-glob');
 import path = require('path');
 
 const samplesRoot = path.join(__dirname, 'sample');
-// Using cwd as __dirname in order to produce jest snapshots that are independent of cwd. 
+// Using cwd as __dirname in order to produce jest snapshots that are independent of cwd.
 // Providing cwd in order to produce jest snapshots that are independent of cwd calling jest
 const bundleSpecs = <string[]>fg.sync(`*/tscc.spec.json`, {cwd: samplesRoot});
 
@@ -18,7 +18,8 @@ describe(`Golden Tests:`, () => {
 			]
 		});
 		const {output} = await bundle.generate({
-			dir: '.'
+			dir: '.',
+			format: 'iife'
 		});
 		Object.keys(output).sort().forEach(name => {
 			let chunk = output[name];

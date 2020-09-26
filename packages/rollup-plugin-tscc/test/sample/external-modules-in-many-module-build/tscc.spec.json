@@ -1,0 +1,20 @@
+{
+	"modules": {
+		"entry": "./entry.js",
+		"dependent": {
+			"entry": "./dependent.js",
+			"dependencies": [
+				"entry"
+			]
+		}
+	},
+	"external": {
+		"./external-entry": "a",
+		"./external-dependent": "b",
+		"./common/external/from/common": "c"
+	},
+	"prefix": {
+		"rollup": "./golden/generated_",
+		"cc": "."
+	}
+}

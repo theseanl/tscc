@@ -33,6 +33,28 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			// Intermediate build format is 'es'.
 			outputOptions.format = 'es';
 		}
+		/**
+		 * "paths" option is mainly intended to replace external module paths to 3rd-party CDN urls
+		 * in the bundle output.
+		 *
+		 * Why are we doing this? Currently rollup's handling of external modules provided via
+		 * absolute path is somewhat buggy. I haven't tracked down the exact cause, but sometimes
+		 * external modules' paths are relative to CWD, sometimes relative to the common demoninator
+		 * of files (check inputBase of rollup source). It seems that this is consistent internally,
+		 * but not when user-provided absolute paths are involved. In particular the
+		 * "external-modules-in-many-module-build" test case fails.
+		 *
+		 * One place where one replaces an absolute path to a relative path is
+		 * `ExternalModule.setRenderPath` which sets `renderPath` which is later resolved relatively
+		 * from certain path to compute final path in import statements. If outputOption.path
+		 * function is provided, the value produced by this function is used as `renderPath`
+		 * instead, so we are hooking into it so that `renderPath` is set to an absolute path.
+		 */
+		const orig = outputOptions.paths;
+		outputOptions.paths = (id) => {
+			if (id in globals) return id;
+			if (typeof orig === 'function') return orig(id);
+		}
 		return outputOptions;
 	};
 	const resolveId: rollup.ResolveIdHook = (source) => {
@@ -54,7 +76,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		this: rollup.PluginContext, options, bundle, isWrite
 	) {
 		// Quick path for single-module builds
-		if (spec.getOrderedModuleSpecs.length === 1) return;
+		if (spec.getOrderedModuleSpecs().length === 1) return;
 
 		// Get entry dependency from spec
 		const entryDeps = spec.getRollupOutputNameDependencyMap();
