@@ -198,7 +198,9 @@ CLI equivalent is `--module <module_name>:<entry_file>:<comma_separated_dependen
 }
 ```
 
-It is identical to the [`output.global` option](https://rollupjs.org/guide/en#core-functionality) of rollup. It is a key-value pair, where key is a module name as used in `import ... from 'module_name'` statement, and value is a name of a global variable which this imported value will refer to.
+It is mostly identical to the [`output.global` option](https://rollupjs.org/guide/en#core-functionality) of rollup. It is a key-value pair, where key is a module name whose content will not be included in the bundle output, and value is a name of a global variable to which an `module.exports` of the module will be aliased.
+
+If a module name is a relative path, the file it _resolves to_ will be treated as an external module. This is similar to rollup's case, but is different in that only relative path can be used and absolute paths can't. Such paths are resolved in the same convention how other relative paths in the spec file are resolved, see `prefix` option description.
 
 CLI equivalent is `--external <module_name>:<global_variable_name>`.
 
