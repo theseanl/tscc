@@ -8,6 +8,7 @@ import dtsRequireTypeTransformer from '../../src/transformer/dts_requiretype_tra
 import ITsccSpecWithTS from '../../src/spec/ITsccSpecWithTS';
 import {escapeGoogAdmissibleName} from '../../src/shared/escape_goog_identifier';
 import path = require('path');
+import upath = require('upath');
 
 const samplesRoot = path.resolve(__dirname, '../sample');
 
@@ -165,6 +166,7 @@ function emit(
 		(fileName, data) => {
 			fileName = path.relative(samplesRoot, fileName);
 			fileName = fileName.slice(0, -path.extname(fileName).length) + '.ts';
+			fileName = upath.toUnix(fileName); // so that test outputs are independent of platforms
 			out.set(fileName, data);
 		},
 		undefined /* cancellationtoken */, false /* emitOnlyDtsFiles */,
