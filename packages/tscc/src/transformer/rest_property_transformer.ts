@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import {TsickleHost} from 'tsickle';
-import TsHelperTransformer from './TsHelperTransformer';
+import TsHelperTransformer from './ts_helper_transformer';
 
 export default function decoratorPropertyTransformer(tsickleHost: TsickleHost):
 	(context: ts.TransformationContext) => ts.Transformer<ts.SourceFile> {

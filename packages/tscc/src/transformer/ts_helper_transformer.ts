@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Contains a common logic that is used to typescript transformers that transforms
+ * ts helper (those in tslib) emits.
+ */
 import * as ts from 'typescript';
 import {TsickleHost} from 'tsickle';
 import {createGoogCall, findImportedVariable, findGoogRequiredVariable, identifierIsEmitHelper} from './transformer_utils'

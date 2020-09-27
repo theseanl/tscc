@@ -10,7 +10,7 @@ export interface INamedModuleSpecsWithId extends INamedModuleSpecs {
  * the containing directory of the `tscc.spec.json`.
  */
 export default interface ITsccSpec {
-	getOrderedModuleSpecs():INamedModuleSpecs[]
+	getOrderedModuleSpecs(): INamedModuleSpecs[]
 	/**
 	 * Returns an array of external module names.
 	 */
@@ -18,7 +18,7 @@ export default interface ITsccSpec {
 	/**
 	 * Returns an object that maps external module names to its assumed global names.
 	 */
-	getExternalModuleNamesToGlobalsMap(): {[moduleName: string]: string}
+	getExternalModuleDataMap(): ReadonlyMap<string, Readonly<ExternalModuleData>>
 	/**
 	 * Returns a list of file names provided by the jsFiles key.
 	 */
@@ -26,5 +26,10 @@ export default interface ITsccSpec {
 	/**
 	 * Get debugging options.
 	 */
-	debug():Readonly<IDebugOptions>
+	debug(): Readonly<IDebugOptions>
+}
+
+export interface ExternalModuleData {
+	globalName: string,
+	isFilePath: boolean
 }

@@ -23,10 +23,10 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 		return resolvedPrefix;
 	}
 	private rollupPrefix = this.getResolvedRollupPrefix();
-	private addPrefix(name:string){
+	private addPrefix(name: string) {
 		return this.rollupPrefix + name;
 	}
-	private addPrefixAndExtension(name:string) {
+	private addPrefixAndExtension(name: string) {
 		return this.rollupPrefix + name + '.js';
 	}
 	getRollupOutputNameToEntryFileMap() {
@@ -38,8 +38,8 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 		return out;
 	}
 	getRollupOutputNameDependencyMap() {
-		let out = new MultiMap<string,string>();
-		for (let { moduleName, dependencies } of this.getOrderedModuleSpecs()) {
+		let out = new MultiMap<string, string>();
+		for (let {moduleName, dependencies} of this.getOrderedModuleSpecs()) {
 			// we set outputOption.entryFileName as [name].js - gotta add .js to match
 			// an expected output file name.
 			out.putAll(
@@ -47,6 +47,14 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 				dependencies.map(this.addPrefixAndExtension, this));
 		}
 		return out
+	}
+	getRollupExternalModuleNamesToGlobalMap() {
+		const globals = {};
+		let external = this.getExternalModuleDataMap();
+		for (let [moduleName, {globalName}] of external) {
+			globals[moduleName] = globalName;
+		}
+		return globals;
 	}
 }
 

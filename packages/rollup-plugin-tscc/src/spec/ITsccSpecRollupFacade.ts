@@ -1,4 +1,4 @@
-import { ITsccSpec } from '@tscc/tscc-spec'
+import {ITsccSpec} from '@tscc/tscc-spec'
 import MultiMap from '../MultiMap';
 
 export default interface ITsccSpecRollupFacade extends ITsccSpec {
@@ -13,6 +13,10 @@ export default interface ITsccSpecRollupFacade extends ITsccSpec {
 	 * This map is supposed to be ordered by an order that is provided by user, or yet topologically
 	 * sorted.
 	 */
-	getRollupOutputNameDependencyMap():MultiMap<string,string>
+	getRollupOutputNameDependencyMap(): MultiMap<string, string>
+	/**
+	 * Returns a key-value pair that can be directly used to rollup output.globals option.
+	 */
+	getRollupExternalModuleNamesToGlobalMap(): {[moduleName: string]: string}
 }
 

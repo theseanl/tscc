@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "importHelpers": true
+    },
+    "includes": [
+        "entry.ts"
+    ]
+}

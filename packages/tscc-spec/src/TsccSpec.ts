@@ -1,4 +1,4 @@
-import ITsccSpec from './ITsccSpec';
+import ITsccSpec, {ExternalModuleData} from './ITsccSpec';
 import ITsccSpecJSON, {IModule, INamedModuleSpecs, IDebugOptions} from './ITsccSpecJSON';
 import {DirectedTree, CycleError} from './shared/Graph';
 import path = require('path');
@@ -35,7 +35,7 @@ export default class TsccSpec implements ITsccSpec {
 	private static readonly RE_DOT_PATH = new RegExp('^[\\.]{1,2}' + TsccSpec.PATH_SEP);
 	private static readonly RE_ENDS_WITH_SEP = new RegExp(TsccSpec.PATH_SEP + '$');
 	private static isDotPath(p: string) {return TsccSpec.RE_DOT_PATH.test(p);}
-	private static endsWithSep(p:string){return TsccSpec.RE_ENDS_WITH_SEP.test(p);}
+	private static endsWithSep(p: string) {return TsccSpec.RE_ENDS_WITH_SEP.test(p);}
 	/**
 	 * Follows the behavior of Typescript CLI.
 	 * 1. If --project argument is supplied,
@@ -133,6 +133,7 @@ export default class TsccSpec implements ITsccSpec {
 		protected basePath: string
 	) {
 		this.computeOrderedModuleSpecs();
+		this.resolveRelativeExternalModuleNames();
 	}
 	private orderedModuleSpecs: INamedModuleSpecs[];
 	private computeOrderedModuleSpecs() {
@@ -217,13 +218,22 @@ export default class TsccSpec implements ITsccSpec {
 		if (typeof prefix === 'string') return prefix;
 		return prefix[target];
 	}
-	getExternalModuleNames() {
-		if (!this.tsccSpec.external) return [];
-		return Object.keys(this.tsccSpec.external);
+	private external: Map<string, ExternalModuleData> = new Map();
+	private resolveRelativeExternalModuleNames() {
+		if (!('external' in this.tsccSpec)) return;
+		for (let [moduleName, globalName] of Object.entries(this.tsccSpec.external)) {
+			if (TsccSpec.isDotPath(moduleName)) {
+				this.external.set(this.absolute(moduleName), {globalName, isFilePath: true});
+			} else {
+				this.external.set(moduleName, {globalName, isFilePath: false});
+			}
+		}
 	}
-	getExternalModuleNamesToGlobalsMap() {
-		if (!this.tsccSpec.external) return {};
-		return Object.assign({}, this.tsccSpec.external);
+	getExternalModuleNames() {
+		return [...this.external.keys()];
+	}
+	getExternalModuleDataMap(): ReadonlyMap<string, Readonly<ExternalModuleData>> {
+		return this.external;
 	}
 	getJsFiles() {
 		let jsFiles = this.tsccSpec.jsFiles;

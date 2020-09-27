@@ -1,11 +1,16 @@
 {
 	"compilerOptions": {
-		"lib": ["es7"],
-		"types": ["node"],
+		"lib": [
+			"es7"
+		],
+		"types": [
+			"node"
+		],
 		"target": "es2017",
 		"module": "commonjs",
-		"experimentalDecorators": true,
 		"declaration": true,
-		"stripInternal": true
+		"stripInternal": true,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true
 	}
 }

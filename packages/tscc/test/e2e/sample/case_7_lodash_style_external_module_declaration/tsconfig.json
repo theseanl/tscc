@@ -1,7 +1,5 @@
 {
-	"compilerOptions": {
-		"target": "es5"
-	},
+	"extends": "../../../tsconfig.test_files.json",
 	"include": [
 		"./*.ts"
 	]

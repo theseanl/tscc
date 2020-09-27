@@ -1,6 +1,7 @@
 import * as rollup from 'rollup';
 import MultiMap from './MultiMap';
 import path = require('path');
+import upath = require('upath');
 
 export default async function mergeChunks(
 	entry: string,
@@ -27,7 +28,7 @@ class ChunkMerger {
 		private bundle: Readonly<rollup.OutputBundle>,
 		private globals?: {[id: string]: string}
 	) {}
-	private resolveGlobalForMainBuild(id:string) {
+	private resolveGlobalForMainBuild(id: string) {
 		if (typeof this.globals !== 'object') return;
 		if (!this.globals.hasOwnProperty(id)) return;
 		return this.globals[id];
@@ -65,11 +66,12 @@ class ChunkMerger {
 	private createFacadeModuleCode(): string {
 		const importStmts: string[] = [];
 		const exportStmts: string[] = [];
-		exportStmts.push(`export * from '${this.entry}'`);
+		// nodejs specification only allows posix-style path separators in module IDs.
+		exportStmts.push(`export * from '${upath.toUnix(this.entry)}'`);
 		for (let chunk of this.chunkAllocation.iterateValues(this.entry)) {
 			if (chunk === this.entry) continue;
 			let chunkNs = this.chunkNamespaces.get(chunk);
-			importStmts.push(`import * as ${chunkNs} from '${chunk}'`);
+			importStmts.push(`import * as ${chunkNs} from '${upath.toUnix(chunk)}'`);
 			exportStmts.push(`export { ${chunkNs} }`);
 		}
 		const facadeModuleCode = [...importStmts, ...exportStmts].join('\n');
@@ -121,7 +123,7 @@ class ChunkMerger {
 		if (allocated !== id) ns += '.' + this.chunkNamespaces.get(id);
 		return ns;
 	}
-	// TODO inherit outputOption provided by the caller
+	// TODO: inherit outputOption provided by the caller
 	async getBundleOutput(): Promise<rollup.OutputChunk> {
 		this.populateEntryModuleNamespaces();
 		this.populateChunkNamespaces();

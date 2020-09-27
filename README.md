@@ -198,7 +198,9 @@ CLI equivalent is `--module <module_name>:<entry_file>:<comma_separated_dependen
 }
 ```
 
-It is identical to the [`output.global` option](https://rollupjs.org/guide/en#core-functionality) of rollup. It is a key-value pair, where key is a module name as used in `import ... from 'module_name'` statement, and value is a name of a global variable which this imported value will refer to.
+It is mostly identical to the [`output.global` option](https://rollupjs.org/guide/en#core-functionality) of rollup. It is a key-value pair, where key is a module name whose content will not be included in the bundle output, and value is a name of a global variable to which an `module.exports` of the module will be aliased.
+
+If a module name is a relative path, the file it _resolves to_ will be treated as an external module. This is similar to rollup's case, but is different in that only relative path can be used and absolute paths can't. Such paths are resolved in the same convention how other relative paths in the spec file are resolved, see `prefix` option description.
 
 CLI equivalent is `--external <module_name>:<global_variable_name>`.
 
@@ -260,6 +262,17 @@ Best practice is to provide them as a separate script tag instead of bundling it
     var React = {};
     ```
     tsickle writes module-scoped externs to certain mangled namespace like this, so by declaring a global variable to be a type of that namespace, this provides type information of the external module to Closure Compiler.
+
+#### How compilation source files are determined
+
+In order to generate externs for external modules, TSCC has to provide declaration files to tsickle. Which files are provided? Typescript compiler's default behavior is hidden in most of cases, because `.d.ts` files does not anyway affect the compilation output. However, `.d.ts` files are used to generate externs in TSCC, so sometimes you may need to know this for troubleshooting.
+
+The Typescript compiler's default behavior is to include every type declarations in `./node_modules/@types/`, `../node_modules/@types/`, `../../node_modules/@types/`, ..., and if you specify `"types": ["a", "b", ...]` in compiler options, it instead only includes files in `(../)node_modules/@types/a/` -- See official documentation on [`types`](https://www.typescriptlang.org/tsconfig#types) and [`typeRoots`](https://www.typescriptlang.org/tsconfig#typeRoots).
+
+In comparison, TSCC will only include a file when it is reachable from _root files_ via transitive `import`s, triple-slash reference directives `///<reference path="..."/>` and `///<reference types="..."/>`. Root files will be the following:
+ - module entry points designated in the spec file,
+ - external module's base type declaration files,
+ - modules included in tsconfig.json `types` key.
 
 #### Importing typescript sources in node_modules
 

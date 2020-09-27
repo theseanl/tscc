@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates - es3 1`] = `
+exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates.ts - es3 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 exports.__esModule = true;
@@ -53,7 +53,7 @@ var A = /** @class */ (function () {
 "
 `;
 
-exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates - es5 1`] = `
+exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates.ts - es5 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
@@ -106,7 +106,7 @@ var A = /** @class */ (function () {
 "
 `;
 
-exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates 1`] = `
+exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates.ts 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
@@ -152,7 +152,22 @@ A = tslib_1.__decorate([
 "
 `;
 
-exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1 - es3 1`] = `
+exports[`dts_requiretype_transformer modifies requireType calls to a global variable: dts_requiretype/entry.ts 1`] = `
+"/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+goog.module('dts_requiretype.entry$.ts');
+var module = module || { id: '' };
+goog.require('tslib');
+const tsickle_required_1 = dts_requiretype$required$$d$$ts;
+const required = goog.require('dts_requiretype.required');
+/** @type {!tsickle_required_1.I} */
+var a = required.func();
+"
+`;
+
+exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1.ts - es3 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 var _a;
@@ -193,7 +208,7 @@ function A(a, _a) {
 "
 `;
 
-exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1 - es5 1`] = `
+exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1.ts - es5 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 var _a;
@@ -234,7 +249,7 @@ function A(a, _a) {
 "
 `;
 
-exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1 1`] = `
+exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1.ts 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
@@ -273,7 +288,7 @@ function A(a, _a) {
 "
 `;
 
-exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators - es3 1`] = `
+exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators.ts - es3 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 exports.__esModule = true;
@@ -304,7 +319,7 @@ window.d = rest;
 "
 `;
 
-exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators - es5 1`] = `
+exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators.ts - es5 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
@@ -335,7 +350,7 @@ window.d = rest;
 "
 `;
 
-exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators 1`] = `
+exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators.ts 1`] = `
 "const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });

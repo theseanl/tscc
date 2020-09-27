@@ -1,5 +1,60 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Golden Tests: external-modules/tscc.spec.json 1`] = `
+"(function (externalInNodeModules, externalWithFilePaths) {
+	'use strict';
+
+	console.log(externalInNodeModules.someProperty);
+	console.log(externalWithFilePaths.anotherProperty);
+
+}(externalInNodeModules, externalWithFilePaths));
+"
+`;
+
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json 1`] = `
+"var generated_entry = (function (exports, common$1, a) {
+	'use strict';
+
+	function common(n) {
+		console.log(\\"common\\");
+	}
+	console.log(common$1.a);
+
+	function entry() {
+		common();
+		console.log(\\"entry\\");
+	}
+
+	entry();
+	console.log(a);
+
+	var _ = {
+		__proto__: null,
+		c: common,
+		e: entry
+	};
+
+	exports.$0 = _;
+	exports.entry = entry;
+
+	return exports;
+
+}({}, c, a));
+"
+`;
+
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json 2`] = `
+"(function (common, _, externalEntry, b) {
+	'use strict';
+
+	_.c();
+	_.e();
+	console.log(b);
+
+}(c, generated_entry.$0, a, b));
+"
+`;
+
 exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
 "var generated_entry = (function (exports) {
 	'use strict';

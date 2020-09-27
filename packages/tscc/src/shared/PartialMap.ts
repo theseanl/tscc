@@ -1,5 +1,5 @@
-export default class PartialMap<K,V extends {}> extends Map<K, Partial<V>> {
-	set(key:K, value:Partial<V>) {
+export default class PartialMap<K, V extends {}> extends Map<K, Partial<V>> {
+	set(key: K, value: Partial<V>) {
 		if (!this.has(key)) {
 			super.set(key, value);
 		} else {
@@ -9,4 +9,3 @@ export default class PartialMap<K,V extends {}> extends Map<K, Partial<V>> {
 		return this;
 	}
 }
-

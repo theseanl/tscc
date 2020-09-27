@@ -1,4 +1,5 @@
 {
+	"extends": "../../../tsconfig.test_files.json",
 	"compilerOptions": {
 		"experimentalDecorators": true,
 		"target": "es2016"
