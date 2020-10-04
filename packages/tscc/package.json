@@ -58,7 +58,7 @@
 		"upath": "^1.2.0",
 		"vinyl": "^2.2.0",
 		"vinyl-fs": "^3.0.3",
-		"yargs": "^15.0.2"
+		"yargs": "^16.0.3"
 	},
 	"publishConfig": {
 		"access": "public"
