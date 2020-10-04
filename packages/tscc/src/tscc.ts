@@ -348,6 +348,8 @@ function pushTsickleOutputToStream(
 function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
 	const options = tsccSpec.getCompilerOptions();
 	const compilerHost = tsccSpec.getCompilerHost();
+	// Non-absolute file names are resolved from the TS project root.
+	const fileNamesSet = tsccSpec.getAbsoluteFileNamesSet();
 	const externalModuleData = tsccSpec.getExternalModuleDataMap();
 
 	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules/"];
@@ -356,6 +358,9 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 		shouldSkipTsickleProcessing(fileName: string) {
 			// Non-absolute files are resolved relative to a typescript project root.
 			const absFileName = path.resolve(tsccSpec.getTSRoot(), fileName);
+			// This may include script(non-module) files that is specified in tsconfig. Such files
+			// are not discoverable by dependency checking.
+			if (fileNamesSet.has(absFileName)) return false;
 			// Previously, we've processed all files that are in the same node_modules directory of type
 			// declaration file for external modules. The current behavior with including transitive
 			// dependencies only will have the same effect on such files, because `ts.createProgram`
@@ -399,12 +404,12 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 		 */
 		pathToModuleName: (context: string, fileName: string) => {
 			// 'tslib' is always considered as an external module.
-			if (fileName === 'tslib') return fileName;
+			if (fileName === 'tslib') return 'tslib';
 			if (externalModuleData.has(fileName)) {
 				let data = externalModuleData.get(fileName);
 				// Module names specified as external are not resolved, which in effect cause
 				// googmodule transformer to emit module names verbatim in `goog.require()`.
-				if (!data.isFilePath) return fileName;
+				if (!data.isFilePath) return escapeGoogAdmissibleName(fileName);
 			}
 			// Resolve module via ts API
 			const resolved = ts.resolveModuleName(fileName, context, options, compilerHost);

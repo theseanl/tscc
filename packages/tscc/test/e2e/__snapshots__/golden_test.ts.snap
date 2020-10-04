@@ -126,3 +126,14 @@ exports[`tscc e2e case_9_ts_in_node_modules: case_9_ts_in_node_modules/index.js 
 "console.log(1);
 "
 `;
+
+exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_10_unsafe_module_name_and_script_dts 1`] = `
+Array [
+  "index.js",
+]
+`;
+
+exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_10_unsafe_module_name_and_script_dts/index.js 1`] = `
+"console.log(unsafeModuleName.variableNameThatShouldntBeMangled.propertyNameThatShouldntBeMangled);
+"
+`;

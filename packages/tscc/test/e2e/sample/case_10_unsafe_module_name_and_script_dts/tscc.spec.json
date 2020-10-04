@@ -1,0 +1,9 @@
+{
+	"modules": {
+		"index": "./index.ts"
+	},
+	"external": {
+		"@unsafe/module-name": "unsafeModuleName"
+	},
+	"prefix": ".tscc_temp/case_10_unsafe_module_name_and_script_dts/"
+}
