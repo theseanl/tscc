@@ -3266,10 +3266,10 @@ globby@^9.2.0:
     pify "^4.0.1"
     slash "^2.0.0"
 
-google-closure-compiler-java@^20200927.0.0:
-  version "20200927.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20200927.0.0.tgz#e9d5490e470e494e187735402f66d5982ead1753"
-  integrity sha512-pW9n+DTdxKSMcI2GJe8Q/40Hu8eNzC4o6AC11ta3nACH+NlA2zTcuVV+qfF7Ttv+guvIul/ppEHoOU/18EVoDg==
+google-closure-compiler-java@^20201006.0.0:
+  version "20201006.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20201006.0.0.tgz#a650d2fcac37df892be4dc34e8aa9d480b4a9748"
+  integrity sha512-22FBVYwCDxR97pNRQ1ll+YzXlaSyKHZqhDCEAPJ1q6RWhSROvV/hY/n3rZggjLj4aoi7vXU7k9KjyxtIOfdhPg==
 
 google-closure-compiler-linux@^20200927.0.0:
   version "20200927.0.0"
