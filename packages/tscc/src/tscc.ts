@@ -163,7 +163,7 @@ export default async function tscc(
 
 	// Write externs to a temp file.
 	// ..only after attaching tscc's generated externs
-	const externs = tsickle.getGeneratedExterns(result.externs, '') +
+	const externs = tsickle.getGeneratedExterns(result.externs, tsccSpec.getTSRoot()) +
 		getExternsForExternalModules(tsccSpec, transformerHost);
 	writeExterns(externs);
 

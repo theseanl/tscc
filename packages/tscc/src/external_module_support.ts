@@ -20,7 +20,7 @@ export function getExternsForExternalModules(tsccSpec: ITsccSpecWithTS, tsickleH
  * @type{${moduleNameAsIdentifier(tsickleHost, typeRefFile)}}
  * @const
  */
-${tsickleHost.es5Mode ? 'var' : 'const'} ${globalName} = {};\n`;
+var ${globalName} = {};\n`;
 	}
 	if (out.length) out = header + out;
 	return out;
