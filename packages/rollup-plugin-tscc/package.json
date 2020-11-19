@@ -32,6 +32,6 @@
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.6.0",
 		"rollup": "^2.28.1",
-		"upath": "^1.2.0"
+		"upath": "^2.0.1"
 	}
 }
