@@ -30,11 +30,11 @@
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.1",
-		"@types/node": "^14.11.2",
+		"@types/node": "^14.14.8",
 		"@types/stream-json": "^1.5.1",
 		"@types/vinyl": "^2.0.4",
 		"@types/vinyl-fs": "^2.4.11",
-		"@types/yargs": "^15.0.5",
+		"@types/yargs": "^15.0.10",
 		"magic-string": "^0.25.4"
 	},
 	"optionalDependencies": {
@@ -53,9 +53,9 @@
 		"source-map": "^0.7.3",
 		"stream-json": "^1.7.1",
 		"tsickle": "0.39.1",
-		"tslib": "^2.0.1",
+		"tslib": "^2.0.3",
 		"typescript": "~3.9.5",
-		"upath": "^1.2.0",
+		"upath": "^2.0.1",
 		"vinyl": "^2.2.0",
 		"vinyl-fs": "^3.0.3",
 		"yargs": "^16.0.3"
