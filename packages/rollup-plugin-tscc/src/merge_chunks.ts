@@ -27,7 +27,7 @@ class ChunkMerger {
 		private chunkAllocation: MultiMap<string, string>,
 		private bundle: Readonly<rollup.OutputBundle>,
 		private globals?: {[id: string]: string}
-	) {}
+	) { }
 	private resolveGlobalForMainBuild(id: string) {
 		if (typeof this.globals !== 'object') return;
 		if (!this.globals.hasOwnProperty(id)) return;
@@ -138,6 +138,7 @@ class ChunkMerger {
 			file: ChunkMerger.FACADE_MODULE_ID,
 			globals: (id) => this.resolveGlobal(id),
 			interop: "esModule",
+			esModule: false,
 			freeze: false
 		});
 		if (output.length > 1) {
@@ -163,7 +164,7 @@ class ChunkMerger {
 	}
 }
 
-export class ChunkMergeError extends Error {}
+export class ChunkMergeError extends Error { }
 
 /**
  * Converts SourceMap type used by OutputChunk type to ExistingRawSourceMap type used by load hooks.
