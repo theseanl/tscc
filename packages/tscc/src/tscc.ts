@@ -116,7 +116,7 @@ export default async function tscc(
 	const {writeFile, writeExterns, externPath} =
 		getWriteFileImpl(tsccSpec, tsickleOutput, closureDepsGraph);
 
-	const stdInStream = new stream.Readable({read: function () {}});
+	const stdInStream = new stream.Readable({read: function () { }});
 	const pushImmediately = (arg: string) => setImmediate(pushToStream, stdInStream, arg);
 
 	// ----- start tsickle call -----
@@ -225,9 +225,9 @@ export default async function tscc(
 	await Promise.all([compilerProcessClose, writeCompilationOutput])
 }
 
-export class CcError extends Error {}
-export class TsccError extends Error {}
-class UnexpectedFileError extends TsccError {}
+export class CcError extends Error { }
+export class TsccError extends Error { }
+class UnexpectedFileError extends TsccError { }
 
 /**
  * Remove `//# sourceMappingURL=...` from source TS output which typescript generates when

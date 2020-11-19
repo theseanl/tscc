@@ -17,7 +17,7 @@ export function getExternsForExternalModules(tsccSpec: ITsccSpecWithTS, tsickleH
 		let typeRefFile = tsccSpec.resolveExternalModuleTypeReference(moduleName) || moduleName;
 		out += `
 /**
- * @type{${moduleNameAsIdentifier(tsickleHost, typeRefFile)}}
+ * @type{typeof ${moduleNameAsIdentifier(tsickleHost, typeRefFile)}}
  * @const
  */
 var ${globalName} = {};\n`;
