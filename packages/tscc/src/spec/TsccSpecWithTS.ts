@@ -50,7 +50,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		const configFileName =
 			TsccSpecWithTS.resolveSpecFile(searchPath, 'tsconfig.json', defaultLocation);
 		if (configFileName === undefined) {
-			throw new TsccSpecError(`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath)}.`)
+			throw new TsccSpecError(
+				`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath ?? defaultLocation)}.`
+			)
 		}
 		return configFileName;
 	}
