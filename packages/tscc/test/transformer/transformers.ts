@@ -105,7 +105,8 @@ describe(`dts_requiretype_transformer`, () => {
 		const testFiles = [
 			"dts_requiretype/entry.ts"
 		];
-		const mockSpec = <ITsccSpecWithTS>{
+
+		const mockSpec = <TsccSpecWithTS>{
 			getTSRoot() {
 				return samplesRoot;
 			},
@@ -113,6 +114,7 @@ describe(`dts_requiretype_transformer`, () => {
 				return []
 			}
 		};
+
 		const tsickleHostOverride: Partial<tsickle.TsickleHost> = {
 			googmodule: true,
 			transformTypesToClosure: true,
@@ -132,9 +134,9 @@ describe(`dts_requiretype_transformer`, () => {
 		const {out} = emit(testFiles, (transformerHost) => ({
 			afterTs: [dtsRequireTypeTransformer(mockSpec, transformerHost)]
 		}), {}, tsickleHostOverride);
-		for (let testFile of testFiles) {
+
+		for (let testFile of testFiles) 
 			expect(out.get(testFile)).toMatchSnapshot(testFile);
-		}
 	})
 });
 
