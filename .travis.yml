@@ -10,3 +10,5 @@ install:
 # Build the gnv template with `gnv build`.
 script:
   - yarn test
+
+cache: yarn

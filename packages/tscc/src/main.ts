@@ -176,8 +176,8 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args: { [key: string]: any; }
 	if (closureCompilerArgs.length) {
 		let compilerFlags = yargs().parse(closureCompilerArgs);
 		// delete special args produced by yargs
-		delete compilerFlags["_"];
-		delete compilerFlags["$0"];
+		/** @ts-ignore */
+		delete compilerFlags["_"], delete compilerFlags["$0"];
 		out.compilerFlags = <any>compilerFlags;
 	}
 
