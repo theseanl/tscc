@@ -144,7 +144,7 @@ export default class ClosureDependencyGraph {
 				const args: (string | number)[] = [entryPoint.moduleName, depsOfAModule.length];
 				if (index !== 0) {
 					// Do not specify dependencies for the very first (root) chunk.
-					args.push(...entryPoint.dependencies);
+					args.push(...entryPoint.dependencies!);
 				}
 				return args.join(':');
 			}));

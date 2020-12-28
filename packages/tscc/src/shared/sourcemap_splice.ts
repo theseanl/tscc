@@ -1,4 +1,4 @@
-import {SourceMapConsumer, SourceMapGenerator, Mapping, RawSourceMap} from 'source-map';
+import { SourceMapConsumer, SourceMapGenerator, Mapping, RawSourceMap } from 'source-map';
 
 /**
  * From a file with sourcemap, splice intervals specified with the third argument
@@ -9,19 +9,23 @@ import {SourceMapConsumer, SourceMapGenerator, Mapping, RawSourceMap} from 'sour
  */
 export default async function spliceSourceMap(content: string, map: RawSourceMap, spliceIntervals: [number, number][]): Promise<RawSourceMap> {
 	const consumer = await new SourceMapConsumer(map);
-	const generator = new SourceMapGenerator({file: map.file});
+	const generator = new SourceMapGenerator({ file: map.file });
 
 	const seeker = new Seeker(content, spliceIntervals);
 
-	consumer.eachMapping(({source, generatedLine, generatedColumn, originalLine, originalColumn, name}) => {
+	consumer.eachMapping(({ source, generatedLine, generatedColumn, originalLine, originalColumn, name }) => {
 		// line numbers in mozilla/source-map are 1-based. column numbers are 0-based.
 		seeker.seek(generatedLine - 1, generatedColumn);
 		if (seeker.isInInterval()) return;
 		let transformedLine = seeker.getTransformedLine();
 		let transformedColumn = seeker.getTransformedColumn();
 		const mapping = getMapping(
-			source, transformedLine + 1, transformedColumn,
-			originalLine, originalColumn, name
+			source, 
+			transformedLine + 1, 
+			transformedColumn,
+			originalLine, 
+			originalColumn,
+			name
 		);
 		generator.addMapping(mapping);
 	});
@@ -29,48 +33,38 @@ export default async function spliceSourceMap(content: string, map: RawSourceMap
 	return generator.toJSON();
 }
 
-const mapping: Mapping = {
-	source: undefined,
-	generated: {
-		line: undefined,
-		column: undefined
-	},
-	original: {
-		line: undefined,
-		column: undefined
-	},
-	name: undefined
-};
+/**
+ * A lot of seemingly unused code was removed here that did not affect test
+ * runs. If some mysterious source map bug emerges, look here first.
+ */
 
-const mappingWithoutOriginal = <Mapping>{
-	source: undefined,
-	generated: {
-		line: undefined,
-		column: undefined
-	}
-};
-
-function getMapping(source, generatedLine, generatedColumn, originalLine, originalColumn, name): Mapping {
-	if (typeof originalLine !== 'number' && typeof originalLine !== 'number') {
-		mappingWithoutOriginal.source = source;
-		mappingWithoutOriginal.generated.line = generatedLine;
-		mappingWithoutOriginal.generated.column = generatedColumn;
-		return mappingWithoutOriginal;
-	}
-	mapping.source = source;
-	mapping.generated.line = generatedLine;
-	mapping.generated.column = generatedColumn;
-	mapping.original.line = originalLine;
-	mapping.original.column = originalColumn;
-	mapping.name = name;
-	return mapping;
+function getMapping(
+	source: string,
+	generatedLine: number,
+	generatedColumn: number,
+	originalLine: number,
+	originalColumn: number,
+	name: string
+): Mapping {
+	return <Mapping>{
+		name,
+		source,
+		generated: {
+			line: generatedLine,
+			column: generatedColumn,
+		},
+		original: {
+			line: originalLine,
+			column: originalColumn,
+		},
+	};
 }
 
 export function splitWithRegex(contents: string, regex: RegExp) {
 	const intervals: [number, number][] = [];
 	let prevEnd = 0;
 	let replacedContent = '';
-	let execRes: RegExpExecArray
+	let execRes: RegExpExecArray | null;
 	while ((execRes = regex.exec(contents)) !== null) {
 		let removeStart = execRes.index;
 		let removeEnd = removeStart + execRes[0].length;
@@ -79,14 +73,14 @@ export function splitWithRegex(contents: string, regex: RegExp) {
 		intervals.push([removeStart, removeEnd])
 	}
 	replacedContent += contents.substring(prevEnd);
-	return {contents: replacedContent, intervals}
+	return { contents: replacedContent, intervals }
 }
 
 export class Seeker {
 	constructor(
 		private contents: string,
 		private intervals: [number, number][]
-	) {}
+	) { }
 	/*************** State machine state *****************/
 	// Current cursor position descriptors
 	private line = 0;
@@ -104,7 +98,7 @@ export class Seeker {
 	 * (Beware the parentheses)
 	 */
 	private seekInterval(index: number) {
-		let {intervalIndex, index: prevIndex} = this;
+		let { intervalIndex, index: prevIndex } = this;
 		let occupied = 0;
 		if (intervalIndex === -1) intervalIndex = 0;
 		let interval = this.getInterval(intervalIndex);

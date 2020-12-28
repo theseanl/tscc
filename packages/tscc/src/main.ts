@@ -2,17 +2,17 @@
 
 import yargs = require('yargs/yargs');
 import chalk = require('chalk');
-import tscc, {TEMP_DIR, CcError, TsccError} from './tscc';
-import {TsError} from './spec/TsccSpecWithTS'
-import {IInputTsccSpecJSON, INamedModuleSpecs, TsccSpecError, primitives} from '@tscc/tscc-spec'
-import {ClosureDepsError} from './graph/ClosureDependencyGraph'
+import tscc, { TEMP_DIR, CcError, TsccError } from './tscc';
+import { TsError } from './spec/TsccSpecWithTS'
+import { IInputTsccSpecJSON, INamedModuleSpecs, TsccSpecError, primitives } from '@tscc/tscc-spec'
+import { ClosureDepsError } from './graph/ClosureDependencyGraph'
 import Logger from './log/Logger';
 import console = require('console');
 
 /**
  * example: tscc -s src/tscc.spec.json -- --experimentalDecorators -- --assume_function_wrapper
  */
-async function main(args) {
+async function main(args: { [key: string]: any }) {
 	if (args.clean) {
 		require('rimraf').sync(TEMP_DIR);
 		console.log(`Removed ${TEMP_DIR}.`);
@@ -24,13 +24,13 @@ async function main(args) {
 		args['spec'] = '.';
 	}
 
-	const {tsccSpecJSON, tsArgs} = buildTsccSpecJSONAndTsArgsFromArgs(args);
+	const { tsccSpecJSON, tsArgs } = buildTsccSpecJSONAndTsArgsFromArgs(args);
 	await tscc(<IInputTsccSpecJSON>tsccSpecJSON, tsArgs);
 
 	return 0;
 }
 
-export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: string]: primitives | primitives[]} {
+export function parseTsccCommandLineArgs(args: string[], strict = true): { [key: string]: primitives | primitives[] } {
 	return <any>yargs()
 		.scriptName('tscc')
 		.usage(`tscc [--help] [--clean] [--spec <spec_file_path>] [-- <typescript_flags> [-- <closure_compiler_flags>]]`)
@@ -111,10 +111,10 @@ export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: 
 		.parse(args);
 }
 
-export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
+export function buildTsccSpecJSONAndTsArgsFromArgs(args: { [key: string]: any; }) {
 	const tsArgs = <string[]>args["--"] || [];
 	const closureCompilerArgs: string[] = (<any>yargs()
-		.parserConfiguration({'populate--': true})
+		.parserConfiguration({ 'populate--': true })
 		.parse(tsArgs))["--"] || [];
 
 	let i = tsArgs.indexOf('--');
@@ -129,13 +129,28 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	let moduleFlags: string[] = args["module"];
 	if (moduleFlags) {
 		const moduleFlagValue: INamedModuleSpecs[] = [];
+
 		for (let moduleFlag of moduleFlags) {
 			// --modules chunk2:./src/chunk2.ts:chunk0,chunk1:css_renaming_map.js
-			let [moduleName, entry, dependenciesStr, extraSourcesStr] = moduleFlag.split(':');
-			let dependencies: string[], extraSources: string[];
+			let [
+				moduleName,
+				entry,
+				dependenciesStr,
+				extraSourcesStr
+			] = moduleFlag.split(':');
+
+			let dependencies: string[] | undefined,
+				extraSources: string[] | undefined;
+
 			if (dependenciesStr) dependencies = dependenciesStr.split(',');
 			if (extraSourcesStr) extraSources = extraSourcesStr.split(',');
-			moduleFlagValue.push({moduleName, entry, dependencies, extraSources})
+
+			moduleFlagValue.push({
+				moduleName,
+				entry,
+				dependencies,
+				extraSources
+			});
 		}
 		out.modules = moduleFlagValue;
 	}
@@ -144,7 +159,7 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	// --external react-dom:ReactDOM
 	let external: string[] = args["external"]
 	if (external) {
-		const externalValue: {[moduleName: string]: string} = {};
+		const externalValue: { [moduleName: string]: string } = {};
 		for (let externalEntry of external) {
 			let [moduleName, globalName] = externalEntry.split(':');
 			externalValue[moduleName] = globalName;
@@ -177,7 +192,7 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 		out.specFile = args["spec"];
 	}
 
-	return {tsccSpecJSON: <IInputTsccSpecJSON>out, tsArgs}
+	return { tsccSpecJSON: <IInputTsccSpecJSON>out, tsArgs }
 }
 
 if (require.main === module) {
