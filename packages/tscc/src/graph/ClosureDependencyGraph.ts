@@ -103,7 +103,7 @@ export default class ClosureDependencyGraph {
 		}
 	}
 	// Walks the graph marking required/type-required nodes as forwardDeclared.
-	private walkTypeRequiredNodes(node: ISourceNode): IterableIterator<ISourceNode> {
+	private walkTypeRequiredNodes(node: ISourceNode) {
 		if (this.forwardDeclared.has(node) || this.required.has(node)) return;
 
 		this.forwardDeclared.add(node);

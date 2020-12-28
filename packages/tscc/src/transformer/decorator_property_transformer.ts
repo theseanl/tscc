@@ -43,12 +43,12 @@ class DecoratorTransformer extends TsHelperTransformer {
 	}
 	private counter = 1;
 
-	protected onHelperCall(node: ts.CallExpression, googReflectImport:ts.Identifier) {
+	protected onHelperCall(node: ts.CallExpression, googReflectImport : ts.Identifier) : ts.CallExpression {
 		// Found a candidate. Decorator helper call signature:
 		// __decorate([decoratorsArray], <target>, <propertyName>, <desc>)
 		// Note that class decorator only has 2 arguments.
 		let propNameLiteral = node.arguments[2];
-		if (!propNameLiteral || !ts.isStringLiteral(propNameLiteral)) return;
+		if (!propNameLiteral || !ts.isStringLiteral(propNameLiteral)) return node;
 		let propName = propNameLiteral.text;
 
 		// Create goog.reflect.objectProperty

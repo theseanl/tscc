@@ -19,7 +19,7 @@
  * TODO: improve comment here and documentation.
  */
 import * as ts from 'typescript';
-import ITsccSpecWithTS from '../spec/ITsccSpecWithTS';
+import TsccSpecWithTS from '../spec/TsccSpecWithTS';
 import {TsickleHost} from 'tsickle';
 import {moduleNameAsIdentifier} from 'tsickle/src/annotator_host';
 import {namespaceToQualifiedName, isGoogRequireLikeStatement} from './transformer_utils';
@@ -32,7 +32,7 @@ import path = require('path');
  * top-level `require`s of external modules to an assignment of a local variable to
  * a global symbol. This results in no `goog.require` or `goog.requireType` emit.
  */
-export default function dtsRequireTypeTransformer(spec: ITsccSpecWithTS, tsickleHost: TsickleHost)
+export default function dtsRequireTypeTransformer(spec: TsccSpecWithTS, tsickleHost: TsickleHost)
 	: (context: ts.TransformationContext) => ts.Transformer<ts.SourceFile> {
 	const externalModuleNames = spec.getExternalModuleNames();
 	return (context: ts.TransformationContext): ts.Transformer<ts.SourceFile> => {

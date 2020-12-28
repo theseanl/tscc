@@ -68,6 +68,7 @@ export function patchTsickleResolveModule() {
 export function restoreTsickleResolveModule() {
 	if (original) {
 		require('tsickle/src/googmodule').resolveModuleName = original;
+		/** @ts-ignore */
 		original = undefined;
 	}
 }

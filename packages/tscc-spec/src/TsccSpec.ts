@@ -77,7 +77,7 @@ export default class TsccSpec implements ITsccSpec {
 	}
 	// A helper function for creating path strings to display in terminal environments
 	protected static toDisplayedPath(p: string): string {
-		const relPath = path.relative('.', p);
+		const relPath = path.relative('.', p!);
 		if (TsccSpec.isDotPath(relPath)) return path.resolve(p); // use an absolute path
 		if (relPath === '.') return "the current working directory";
 		return relPath;

@@ -1,31 +1,31 @@
-import {IInputTsccSpecJSON} from '@tscc/tscc-spec';
+import { IInputTsccSpecJSON } from '@tscc/tscc-spec';
 import * as StreamArray from 'stream-json/streamers/StreamArray';
 import * as tsickle from "tsickle";
 import * as ts from "typescript";
 import getDefaultLibs from './default_libs';
-import {Cache, FSCacheAccessor} from './graph/Cache';
+import { Cache, FSCacheAccessor } from './graph/Cache';
 import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
 import TypescriptDependencyGraph from './graph/TypescriptDependencyGraph';
-import {ISourceNode} from './graph/ISourceNode';
-import {sourceNodeFactory} from './graph/source_node_factory';
+import { ISourceNode } from './graph/ISourceNode';
+import { sourceNodeFactory } from './graph/source_node_factory';
 import Logger from './log/Logger';
 import * as spinner from './log/spinner';
-import {applyPatches, restorePatches} from './tsickle_patches/facade'
-import {riffle, union} from './shared/array_utils';
+import { applyPatches, restorePatches } from './tsickle_patches/facade'
+import { riffle, union } from './shared/array_utils';
 import PartialMap from './shared/PartialMap';
-import {ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignments} from './shared/vinyl_utils';
-import {escapeGoogAdmissibleName} from './shared/escape_goog_identifier'
+import { ClosureJsonToVinyl, IClosureCompilerInputJson, RemoveTempGlobalAssignments } from './shared/vinyl_utils';
+import { escapeGoogAdmissibleName } from './shared/escape_goog_identifier'
 import spawnCompiler from './spawn_compiler';
 import ITsccSpecWithTS from "./spec/ITsccSpecWithTS";
-import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
+import TsccSpecWithTS, { TsError } from "./spec/TsccSpecWithTS";
 import decoratorPropertyTransformer from './transformer/decorator_property_transformer';
 import restPropertyTransformer from './transformer/rest_property_transformer';
 import dtsRequireTypeTransformer from './transformer/dts_requiretype_transformer';
-import {getExternsForExternalModules, getGluingModules} from './external_module_support';
+import { getExternsForExternalModules, getGluingModules } from './external_module_support';
 import fs = require('fs');
 import path = require('path');
 import stream = require('stream');
-import {promisify} from 'util';
+import { promisify } from 'util';
 import fsExtra = require('fs-extra');
 import vfs = require('vinyl-fs');
 import upath = require('upath');
@@ -69,7 +69,7 @@ export default async function tscc(
 		tsccSpecJSONOrItsPath,
 		tsConfigPathOrTsArgs,
 		compilerOptionsOverride,
-		(msg: string) => {tsccLogger.log(msg)}
+		(msg: string) => { tsccLogger.log(msg) }
 	);
 
 	const program = ts.createProgram(
@@ -77,14 +77,26 @@ export default async function tscc(
 		tsccSpec.getCompilerOptions(),
 		tsccSpec.getCompilerHost()
 	);
+	
 	const diagnostics = ts.getPreEmitDiagnostics(program);
 	if (diagnostics.length) throw new TsError(diagnostics);
 
-	const tsDepsGraph = new TypescriptDependencyGraph(program)
-	tsccSpec.getOrderedModuleSpecs().forEach(moduleSpec => tsDepsGraph.addRootFile(moduleSpec.entry));
-	union(tsccSpec.getExternalModuleNames(), tsccSpec.getCompilerOptions().types ?? [])
-		.map(tsccSpec.resolveExternalModuleTypeReference, tsccSpec)
-		.map(tsDepsGraph.addRootFile, tsDepsGraph);
+	const tsDepsGraph = new TypescriptDependencyGraph(program);
+	tsccSpec.getOrderedModuleSpecs().forEach(
+		moduleSpec => tsDepsGraph.addRootFile(moduleSpec.entry)
+	);
+
+	union(
+		tsccSpec.getExternalModuleNames(),
+		tsccSpec.getCompilerOptions().types ?? []
+	).map(
+		tsccSpec.resolveExternalModuleTypeReference,
+		tsccSpec
+	).map(
+		/** @ts-ignore */
+		tsDepsGraph.addRootFile,
+		tsDepsGraph
+	);
 	// If user explicitly provided `types` compiler option, it is more likely that its type is actually
 	// used in user code.
 
@@ -113,25 +125,25 @@ export default async function tscc(
 
 	const tsickleOutput: PartialMap<string, IClosureCompilerInputJson> = new PartialMap();
 
-	const {writeFile, writeExterns, externPath} =
+	const { writeFile, writeExterns, externPath } =
 		getWriteFileImpl(tsccSpec, tsickleOutput, closureDepsGraph);
 
-	const stdInStream = new stream.Readable({read: function () { }});
-	const pushImmediately = (arg: string) => setImmediate(pushToStream, stdInStream, arg);
+	const stdInStream = new stream.Readable({ read: function () { } });
+	const pushImmediately = (arg: string | null) => setImmediate(pushToStream, stdInStream, arg);
 
 	// ----- start tsickle call -----
 	pushImmediately("[")
 
 	// Manually push tslib, goog(base.js), goog.reflect, which are required in compilation
 	const defaultLibsProvider = getDefaultLibs(tsccSpec.getTSRoot());
-	defaultLibsProvider.libs.forEach(({path, id}) => {
+	defaultLibsProvider.libs.forEach(({ path, id }) => {
 		// ..only when user-provided sources do not provide such modules
 		if (closureDepsGraph.hasModule(id)) return;
 		writeFile(path, fs.readFileSync(path, 'utf8'))
 	})
 
 	// Manually push gluing modules
-	getGluingModules(tsccSpec, transformerHost).forEach(({path, content}) => {
+	getGluingModules(tsccSpec, transformerHost).forEach(({ path, content }) => {
 		writeFile(path, content)
 	})
 
@@ -152,7 +164,7 @@ export default async function tscc(
 	// If tsickle errors, print diagnostics and exit.
 	if (result.diagnostics.length) throw new TsError(result.diagnostics);
 
-	const {src, flags} = closureDepsGraph.getSortedFilesAndFlags(
+	const { src, flags } = closureDepsGraph.getSortedFilesAndFlags(
 		tsccSpec.getOrderedModuleSpecs().map(entry => ({
 			moduleId: transformerHost.pathToModuleName('', entry.entry),
 			...entry
@@ -163,8 +175,10 @@ export default async function tscc(
 
 	// Write externs to a temp file.
 	// ..only after attaching tscc's generated externs
-	const externs = tsickle.getGeneratedExterns(result.externs, tsccSpec.getTSRoot()) +
-		getExternsForExternalModules(tsccSpec, transformerHost);
+	const externs = tsickle.getGeneratedExterns(
+		result.externs,
+		tsccSpec.getTSRoot()
+	) + getExternsForExternalModules(tsccSpec, transformerHost);
 	writeExterns(externs);
 
 	pushImmediately("]");
@@ -186,7 +200,7 @@ export default async function tscc(
 	], ccLogger, tsccSpec.debug().persistArtifacts);
 
 	const compilerProcessClose = new Promise((resolve, reject) => {
-		function onCompilerProcessClose(code) {
+		function onCompilerProcessClose(code: number) {
 			if (code === 0) {
 				spinner.succeed();
 				spinner.unstick();
@@ -194,7 +208,7 @@ export default async function tscc(
 				if (tsccSpec.debug().persistArtifacts) {
 					tsccLogger.log(tsccSpec.getOutputFileNames().join('\n'));
 				}
-				resolve();
+				resolve(void 0);
 			} else {
 				spinner.fail(`Closure compiler error`);
 				spinner.unstick();
@@ -209,17 +223,17 @@ export default async function tscc(
 
 	// Use gulp-style transform streams to post-process cc output - see shared/vinyl_utils.ts.
 	// TODO support returning gulp stream directly
-	const useSourceMap: boolean = tsccSpec.getCompilerOptions().sourceMap;
+	const useSourceMap: boolean = tsccSpec.getCompilerOptions().sourceMap as boolean;
 
 	const writeCompilationOutput = promisify(stream.pipeline)(
 		compilerProcess.stdout,
 		// jsonStreaming: true option makes the Parser of the stream-json package to fail gracefully
 		// when no data is streamed. Currently this is not included in @types/stream-json. TODO make a
 		// PR in Definitelytyped about this.
-		StreamArray.withParser(<any>{jsonStreaming: true}),
+		StreamArray.withParser(<any>{ jsonStreaming: true }),
 		new ClosureJsonToVinyl(useSourceMap, tsccLogger),
 		new RemoveTempGlobalAssignments(tsccLogger),
-		vfs.dest('.', {sourcemaps: '.'})
+		vfs.dest('.', { sourcemaps: '.' })
 	);
 
 	await Promise.all([compilerProcessClose, writeCompilationOutput])
@@ -241,7 +255,7 @@ function removeSourceMappingUrl(tsOutput: string): string {
 }
 const reSourceMappingURL = /^\/\/[#@]\s*sourceMappingURL\s*=\s*.*?\s*$/mi;
 
-function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJson>, closureDepsGraph: ClosureDependencyGraph) {
+function getWriteFileImpl(spec: TsccSpecWithTS, tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJson>, closureDepsGraph: ClosureDependencyGraph) {
 	const tempFileDir = path.join(process.cwd(), TEMP_DIR, spec.getProjectHash());
 	fsExtra.mkdirpSync(tempFileDir);
 	// Closure compiler produces an error if output file's name is the same as one of
@@ -306,7 +320,7 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 		fs.writeFileSync(externPath, contents);
 	}
 	const externPath = path.join(tempFileDir, "externs_generated.js");
-	return {writeFile, writeExterns, externPath}
+	return { writeFile, writeExterns, externPath }
 }
 
 function pushToStream(stream: stream.Readable, ...args: string[]) {
@@ -315,7 +329,7 @@ function pushToStream(stream: stream.Readable, ...args: string[]) {
 
 function pushTsickleOutputToStream(
 	src: ReadonlyArray<string>, // file names, ordered to be pushed to compiler sequentially
-	tsccSpec: ITsccSpecWithTS,
+	tsccSpec: TsccSpecWithTS,
 	tsickleVinylOutput: PartialMap<string, IClosureCompilerInputJson>,
 	stdInStream: stream.Readable,
 	logger: Logger
@@ -345,7 +359,7 @@ function pushTsickleOutputToStream(
 	});
 }
 
-function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
+function getTsickleHost(tsccSpec: TsccSpecWithTS, tsDependencyGraph: TypescriptDependencyGraph, logger: Logger): tsickle.TsickleHost {
 	const options = tsccSpec.getCompilerOptions();
 	const compilerHost = tsccSpec.getCompilerHost();
 	// Non-absolute file names are resolved from the TS project root.
@@ -381,7 +395,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 		untyped: false,
 		logWarning(warning) {
 			if (warning.file) {
-				let {fileName} = warning.file;
+				let { fileName } = warning.file;
 				for (let i = 0, l = ignoreWarningsPath.length; i < l; i++) {
 					if (fileName.indexOf(ignoreWarningsPath[i]) !== -1) return;
 				}
@@ -409,7 +423,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 				let data = externalModuleData.get(fileName);
 				// Module names specified as external are not resolved, which in effect cause
 				// googmodule transformer to emit module names verbatim in `goog.require()`.
-				if (!data.isFilePath) return escapeGoogAdmissibleName(fileName);
+				if (!data?.isFilePath) return escapeGoogAdmissibleName(fileName);
 			}
 			// Resolve module via ts API
 			const resolved = ts.resolveModuleName(fileName, context, options, compilerHost);

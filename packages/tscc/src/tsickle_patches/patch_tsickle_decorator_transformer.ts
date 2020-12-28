@@ -25,6 +25,7 @@ export function patchTsickleDecoratorTransformer() {
 export function restoreTsickleDecoratorTransformer() {
 	if (original) {
 		require('tsickle/src/decorators').transformDecoratorsOutputForClosurePropertyRenaming = original;
+		/** @ts-ignore */
 		original = undefined;
 	}
 }

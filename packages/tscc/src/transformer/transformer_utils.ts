@@ -19,7 +19,7 @@ type TGoogRequireLike = "require" | "requireType";
  * Verify that the call is a call of a form goog.require(...).
  * @param requireLike require, requireType, provides, ...
  */
-function extractGoogRequireLike(call: ts.CallExpression, requireLike:TGoogRequireLike): string | null {
+function extractGoogRequireLike(call: ts.CallExpression, requireLike: TGoogRequireLike): string | null {
 	let exp = call.expression;
 	if (!ts.isPropertyAccessExpression(exp)) return null;
 	if (!ts.isIdentifier(exp.expression) || exp.expression.escapedText !== 'goog') return null;
@@ -42,7 +42,7 @@ interface IImportedVariable {
 	newIdent: ts.Identifier
 }
 
-function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable {
+function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable | undefined {
 	if (!ts.isVariableStatement(stmt)) return;
 	// Verify it's a single decl (and not "var x = ..., y = ...;").
 	if (stmt.declarationList.declarations.length !== 1) return;
@@ -55,10 +55,10 @@ function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable {
 	}
 	const importedUrl = extractRequire(decl.initializer);
 	if (!importedUrl) return;
-	return {importedUrl, newIdent: decl.name};
+	return { importedUrl, newIdent: decl.name };
 }
 
-export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike:TGoogRequireLike): IImportedVariable {
+export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike: TGoogRequireLike): IImportedVariable | undefined {
 	if (!ts.isVariableStatement(stmt)) return;
 	// Verify it's a single decl (and not "var x = ..., y = ...;").
 	if (stmt.declarationList.declarations.length !== 1) return;
@@ -71,10 +71,10 @@ export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike:TGoog
 	}
 	const importedUrl = extractGoogRequireLike(decl.initializer, requireLike);
 	if (!importedUrl) return;
-	return {importedUrl, newIdent: decl.name};
+	return { importedUrl, newIdent: decl.name };
 }
 
-export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier {
+export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier | undefined {
 	for (let stmt of sf.statements) {
 		let _ = isVariableRequireStatement(stmt);
 		if (!_) continue;
@@ -83,7 +83,7 @@ export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.
 	}
 }
 
-export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier {
+export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier | undefined {
 	for (let stmt of sf.statements) {
 		let _ = isGoogRequireLikeStatement(stmt, "require");
 		if (!_) continue;
