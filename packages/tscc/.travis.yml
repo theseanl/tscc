@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - 14
+  - lts/*
+
+# Install gnv with `npm i -g`, then add peer deps with `gnv get-peer-deps`.
+install:
+  - yarn
+
+# Build the gnv template with `gnv build`.
+script:
+  - yarn test
