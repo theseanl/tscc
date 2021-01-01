@@ -9,12 +9,12 @@ Array [
 `;
 
 exports[`tscc e2e case_1: case_1/a.js 1`] = `
-"var b=new (function(){function a(){}a.prototype.a=function(){console.log(\\"methodUsedByA\\")};a.prototype.b=function(){console.log(\\"methodUsedByB\\")};return a}());b.a();console.log(\\"ac\\");
+"var b=new (function(){function a(){}a.prototype.g=function(){console.log(\\"methodUsedByA\\")};a.prototype.h=function(){console.log(\\"methodUsedByB\\")};return a}());b.g();console.log(\\"ac\\");
 "
 `;
 
 exports[`tscc e2e case_1: case_1/b.js 1`] = `
-"b.b();console.log(\\"bba\\");console.log(\\"bc\\");
+"b.h();console.log(\\"bba\\");console.log(\\"bc\\");
 "
 `;
 
@@ -46,7 +46,7 @@ Array [
 `;
 
 exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js 1`] = `
-"function d(){}d.prototype.a=function(){console.log(\\"a\\")};(function(e,b,c,f){var g=arguments.length,a=3>g?b:null===f?f=Object.getOwnPropertyDescriptor(b,c):f,h;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(e,b,c,f);else for(var k=e.length-1;0<=k;k--)if(h=e[k])a=(3>g?h(a):3<g?h(b,c,a):h(b,c))||a;return 3<g&&a&&Object.defineProperty(b,c,a),a})([function(e,b,c){return c}],d.prototype,\\"a\\",null);(new d).a();
+"function d(){}d.prototype.b=function(){console.log(\\"a\\")};(function(e,b,c,f){var g=arguments.length,a=3>g?b:null===f?f=Object.getOwnPropertyDescriptor(b,c):f,h;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(e,b,c,f);else for(var k=e.length-1;0<=k;k--)if(h=e[k])a=(3>g?h(a):3<g?h(b,c,a):h(b,c))||a;return 3<g&&a&&Object.defineProperty(b,c,a),a})([function(e,b,c){return c}],d.prototype,\\"b\\",null);(new d).b();
 //# sourceMappingURL=a.js.map
 "
 `;
@@ -71,8 +71,8 @@ Array [
 `;
 
 exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js 1`] = `
-"function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};function k(){}k.prototype.b=function(a,c){a=c.a;h(c,[\\"a\\"]);c=h(a,[\\"d\\"]);console.log(c)};
-(function(a,c,e,b){var f=arguments.length,g=3>f?c:null===b?b=Object.getOwnPropertyDescriptor(c,e):b,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,c,e,b);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(c,e,g):l(c,e))||g;return 3<f&&g&&Object.defineProperty(c,e,g),g})([function(a,c,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"b\\",null);(new k).b({},{a:{c:{},d:{}},e:{},g:{},h:{}});var n={f:{},a:{},c:{}},p=h(n,[\\"c\\"]);
+"function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};function k(){}k.prototype.g=function(a,c){a=c.b;h(c,[\\"b\\"]);c=h(a,[\\"d\\"]);console.log(c)};
+(function(a,c,e,b){var f=arguments.length,g=3>f?c:null===b?b=Object.getOwnPropertyDescriptor(c,e):b,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,c,e,b);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(c,e,g):l(c,e))||g;return 3<f&&g&&Object.defineProperty(c,e,g),g})([function(a,c,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"g\\",null);(new k).g({},{b:{c:{},d:{}},e:{},f:{},h:{}});var n={a:{},b:{},c:{}},p=h(n,[\\"c\\"]);
 window.d=p;
 "
 `;
@@ -85,12 +85,12 @@ Array [
 `;
 
 exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/1.js 1`] = `
-"window.b=function(c){c({a:function(){}})};
+"window.b=function(c){c({b:function(){}})};
 "
 `;
 
 exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/2.js 1`] = `
-"function a(){}a.prototype.a=function(){console.log(\\"boo\\")};(new a).a();
+"function a(){}a.prototype.b=function(){console.log(\\"boo\\")};(new a).b();
 "
 `;
 
