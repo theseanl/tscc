@@ -9,11 +9,13 @@ describe(`TsccSpecWithTS`, () => {
 			const projectInNestedDirectory = path.join(__dirname, 'sample/nested_directory');
 			const {projectRoot, parsedConfig} = TsccSpecWithTS.loadTsConfigFromArgs(
 				['--project', projectInNestedDirectory],
+				/** @ts-ignore */
 				undefined,
 				() => {}
 			);
+			/** @ts-ignore */
 			expect(projectRoot).toBe(projectInNestedDirectory);
-			expect(parsedConfig.options.moduleResolution).toBe(ts.ModuleResolutionKind.NodeJs);
+			expect(parsedConfig!.options.moduleResolution).toBe(ts.ModuleResolutionKind.NodeJs);
 		});
 	})
 	describe(`loadTsConfigFromPath`, () => {
@@ -23,11 +25,12 @@ describe(`TsccSpecWithTS`, () => {
 				'sample/nested_directory/nested_nested_directory'
 			);
 			const {projectRoot, parsedConfig} = TsccSpecWithTS.loadTsConfigFromPath(
+				/** @ts-ignore */
 				undefined,
 				directoryNestedInProject
 			);
 			expect(projectRoot).toBe(path.dirname(directoryNestedInProject));
-			expect(parsedConfig.options.downlevelIteration).toBe(true);
+			expect(parsedConfig!.options.downlevelIteration).toBe(true);
 		});
 		test(`merges compilerOptions override provided as a second argument`, () => {
 			const {projectRoot, parsedConfig} = TsccSpecWithTS.loadTsConfigFromPath(
@@ -39,9 +42,9 @@ describe(`TsccSpecWithTS`, () => {
 				}
 			);
 			expect(projectRoot).toBe(path.join(__dirname, 'sample'));
-			expect(parsedConfig.options.moduleResolution).toBe(ts.ModuleResolutionKind.NodeJs);
-			expect(parsedConfig.options.target).toBe(ts.ScriptTarget.ES2016);
-			expect(parsedConfig.options.downlevelIteration).toBe(false);
+			expect(parsedConfig!.options.moduleResolution).toBe(ts.ModuleResolutionKind.NodeJs);
+			expect(parsedConfig!.options.target).toBe(ts.ScriptTarget.ES2016);
+			expect(parsedConfig!.options.downlevelIteration).toBe(false);
 		})
 	})
 });

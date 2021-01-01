@@ -56,7 +56,7 @@ function resolveModuleName(
 	return resolvedModule;
 }
 
-let original:typeof import('tsickle/src/googmodule').resolveModuleName;
+let original: typeof import('tsickle/src/googmodule').resolveModuleName | null;
 export function patchTsickleResolveModule() {
 	if (!original) {
 		const googmodule: typeof import('tsickle/src/googmodule') = require('tsickle/src/googmodule');
@@ -68,6 +68,6 @@ export function patchTsickleResolveModule() {
 export function restoreTsickleResolveModule() {
 	if (original) {
 		require('tsickle/src/googmodule').resolveModuleName = original;
-		original = undefined;
+		original = null;
 	}
 }

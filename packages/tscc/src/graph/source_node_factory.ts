@@ -29,7 +29,7 @@ export function sourceNodeFactoryFromContent(fileName: string, content: string):
 
 class ClosureSourceLineParser {
 	private isInComment = false;
-	private moduleSymbol: string;
+	private moduleSymbol: string | undefined;
 	private providedSymbols = new Set<string>();
 	private requiredSymbols = new Set<string>();
 	private forwardDeclaredSymbols = new Set<string>();
@@ -39,7 +39,7 @@ class ClosureSourceLineParser {
 	// Looking for top-level goog.require,provide,module,forwardDeclare,requireType calls on each line.
 	// Tsickle now emits goog.requireType instead of forwardDeclare as of Feb 3 2019.
 	// Returns truthy value when no more line needs to be consumed.
-	consumeLine(line: string): boolean {
+	consumeLine(line: string) {
 		// Heuristic for searching provideGoog in comments
 		if (!this.isInComment && reStartPureComment.test(line)) this.isInComment = true;
 		if (this.isInComment) {

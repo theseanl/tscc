@@ -1,7 +1,24 @@
-import {IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
-import * as ts from 'typescript';
-import ITsccSpecWithTS from './ITsccSpecWithTS';
 import path = require('path');
+import * as ts from 'typescript';
+
+/** Closure Compiler spec imports. */
+import ITsccSpecWithTS from './ITsccSpecWithTS';
+import {
+	IInputTsccSpecJSON,
+	ITsccSpecJSON,
+	TsccSpec,
+	TsccSpecError
+} from '@tscc/tscc-spec';
+
+/** Closure Compiler spec imports. */
+import {
+	ClosureCompilerFlags,
+	DEFAULT_FLAGS,
+	ES_TARGETS,
+} from './ClosureCompilerSpec';
+
+/** Set up the Closure Compiler flags. */
+const compilerFlags = {...DEFAULT_FLAGS};
 
 export class TsError extends Error {
 	constructor(
@@ -11,7 +28,7 @@ export class TsError extends Error {
 	}
 }
 
-type TWarningCallback = (msg: string) => void;
+export type TWarningCallback = (msg: string) => void;
 
 export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS {
 	static loadTsConfigFromArgs(tsArgs: string[], specRoot: string, onWarning: TWarningCallback) {
@@ -28,13 +45,13 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		// I think this is a more reasonable behavior, since many users will just put spec.json and
 		// tsconfig.json at the same directory, they will otherwise have to provide the same information
 		// twice, once for tscc and once for tsc.
-		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(options.project, specRoot);
+		const configFileName: string = TsccSpecWithTS.findConfigFileAndThrow(options.project!, specRoot);
 		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
 	}
 	// compilerOptions is a JSON object in the form of tsconfig.json's compilerOption value.
 	// Its value will override compiler options.
 	static loadTsConfigFromPath(tsConfigPath: string, specRoot?: string, compilerOptions?: object) {
-		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath, specRoot);
+		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath, specRoot!);
 		let options: ts.CompilerOptions = {}, errors: ts.Diagnostic[];
 		if (compilerOptions) {
 			({options, errors} = ts.convertCompilerOptionsFromJson(
@@ -46,10 +63,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		}
 		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
 	}
-	private static findConfigFileAndThrow(searchPath: string, defaultLocation: string) {
+	private static findConfigFileAndThrow(searchPath: string, defaultLocation: string): string {
 		const configFileName =
 			TsccSpecWithTS.resolveSpecFile(searchPath, 'tsconfig.json', defaultLocation);
-		if (configFileName === undefined) {
+		if (!configFileName) {
 			throw new TsccSpecError(
 				`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath ?? defaultLocation)}.`
 			)
@@ -60,8 +77,8 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		const compilerHost: ts.ParseConfigFileHost = Object.create(ts.sys);
 		compilerHost.onUnRecoverableConfigFileDiagnostic = (diagnostic) => {throw new TsError([diagnostic]);}
 		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, options, compilerHost);
-		if (parsedConfig.errors.length) {
-			throw new TsError(parsedConfig.errors);
+		if (parsedConfig!.errors.length) {
+			throw new TsError(parsedConfig!.errors);
 		}
 		const projectRoot = path.dirname(configFileName);
 		return {projectRoot, parsedConfig};
@@ -77,10 +94,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		let specRoot = path.dirname(tsccSpecJSONPath);
 		let {projectRoot, parsedConfig} = Array.isArray(tsConfigPathOrTsArgs) ?
 			TsccSpecWithTS.loadTsConfigFromArgs(tsConfigPathOrTsArgs, specRoot, onTsccWarning) :
-			TsccSpecWithTS.loadTsConfigFromPath(tsConfigPathOrTsArgs, specRoot, compilerOptionsOverride);
+			TsccSpecWithTS.loadTsConfigFromPath(tsConfigPathOrTsArgs!, specRoot, compilerOptionsOverride);
 
-		TsccSpecWithTS.pruneCompilerOptions(parsedConfig.options, onTsccWarning);
-		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath, parsedConfig, projectRoot);
+		TsccSpecWithTS.pruneCompilerOptions(parsedConfig!.options, onTsccWarning);
+		return new TsccSpecWithTS(tsccSpecJSON, tsccSpecJSONPath, parsedConfig!, projectRoot);
 	}
 	/**
 	 * Prune compiler options
@@ -133,7 +150,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			options.declaration = false;
 		}
 	}
-	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig.options);
+	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig!.options);
 	constructor(
 		tsccSpec: ITsccSpecJSON,
 		basePath: string,
@@ -165,16 +182,6 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	getCompilerHost() {
 		return this.tsCompilerHost;
 	}
-	private static readonly tsTargetToCcTarget = {
-		[ts.ScriptTarget.ES3]: "ECMASCRIPT3",
-		[ts.ScriptTarget.ES5]: "ECMASCRIPT5_STRICT",
-		[ts.ScriptTarget.ES2015]: "ECMASCRIPT_2015",
-		[ts.ScriptTarget.ES2016]: "ECMASCRIPT_2016",
-		[ts.ScriptTarget.ES2017]: "ECMASCRIPT_2017",
-		[ts.ScriptTarget.ES2018]: "ECMASCRIPT_2018",
-		[ts.ScriptTarget.ES2019]: "ECMASCRIPT_2019",
-		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
-	}
 	getOutputFileNames(): string[] {
 		return this.getOrderedModuleSpecs()
 			.map(moduleSpec => {
@@ -182,38 +189,33 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				return this.absolute(this.getOutputPrefix('cc')) + moduleName + '.js';
 			});
 	}
-	private getDefaultFlags(): {[flag: string]: primitives | primitives[]} {
+	private getDefaultFlags(): ClosureCompilerFlags {
 		let {target, sourceMap, inlineSources} = this.parsedConfig.options;
 
-		const defaultFlags = {};
-		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[
-			typeof target === 'undefined' ? ts.ScriptTarget.ES3 : target
-		]; // ts default value is ES3.
-		defaultFlags["language_out"] = "ECMASCRIPT5";
-		defaultFlags["compilation_level"] = "ADVANCED";
+		if (target)
+			compilerFlags['language_in'] = ES_TARGETS[target];
+
 		if (this.getOrderedModuleSpecs().length > 1) {
 			// Multi-chunk build uses --chunk and --chunk_output_path_prefix.
 			// This path will appear in a sourcemap that closure compiler generates - need to use
 			// relative path in order not to leak global directory structure.
-			defaultFlags["chunk_output_path_prefix"] = this.relativeFromCwd(this.getOutputPrefix('cc'));
+			compilerFlags["chunk_output_path_prefix"] = this.relativeFromCwd(this.getOutputPrefix('cc'));
 		} else {
 			// Single-chunk build uses --js_output_file.
-			defaultFlags["js_output_file"] =
+			compilerFlags["js_output_file"] =
 				this.relativeFromCwd(this.getOutputPrefix('cc')) +
 				this.getOrderedModuleSpecs()[0].moduleName + '.js';
 		}
-		defaultFlags["generate_exports"] = true;
-		defaultFlags["export_local_property_definitions"] = true;
 
 		if (sourceMap) {
-			defaultFlags["create_source_map"] = "%outname%.map";
-			defaultFlags["apply_input_source_maps"] = true;
+			compilerFlags["create_source_map"] = "%outname%.map";
+			compilerFlags["apply_input_source_maps"] = true;
 		}
 		if (inlineSources) {
-			defaultFlags["source_map_include_content"] = true;
+			compilerFlags["source_map_include_content"] = true;
 		}
 
-		return defaultFlags;
+		return compilerFlags;
 	}
 	getBaseCompilerFlags() {
 		const baseFlags = this.tsccSpec.compilerFlags || {};
@@ -245,19 +247,17 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				.map(fileName => path.resolve(this.projectRoot, fileName))
 		);
 	}
-	resolveExternalModuleTypeReference(moduleName: string) {
+	resolveExternalModuleTypeReference(moduleName: string): string | undefined {
 		const resolved = ts.resolveTypeReferenceDirective(
 			moduleName,
 			// Following convention of Typescript source code
 			path.join(this.projectRoot, '__inferred type names__.ts'),
 			this.getCompilerOptions(),
 			this.getCompilerHost()
-		);
-		if (resolved && resolved.resolvedTypeReferenceDirective &&
-			resolved.resolvedTypeReferenceDirective.isExternalLibraryImport) {
-			return resolved.resolvedTypeReferenceDirective.resolvedFileName;
-		}
-		return null;
+    );
+    const referenceDirective = resolved?.resolvedTypeReferenceDirective;
+    if (referenceDirective?.isExternalLibraryImport)
+      return referenceDirective?.resolvedFileName;
 	}
 	getProjectHash(): string {
 		return require('crypto').createHash('sha256')

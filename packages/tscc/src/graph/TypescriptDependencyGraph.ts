@@ -62,18 +62,24 @@ export default class TypescriptDependencyGraph {
 	private isTslib(fileName: string) {
 		return getPackageBoundary(fileName).endsWith(path.sep + 'tslib' + path.sep);
 	}
-	private walk(fileName: string) {
+	private walk(fileName?: string) {
 		if (typeof fileName !== 'string') return;
+
 		// Typescript may use unix-style path separators in internal APIs even on Windows environment.
 		// We should normalize it because we use string === match on file names, for example in
 		// shouldSkipTsickleProcessing.
 		fileName = path.normalize(fileName);
+
 		// Default libraries (lib.*.d.ts) files and tslib.d.ts are not processed by tsickle.
 		if (this.isDefaultLib(fileName) || this.isTslib(fileName)) return;
+
 		// add file to visited set
 		if (this.visited.has(fileName)) return;
 		this.visited.add(fileName);
+
 		const sf = <SourceFileWithInternalAPIs>this.host.getSourceFile(fileName);
+		if (!sf) return;
+
 		/**
 		 * Files imported to the current file are available in `resolvedModules` property.
 		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processImportedModules`
@@ -85,18 +91,22 @@ export default class TypescriptDependencyGraph {
 				this.walk(entry?.[1]?.resolvedFileName);
 			}
 		}
-		/**
+
+		/**d
 		 * Files referenced from the current file via /// <reference path="...." /> are available in
 		 * `referencedFiles` property. Unlike the previous `resolvedModules`, this is a public API.
 		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processReferencedFiles`
 		 * These are always initialized, so no if check is needed: see ts.Parser.parseSourceFile
 		 */
-		for (let ref of sf.referencedFiles) {
-			// Unlike the above API, this is not a resolved path, so we have to call TS API
-			// to resolve it first. See the function body of `processReferencedFiles`.
-			const resolvedReferencedFileName = ts.resolveTripleslashReference(ref?.fileName, fileName);
-			this.walk(resolvedReferencedFileName);
+		if (sf.referencedFiles) {
+			for (let ref of sf.referencedFiles) {
+				// Unlike the above API, this is not a resolved path, so we have to call TS API
+				// to resolve it first. See the function body of `processReferencedFiles`.
+				const resolvedReferencedFileName = ts.resolveTripleslashReference(ref?.fileName, fileName);
+				this.walk(resolvedReferencedFileName);
+			}
 		}
+
 		/**
 		 * Files referenced from the current file via /// <reference type="..." /> are available in
 		 * `resolvedTypeReferenceDirectiveNames` internal API. This is also available in `typeReferencedFile`,
@@ -110,8 +120,8 @@ export default class TypescriptDependencyGraph {
 			}
 		}
 	}
-	addRootFile(fileName: string) {
-		this.walk(fileName);
+	addRootFile(fileName?: string | null) {
+		this.walk(fileName || '');
 	}
 	hasFile(fileName: string) {
 		return this.visited.has(fileName);

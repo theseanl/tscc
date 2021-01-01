@@ -60,7 +60,7 @@ export class ClosureJsonToVinyl extends LoggingTransformStream {
 		private applySourceMap: boolean,
 		logger: Logger
 	) {super(logger)}
-	_rawTransform(data: ArrayStreamItem<IClosureCompilerOutputJson>, encoding) {
+	_rawTransform(data: ArrayStreamItem<IClosureCompilerOutputJson>, encoding: BufferEncoding) {
 		if (!data) return data;
 		const json = data.value;
 		const vinyl = new Vinyl({
@@ -76,9 +76,9 @@ export class ClosureJsonToVinyl extends LoggingTransformStream {
 }
 
 export class RemoveTempGlobalAssignments extends LoggingTransformStream {
-	async _rawTransform(data: Vinyl, encoding) {
+	async _rawTransform(data: Vinyl, encoding: BufferEncoding) {
 		if (data.isNull()) return data;
-		const origContents = data.contents.toString(encoding);
+		const origContents = data.contents!.toString(encoding);
 		// Fast path
 		if (!origContents.includes('__tscc_export_start__')) return data;
 		if (!data[SOURCE_MAP]) { // Simple regex replace

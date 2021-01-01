@@ -6,28 +6,35 @@ export default class MultiMap<K, V> {
 			ar = new Set();
 			this.map.set(key, ar);
 		} else {
-			ar = this.map.get(key);
+			ar = this.getKey(key);
 		}
 		if (arguments.length > 1) {
-			ar.add(value);
+			if (value)
+				ar.add(value);
 		}
 	}
-	find(key:K, value:V):boolean {
+	find(key: K, value: V): boolean {
 		if (!this.findKey(key)) return false;
-		let values = this.map.get(key);
+		let values = this.getKey(key);
 		return values.has(value);
 	}
-	findKey(key:K):boolean {
+	findKey(key: K): boolean {
 		return this.map.has(key);
 	}
-	findValue(value:V):K {
+	findValue(value: V): K | null {
 		for (let [key, values] of this.map) {
-			if (values.has(value)) return key;
+			if (values.has(value))
+				return key;
 		}
+
+		return null;
 	}
 	get(key: K): V[] {
 		if (!this.map.has(key)) return [];
-		return [...this.map.get(key)];
+		return [...this.getKey(key)];
+	}
+	getKey(key: K): Set<V> {
+		return this.map.get(key) || new Set<V>([]);
 	}
 	putAll(key: K, values: Iterable<V>) {
 		this.map.set(key, new Set(values));
@@ -40,10 +47,9 @@ export default class MultiMap<K, V> {
 			}
 		}
 	}
-	iterateValues(key:K):IterableIterator<V> {
-		if (this.map.get(key)) {
-			return this.map.get(key).values();
-		}
+	iterateValues(key: K): IterableIterator<V> {
+		const resultSet = this.getKey(key);
+		return resultSet.values();
 	}
 	keys() {
 		return this.map.keys();

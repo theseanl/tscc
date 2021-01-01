@@ -36,7 +36,7 @@ function createProgramFromConfigFile(configFilePath: string): ts.Program {
 		path.resolve(__dirname, configFilePath),
 		{},
 		<any>ts.sys
-	);
+	)!;
 	const compilerHost = ts.createCompilerHost(options);
 	return ts.createProgram(
 		fileNames,

@@ -21,7 +21,7 @@ export default interface ITsccSpecWithTS extends ITsccSpec {
 	 * For a given module name as used in import ... from ${moduleName}, returns a type reference file's
 	 * file name. Returns null if it cannot find a type definition for a module's name.
 	 */
-	resolveExternalModuleTypeReference(moduleName:string):string;
+	resolveExternalModuleTypeReference(moduleName:string):string|null|undefined;
 	/**
 	 * Create a unique hash for a project, consisting of the absolute path of tsconfig,
 	 * absolute path of tsccspec, and their contents.

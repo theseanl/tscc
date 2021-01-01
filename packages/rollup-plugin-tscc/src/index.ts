@@ -6,8 +6,8 @@ import computeChunkAllocation, {ChunkSortError} from './sort_chunks';
 import mergeChunks, {ChunkMergeError} from './merge_chunks';
 import path = require('path');
 
-const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
-	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(pluginOptions);
+const pluginImpl = (options: IInputTsccSpecJSON) => {
+	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(options);
 
 	const isManyModuleBuild = spec.getOrderedModuleSpecs().length > 1;
 	const globals = spec.getRollupExternalModuleNamesToGlobalMap();
@@ -17,11 +17,11 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 
 	/* Plugin methods start */
 	const name = "rollup-plugin-tscc";
-	const options: rollup.Plugin["options"] = (options = {}) => {
+	const localOptions: rollup.Plugin["options"] = (providedOptions = {}) => {
 		// Add entry files read fom tsccconfig
-		options.input = spec.getRollupOutputNameToEntryFileMap();
-		options.external = spec.getExternalModuleNames();
-		return options;
+		providedOptions.input = spec.getRollupOutputNameToEntryFileMap();
+		providedOptions.external = spec.getExternalModuleNames();
+		return providedOptions;
 	};
 	const outputOptions: rollup.Plugin["outputOptions"] = (outputOptions = {}) => {
 		outputOptions.dir = '.';
@@ -51,9 +51,10 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		 * instead, so we are hooking into it so that `renderPath` is set to an absolute path.
 		 */
 		const orig = outputOptions.paths;
-		outputOptions.paths = (id) => {
+		outputOptions.paths = (id): string => {
 			if (id in globals) return id;
-			if (typeof orig === 'function') return orig(id);
+			else if (typeof orig === 'function') return orig(id);
+			else return '';
 		}
 		return outputOptions;
 	};
@@ -72,55 +73,63 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			return Promise.resolve('');
 		}
 	};
-	const generateBundle = handleError<rollup.Plugin["generateBundle"]>(async function (
-		this: rollup.PluginContext, options, bundle, isWrite
-	) {
-		// Quick path for single-module builds
-		if (spec.getOrderedModuleSpecs().length === 1) return;
+	const generateBundle = handleError<rollup.OutputPluginHooks['generateBundle']>(
+		async function (
+			this: rollup.PluginContext, options, bundle: rollup.OutputBundle, isWrite
+		) {
+			// Quick path for single-module builds
+			if (spec.getOrderedModuleSpecs().length === 1) return;
 
-		// Get entry dependency from spec
-		const entryDeps = spec.getRollupOutputNameDependencyMap();
+			// Get entry dependency from spec
+			const entryDeps = spec.getRollupOutputNameDependencyMap();
 
-		// Get chunk dependency from rollup.OutputBundle
-		const chunkDeps = {};
-		for (let [fileName, chunkInfo] of Object.entries(bundle)) {
-			// TODO This is a possible source of conflicts with other rollup plugins.
-			// Some plugins may add unexpected chunks. In general, it is not clear what TSCC should do
-			// in such cases. A safe way would be to strip out such chunks and deal only with chunks
-			// that are expected to be emitted. We may trim such chunks here.
-			if (!isChunk(chunkInfo)) continue;
-			chunkDeps[fileName] = [];
-			for (let imported of chunkInfo.imports) {
-				chunkDeps[fileName].push(imported);
+			// Get chunk dependency from rollup.OutputBundle
+			const chunkDeps: {[key: string]: any} = {};
+			for (let [fileName, chunkInfo] of Object.entries(bundle)) {
+				// TODO This is a possible source of conflicts with other rollup plugins.
+				// Some plugins may add unexpected chunks. In general, it is not clear what TSCC should do
+				// in such cases. A safe way would be to strip out such chunks and deal only with chunks
+				// that are expected to be emitted. We may trim such chunks here.
+				if (!isChunk(chunkInfo)) continue;
+				chunkDeps[fileName] = [];
+				for (let imported of chunkInfo.imports) {
+					chunkDeps[fileName].push(imported);
+				}
 			}
-		}
 
-		// Compute chunk allocation
-		const chunkAllocation = computeChunkAllocation(chunkDeps, entryDeps);
+			// Compute chunk allocation
+			const chunkAllocation = computeChunkAllocation(chunkDeps, entryDeps);
 
-		/**
-		 * Hack `bundle` object, as described in {@link https://github.com/rollup/rollup/issues/2938}
-		 */
-		await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
-			// 0. Merge bundles that ought to be merged with this entry point
-			const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle, globals);
-			// 1. Delete keys for chunks that are included in this merged chunks
-			for (let chunk of chunkAllocation.get(entry)) {
-				delete bundle[chunk];
-			}
-			// 2. Add the merged bundle object
-			bundle[entry] = mergedBundle;
-		}));
-	});
+			/**
+			 * Hack `bundle` object, as described in {@link https://github.com/rollup/rollup/issues/2938}
+			 */
+			await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
+				// 0. Merge bundles that ought to be merged with this entry point
+				const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle, globals);
+				// 1. Delete keys for chunks that are included in this merged chunks
+				for (let chunk of chunkAllocation.get(entry)) {
+					delete bundle[chunk];
+				}
+				// 2. Add the merged bundle object
+				bundle[entry] = mergedBundle;
+			}));
+		});
 
-	return {name, generateBundle, options, outputOptions, resolveId, load};
+	return <rollup.Plugin>{
+		name,
+		generateBundle,
+		options: localOptions,
+		outputOptions,
+		resolveId,
+		load
+	};
 };
 
 function isChunk(output: rollup.OutputChunk | rollup.OutputAsset): output is rollup.OutputChunk {
 	return output.type === 'chunk';
 }
 
-function handleError<H extends (this: rollup.PluginContext, ..._: unknown[]) => unknown>(hook: H): H {
+function handleError<H extends (this: rollup.PluginContext, ..._: any[]) => unknown>(hook: H): H {
 	return <H>async function () {
 		try {
 			return await Reflect.apply(hook, this, arguments);

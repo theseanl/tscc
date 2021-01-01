@@ -12,7 +12,7 @@ import console = require('console');
 /**
  * example: tscc -s src/tscc.spec.json -- --experimentalDecorators -- --assume_function_wrapper
  */
-async function main(args) {
+async function main(args: {[key: string]: any}) {
 	if (args.clean) {
 		require('rimraf').sync(TEMP_DIR);
 		console.log(`Removed ${TEMP_DIR}.`);
@@ -111,7 +111,7 @@ export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: 
 		.parse(args);
 }
 
-export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
+export function buildTsccSpecJSONAndTsArgsFromArgs(args: {[key: string]: any;}) {
 	const tsArgs = <string[]>args["--"] || [];
 	const closureCompilerArgs: string[] = (<any>yargs()
 		.parserConfiguration({'populate--': true})
@@ -129,13 +129,26 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	let moduleFlags: string[] = args["module"];
 	if (moduleFlags) {
 		const moduleFlagValue: INamedModuleSpecs[] = [];
+
 		for (let moduleFlag of moduleFlags) {
 			// --modules chunk2:./src/chunk2.ts:chunk0,chunk1:css_renaming_map.js
-			let [moduleName, entry, dependenciesStr, extraSourcesStr] = moduleFlag.split(':');
-			let dependencies: string[], extraSources: string[];
+      let dependencies: string[] | undefined, extraSources: string[] | undefined;
+			let [
+        moduleName,
+        entry,
+        dependenciesStr,
+        extraSourcesStr
+      ] = moduleFlag.split(':');
+
 			if (dependenciesStr) dependencies = dependenciesStr.split(',');
 			if (extraSourcesStr) extraSources = extraSourcesStr.split(',');
-			moduleFlagValue.push({moduleName, entry, dependencies, extraSources})
+
+			moduleFlagValue.push({
+				moduleName,
+				entry,
+				dependencies,
+				extraSources
+			});
 		}
 		out.modules = moduleFlagValue;
 	}
@@ -161,8 +174,8 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 	if (closureCompilerArgs.length) {
 		let compilerFlags = yargs().parse(closureCompilerArgs);
 		// delete special args produced by yargs
-		delete compilerFlags["_"];
-		delete compilerFlags["$0"];
+		/** @ts-ignore */
+		delete compilerFlags["_"], delete compilerFlags["$0"];
 		out.compilerFlags = <any>compilerFlags;
 	}
 

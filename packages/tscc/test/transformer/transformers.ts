@@ -105,7 +105,8 @@ describe(`dts_requiretype_transformer`, () => {
 		const testFiles = [
 			"dts_requiretype/entry.ts"
 		];
-		const mockSpec = <ITsccSpecWithTS>{
+
+		const mockSpec = <TsccSpecWithTS><unknown>{
 			getTSRoot() {
 				return samplesRoot;
 			},
@@ -113,6 +114,7 @@ describe(`dts_requiretype_transformer`, () => {
 				return []
 			}
 		};
+
 		const tsickleHostOverride: Partial<tsickle.TsickleHost> = {
 			googmodule: true,
 			transformTypesToClosure: true,
@@ -126,15 +128,15 @@ describe(`dts_requiretype_transformer`, () => {
 				const rel = path.relative(samplesRoot, fileName);
 				return escapeGoogAdmissibleName(rel);
 			},
-			fileNameToModuleId: x => ""
+			fileNameToModuleId: (x: string) => ""
 		};
 
 		const {out} = emit(testFiles, (transformerHost) => ({
 			afterTs: [dtsRequireTypeTransformer(mockSpec, transformerHost)]
 		}), {}, tsickleHostOverride);
-		for (let testFile of testFiles) {
+
+		for (let testFile of testFiles)
 			expect(out.get(testFile)).toMatchSnapshot(testFile);
-		}
 	})
 });
 
@@ -144,8 +146,8 @@ function emit(
 	files: string[], transformerFactory: EmitTransformerFactory,
 	override: Partial<ts.CompilerOptions> = {}, tsickleHostOverride: Partial<tsickle.TsickleHost> = {}
 ) {
-	const {parsedConfig} = TsccSpecWithTS.loadTsConfigFromPath(samplesRoot);
-	const {options} = parsedConfig;
+	const {parsedConfig} = TsccSpecWithTS.loadTsConfigFromPath(samplesRoot)!;
+	const {options} = parsedConfig!;
 	Object.assign(options, override);
 	const host = ts.createCompilerHost(options);
 	files = files.map(file => path.resolve(samplesRoot, file));
@@ -154,9 +156,9 @@ function emit(
 		shouldSkipTsickleProcessing: () => false,
 		shouldIgnoreWarningsForPath: () => true,
 		googmodule: false,
-		pathToModuleName: x => x,
-		fileNameToModuleId: x => x,
-		moduleResolutionHost: ts.createCompilerHost(parsedConfig.options),
+		pathToModuleName: (x: string) => x,
+		fileNameToModuleId: (x: string) => x,
+		moduleResolutionHost: ts.createCompilerHost(options),
 		options,
 	}, tsickleHostOverride);
 

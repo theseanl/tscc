@@ -17,14 +17,17 @@ describe(`Golden Tests:`, () => {
 				tsccPlugin({specFile})
 			]
 		});
-		const {output} = await bundle.generate({
+		const result: rollup.RollupOutput = await bundle.generate({
 			dir: '.',
 			format: 'iife'
 		});
-		Object.keys(output).sort().forEach(name => {
-			let chunk = output[name];
-			expect(chunk.code).toMatchSnapshot();
-		})
+
+		result.output.forEach(
+			(chunk) => {
+				if ('code' in chunk)
+					expect(chunk.code).toMatchSnapshot();
+			}
+		);
 	})
 })
 

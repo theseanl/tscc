@@ -36,6 +36,7 @@ export default class TsccSpec implements ITsccSpec {
 	private static readonly RE_ENDS_WITH_SEP = new RegExp(TsccSpec.PATH_SEP + '$');
 	private static isDotPath(p: string) {return TsccSpec.RE_DOT_PATH.test(p);}
 	private static endsWithSep(p: string) {return TsccSpec.RE_ENDS_WITH_SEP.test(p);}
+
 	/**
 	 * Follows the behavior of Typescript CLI.
 	 * 1. If --project argument is supplied,
@@ -44,47 +45,60 @@ export default class TsccSpec implements ITsccSpec {
 	 *   1-3. If it is not a file nor a directory, throw an error.
 	 * 2. If it is not supplied (and file arguments are not supplied which is always the case for tscc)
 	 *    it calls ts.findConfigFile to search for tsconfig.json from the current working directory.
+	 * 
+	 * @return The path to the spec file, or an empty string if not found.
 	 */
 	protected static resolveSpecFile(
-		searchPath: string | undefined,
-		specFileName: string,
-		defaultLocation?: string
+		searchPath?: string,
+		specFileName: string = 'tsconfig.json',
+		defaultLocation: string = '.'
 	): string {
-		if (typeof searchPath === 'string') { // 1
+		const {resolve, dirname} = path;
+
+		const getStats = (...paths: string[]) => fs.statSync(resolve(...paths));
+		const isFile = (...args: string[]) => getStats(...args).isFile();
+		const isDirectory = (...args: string[]) => getStats(...args).isDirectory();
+
+		// 1
+		if (searchPath) {
 			try {
-				let stat = fs.statSync(searchPath); // Throws if does not exist
-				if (stat.isFile()) return path.resolve(searchPath); // 1-1;
-				if (stat.isDirectory()) { // 1-2;
-					let specPath = path.resolve(searchPath, specFileName);
-					let specStat = fs.statSync(specPath); // Throws if does not exist
-					if (specStat.isFile()) return specPath;
-				}
+				// 1-1
+				if (isFile(searchPath))
+					return resolve(searchPath);
+				// 1-2
+				else if (isDirectory(searchPath))
+					// 1-3
+					if (isFile(searchPath, specFileName))
+						return resolve(searchPath, specFileName);
 			} catch (e) {}
-			return; // 1-3
+		} else {
+			// Search ancestor directories starting from defaultLocation, similar to ts.findConfigFile
+			let nextPath = defaultLocation;
+			while (nextPath !== searchPath) {
+				searchPath = nextPath;
+				try {
+					// 2
+					if (isFile(searchPath, specFileName))
+						return resolve(searchPath, specFileName);
+				} catch (e) {}
+				nextPath = dirname(searchPath);
+			}
 		}
-		// Search ancestor directories starting from defaultLocation, similar to ts.findConfigFile
-		let nextPath = defaultLocation;
-		while (nextPath !== searchPath) {
-			searchPath = nextPath;
-			try {
-				let specPath = path.resolve(searchPath, specFileName);
-				let stat = fs.statSync(specPath);
-				if (stat.isFile()) return specPath;
-			} catch (e) {}
-			nextPath = path.dirname(searchPath);
-		}
-		return;
+		// Return an empty string
+		return '';
 	}
+
 	// A helper function for creating path strings to display in terminal environments
 	protected static toDisplayedPath(p: string): string {
+		/** This is the source of an error related to spec resolution. */
 		const relPath = path.relative('.', p);
 		if (TsccSpec.isDotPath(relPath)) return path.resolve(p); // use an absolute path
 		if (relPath === '.') return "the current working directory";
 		return relPath;
 	}
-	private static findTsccSpecAndThrow(root: string): string {
+	private static findTsccSpecAndThrow(root?: string): string {
 		const specPath = TsccSpec.resolveSpecFile(root, TsccSpec.SPEC_FILE, process.cwd());
-		if (specPath === undefined) {
+		if (!specPath) {
 			let displayedPath = TsccSpec.toDisplayedPath(root || process.cwd());
 			throw new TsccSpecError(`No spec file was found from ${displayedPath}.`);
 		}
@@ -100,7 +114,7 @@ export default class TsccSpec implements ITsccSpec {
 					hasSpecFileKey(tsccSpecJSONOrItsPath) ?
 						TsccSpec.findTsccSpecAndThrow(tsccSpecJSONOrItsPath.specFile) :
 						path.join(process.cwd(), TsccSpec.SPEC_FILE) : // Just a dummy path
-					TsccSpec.findTsccSpecAndThrow(undefined); // Searches in ancestor directories
+					TsccSpec.findTsccSpecAndThrow(); // Searches in ancestor directories
 
 		const readSpecJSON = (): ITsccSpecJSON => {
 			try {
@@ -135,7 +149,7 @@ export default class TsccSpec implements ITsccSpec {
 		this.computeOrderedModuleSpecs();
 		this.resolveRelativeExternalModuleNames();
 	}
-	private orderedModuleSpecs: INamedModuleSpecs[];
+	private orderedModuleSpecs: INamedModuleSpecs[] = [];
 	private computeOrderedModuleSpecs() {
 		const modules = this.tsccSpec.modules;
 		if (Array.isArray(modules)) {
@@ -158,7 +172,7 @@ export default class TsccSpec implements ITsccSpec {
 				graph.addEdgeById(dep, moduleName);
 			}
 		}
-		let sorted: ReadonlyArray<string>;
+		let sorted: ReadonlyArray<string> = [];
 		try {
 			sorted = graph.sort();
 		} catch (e) {
@@ -180,7 +194,7 @@ export default class TsccSpec implements ITsccSpec {
 		if (!('extraSources' in spec)) spec.extraSources = [];
 		spec.moduleName = moduleName;
 		// Resolve entry file name to absolute path
-		spec.entry = this.absolute(spec.entry);
+		spec.entry = this.absolute(spec.entry || '');
 		return <INamedModuleSpecs>spec;
 	}
 	/**
@@ -221,7 +235,7 @@ export default class TsccSpec implements ITsccSpec {
 	private external: Map<string, ExternalModuleData> = new Map();
 	private resolveRelativeExternalModuleNames() {
 		if (!('external' in this.tsccSpec)) return;
-		for (let [moduleName, globalName] of Object.entries(this.tsccSpec.external)) {
+		for (let [moduleName, globalName] of Object.entries(this.tsccSpec.external!)) {
 			if (TsccSpec.isDotPath(moduleName)) {
 				this.external.set(this.absolute(moduleName), {globalName, isFilePath: true});
 			} else {
@@ -236,11 +250,8 @@ export default class TsccSpec implements ITsccSpec {
 		return this.external;
 	}
 	getJsFiles() {
-		let jsFiles = this.tsccSpec.jsFiles;
-		if (jsFiles) {
-			return <string[]>fg.sync(this.tsccSpec.jsFiles)
-		}
-		return [];
+    const jsFiles = this.tsccSpec.jsFiles || [];
+    return jsFiles ? fg.sync(jsFiles) : [];
 	}
 	debug(): Readonly<IDebugOptions> {
 		return this.tsccSpec.debug || {};

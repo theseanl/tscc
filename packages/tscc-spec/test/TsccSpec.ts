@@ -20,6 +20,7 @@ describe(`TsccSpec`, () => {
 		test(`loads spec by searching on ancestor directories starting from CWD`, () => {
 			const done = mockCurrentWorkingDirectory(path.join(testSpecDir, 'nested_directory'));
 
+			/** @ts-ignore */
 			const spec = TsccSpec.loadSpec(undefined);
 			expect(spec.getOrderedModuleSpecs().length).toBe(1);
 
@@ -34,6 +35,7 @@ describe(`TsccSpec`, () => {
 			const done = mockCurrentWorkingDirectory(nonExistentPath);
 
 			expect(() => {
+				/** @ts-ignore */
 				TsccSpec.loadSpec(undefined)
 			}).toThrow(TsccSpecError);
 			// ancestor directory search eventually stops at and throws
@@ -43,7 +45,7 @@ describe(`TsccSpec`, () => {
 		});
 
 		test(`when it cannot find a spec file at a path referenced via specFile key, throws an error with meaningful error message`, () => {
-			let errorThrown: Error;
+			let errorThrown: any;
 			try {
 				TsccSpec.loadSpec({specFile: '/'});
 			} catch (e) {

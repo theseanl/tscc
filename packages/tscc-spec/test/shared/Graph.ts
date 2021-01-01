@@ -1,25 +1,41 @@
 ///<reference types="jest"/>
 import {DirectedTreeBase, DirectedTree, DirectedTreeWithOrdering, DirectedTreeWithLeafs} from "@tscc/tscc-spec"
 
-function compareGraphStructure(nodes, edges, poset) {
-	for (let id of nodes) {
-		let node = poset.getNodeById(id);
-		let expectedTargets = edges.filter(([a, b]) => a === id).map(([a, b]) => b);
-		let expectedSources = edges.filter(([a, b]) => b === id).map(([a, b]) => a);
-		let targets = [...node.iterateOutboundEdges()]
-			.map(edge => edge.target)
-			.map(poset.getIdOfNode, poset);
-		let sources = [...node.iterateInboundEdges()]
-			.map(edge => edge.source)
-			.map(poset.getIdOfNode, poset);
-		expect(new Set(expectedTargets)).toEqual(new Set(targets));
-		expect(new Set(expectedSources)).toEqual(new Set(sources));
+function posetFromEdges<I>(
+	poset: DirectedTreeBase<I, any, any>,
+	edges: [I, I][]
+) {
+	for (let [a, b] of edges) {
+		poset.addEdgeById(a, b);
 	}
 }
 
-function posetFromEdges<I>(poset: DirectedTreeBase<I, any, any>, edges: [I, I][]) {
-	for (let [a, b] of edges) {
-		poset.addEdgeById(a, b);
+function compareGraphStructure<I>(
+	nodes: I[],
+	edges: [I, I][],
+	poset: DirectedTreeBase<I, any, any>
+) {
+	for (let id of nodes) {
+		let node = poset.getNodeById(id);
+
+		let expectedTargets = edges
+			.filter(([a, b]) => a === id)
+			.map(([a, b]) => b);
+
+		let expectedSources = edges
+			.filter(([a, b]) => b === id)
+			.map(([a, b]) => a);
+
+		let targets = [...node.iterateOutboundEdges()]
+			.map(edge => edge.target)
+			.map(poset.getIdOfNode, poset);
+
+		let sources = [...node.iterateInboundEdges()]
+			.map(edge => edge.source)
+			.map(poset.getIdOfNode, poset);
+
+		expect(new Set(expectedTargets)).toEqual(new Set(targets));
+		expect(new Set(expectedSources)).toEqual(new Set(sources));
 	}
 }
 
@@ -38,8 +54,9 @@ describe(`DirectedTree`, function () {
 	})
 	describe(`sort`, function () {
 		let poset: DirectedTree<number>;
-		let nodes: number[]
+		let nodes: number[];
 		let edges: [number, number][];
+
 		beforeEach(() => {
 			poset = new DirectedTree<number>();
 			nodes = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -111,7 +128,7 @@ describe(`DirectedTreeWithLeafs`, function () {
 		const edges = [
 			[5, 1], [5, 2], [6, 3], [6, 4], [7, 5], [7, 3], [8, 2], [8, 6], [9, 7], [9, 8]
 		];
-		const expectedLeafs = {
+		const expectedLeafs: {[key: number]: number[]} = {
 			1: [1],
 			2: [2],
 			3: [3],
@@ -128,7 +145,11 @@ describe(`DirectedTreeWithLeafs`, function () {
 		])
 		poset.populateLeafs();
 		for (let id = 1; id < 10; id++) {
-			expect(new Set(poset.getLeafsOfNode(id))).toEqual(new Set(expectedLeafs[id]));
+			expect(
+				new Set(poset.getLeafsOfNode(id))
+			).toEqual(
+				new Set(expectedLeafs[id])
+			);
 		}
 	})
 })

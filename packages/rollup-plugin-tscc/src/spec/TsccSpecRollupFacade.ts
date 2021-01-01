@@ -4,7 +4,7 @@ import MultiMap from '../MultiMap';
 
 export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecRollupFacade {
 	resolveRollupExternalDeps(moduleId: string) {
-		return null; // Just a stub
+		return ''; // Just a stub
 	}
 	protected getOutputPrefix(target: "cc" | "rollup"): string {
 		let prefix = this.tsccSpec.prefix;
@@ -30,7 +30,7 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 		return this.rollupPrefix + name + '.js';
 	}
 	getRollupOutputNameToEntryFileMap() {
-		let out = {};
+		let out: {[key: string]: any} = {};
 		for (let {moduleName, entry} of this.getOrderedModuleSpecs()) {
 			// If entryFile is a relative path, resolve it relative to the path of tsccSpecJSON.
 			out[this.addPrefix(moduleName)] = this.absolute(entry);
@@ -44,12 +44,12 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 			// an expected output file name.
 			out.putAll(
 				this.addPrefixAndExtension(moduleName),
-				dependencies.map(this.addPrefixAndExtension, this));
+				dependencies!.map(this.addPrefixAndExtension, this));
 		}
 		return out
 	}
 	getRollupExternalModuleNamesToGlobalMap() {
-		const globals = {};
+		const globals: {[key: string]: any} = {};
 		let external = this.getExternalModuleDataMap();
 		for (let [moduleName, {globalName}] of external) {
 			globals[moduleName] = globalName;

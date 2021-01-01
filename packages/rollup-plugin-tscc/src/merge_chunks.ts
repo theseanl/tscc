@@ -19,15 +19,15 @@ export default async function mergeChunks(
 // so as not to collide with exported names of the entry module. We pass this namespace
 // as rollup's global option in order to reference those from other chunks.
 class ChunkMerger {
-	private entryModuleNamespaces: Map<string, string>
-	private chunkNamespaces: Map<string, string>
-	private unresolveChunk: Map<string, string>;
+	private entryModuleNamespaces: Map<string, string> = new Map();
+	private chunkNamespaces: Map<string, string> = new Map();
+	private unresolveChunk: Map<string, string> = new Map();
 	constructor(
 		private entry: string,
 		private chunkAllocation: MultiMap<string, string>,
 		private bundle: Readonly<rollup.OutputBundle>,
-		private globals?: {[id: string]: string}
-	) { }
+		private globals: {[id: string]: string} = {}
+	) {}
 	private resolveGlobalForMainBuild(id: string) {
 		if (typeof this.globals !== 'object') return;
 		if (!this.globals.hasOwnProperty(id)) return;
@@ -101,7 +101,7 @@ class ChunkMerger {
 				let outputChunk = <rollup.OutputChunk>bundle[id];
 				return {
 					code: outputChunk.code,
-					map: toInputSourceMap(outputChunk.map)
+					map: toInputSourceMap(outputChunk.map!)
 				}
 			}
 			// This code path should not be taken
@@ -110,17 +110,30 @@ class ChunkMerger {
 		const name = "tscc-merger";
 		return {name, resolveId, load};
 	}
-	private resolveGlobal(id: string) {
-		if (this.resolveGlobalForMainBuild(id)) return this.globals[id];
-		if (path.isAbsolute(id)) {
-			id = this.unresolveChunk.get(id);
-		}
+	private resolveGlobal(id: string): string {
+		let ns = '';
+
+		if (this.resolveGlobalForMainBuild(id))
+			return this.globals[id];
+
+		if (path.isAbsolute(id))
+			id = this.unresolveChunk.get(id)!;
+
 		let allocated = this.chunkAllocation.findValue(id);
-		if (allocated === undefined) throw new ChunkMergeError(`Unexpected module in output chunk: ${id}`);
-		if (allocated === this.entry) return null; // not global
+		if (allocated === undefined)
+			throw new ChunkMergeError(`Unexpected module in output chunk: ${id}`);
+
+		// not global
+		if (allocated === this.entry)
+			return '';
+
 		// Resolve to <namespace-of-entry-module-that-our-chunk-is-allocated>.<namespace-of-our-chunk>
-		let ns = this.entryModuleNamespaces.get(allocated);
-		if (allocated !== id) ns += '.' + this.chunkNamespaces.get(id);
+		const entryModuleName = this.entryModuleNamespaces.get(allocated!);
+		ns = entryModuleName!;
+
+		if (allocated !== id)
+			ns += '.' + this.chunkNamespaces.get(id);
+
 		return ns;
 	}
 	// TODO: inherit outputOption provided by the caller
@@ -164,13 +177,13 @@ class ChunkMerger {
 	}
 }
 
-export class ChunkMergeError extends Error { }
+export class ChunkMergeError extends Error {}
 
 /**
  * Converts SourceMap type used by OutputChunk type to ExistingRawSourceMap type used by load hooks.
  */
-function toInputSourceMap(sourcemap: rollup.SourceMap): rollup.ExistingRawSourceMap {
-	if (!sourcemap) return;
+function toInputSourceMap(sourcemap: rollup.SourceMap): rollup.ExistingRawSourceMap | null {
+	if (!sourcemap) return null;
 	return {...sourcemap};
 }
 

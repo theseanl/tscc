@@ -37,7 +37,7 @@ export default abstract class TsHelperTransformer {
 	 */
 	protected abstract onHelperCall(node: ts.CallExpression, googReflectImport: ts.Identifier): ts.CallExpression
 
-	private maybeTsGeneratedHelperCall(node: ts.Node, googReflectImport: ts.Identifier): ts.Node {
+	private maybeTsGeneratedHelperCall(node: ts.Node, googReflectImport: ts.Identifier): ts.Node | undefined {
 		if (!this.isTsGeneratedHelperCall(node)) return;
 		return this.onHelperCall(node, googReflectImport);
 	}

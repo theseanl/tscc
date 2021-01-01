@@ -103,7 +103,7 @@ export default class ClosureDependencyGraph {
 		}
 	}
 	// Walks the graph marking required/type-required nodes as forwardDeclared.
-	private walkTypeRequiredNodes(node: ISourceNode): IterableIterator<ISourceNode> {
+	private walkTypeRequiredNodes(node: ISourceNode) {
 		if (this.forwardDeclared.has(node) || this.required.has(node)) return;
 
 		this.forwardDeclared.add(node);
@@ -144,7 +144,7 @@ export default class ClosureDependencyGraph {
 				const args: (string | number)[] = [entryPoint.moduleName, depsOfAModule.length];
 				if (index !== 0) {
 					// Do not specify dependencies for the very first (root) chunk.
-					args.push(...entryPoint.dependencies);
+					args.push(...entryPoint.dependencies!);
 				}
 				return args.join(':');
 			}));

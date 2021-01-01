@@ -10,7 +10,7 @@
  * default target).
  */
 
-let original:typeof import('tsickle/src/decorators').transformDecoratorsOutputForClosurePropertyRenaming;
+let original: typeof import('tsickle/src/decorators').transformDecoratorsOutputForClosurePropertyRenaming | null;
 
 export function patchTsickleDecoratorTransformer() {
 	if (!original) {
@@ -25,6 +25,6 @@ export function patchTsickleDecoratorTransformer() {
 export function restoreTsickleDecoratorTransformer() {
 	if (original) {
 		require('tsickle/src/decorators').transformDecoratorsOutputForClosurePropertyRenaming = original;
-		original = undefined;
+		original = null;
 	}
 }
