@@ -116,8 +116,8 @@ export default async function tscc(
 	const {writeFile, writeExterns, externPath} =
 		getWriteFileImpl(tsccSpec, tsickleOutput, closureDepsGraph);
 
-	const stdInStream = new stream.Readable({read: function () { }});
-	const pushImmediately = (arg: string) => setImmediate(pushToStream, stdInStream, arg);
+	const stdInStream = new stream.Readable({read: function () {}});
+	const pushImmediately = (arg: string | null) => setImmediate(pushToStream, stdInStream, arg);
 
 	// ----- start tsickle call -----
 	pushImmediately("[")
@@ -185,8 +185,8 @@ export default async function tscc(
 		...riffle('--externs', defaultLibsProvider.externs)
 	], ccLogger, tsccSpec.debug().persistArtifacts);
 
-	const compilerProcessClose = new Promise((resolve, reject) => {
-		function onCompilerProcessClose(code) {
+	const compilerProcessClose = new Promise<void>((resolve, reject) => {
+		function onCompilerProcessClose(code: number) {
 			if (code === 0) {
 				spinner.succeed();
 				spinner.unstick();
@@ -209,7 +209,7 @@ export default async function tscc(
 
 	// Use gulp-style transform streams to post-process cc output - see shared/vinyl_utils.ts.
 	// TODO support returning gulp stream directly
-	const useSourceMap: boolean = tsccSpec.getCompilerOptions().sourceMap;
+	const useSourceMap: boolean | undefined = tsccSpec.getCompilerOptions().sourceMap;
 
 	const writeCompilationOutput = promisify(stream.pipeline)(
 		compilerProcess.stdout,
@@ -225,9 +225,9 @@ export default async function tscc(
 	await Promise.all([compilerProcessClose, writeCompilationOutput])
 }
 
-export class CcError extends Error { }
-export class TsccError extends Error { }
-class UnexpectedFileError extends TsccError { }
+export class CcError extends Error {}
+export class TsccError extends Error {}
+class UnexpectedFileError extends TsccError {}
 
 /**
  * Remove `//# sourceMappingURL=...` from source TS output which typescript generates when
@@ -406,7 +406,7 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 			// 'tslib' is always considered as an external module.
 			if (fileName === 'tslib') return 'tslib';
 			if (externalModuleData.has(fileName)) {
-				let data = externalModuleData.get(fileName);
+				let data = externalModuleData.get(fileName)!;
 				// Module names specified as external are not resolved, which in effect cause
 				// googmodule transformer to emit module names verbatim in `goog.require()`.
 				if (!data.isFilePath) return escapeGoogAdmissibleName(fileName);

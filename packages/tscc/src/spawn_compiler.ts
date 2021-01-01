@@ -21,7 +21,7 @@ export default function spawnCompiler(providedArgs: string[], logger: Logger, de
 	return compilerProcess;
 }
 
-function getSupportedCompiler() {
+function getSupportedCompiler(): {bin: string, args: string[]} {
 	const pkgName = PlatformToCompilerPackageName[process.platform];
 	if (pkgName) {
 		try {
@@ -36,6 +36,12 @@ function getSupportedCompiler() {
 enum PlatformToCompilerPackageName {
 	'darwin' = 'google-closure-compiler-osx',
 	'win32' = 'google-closure-compiler-windows',
-	'linux' = 'google-closure-compiler-linux'
+	'linux' = 'google-closure-compiler-linux',
+	'aix' = '',
+	'android' = '',
+	'freebsd' = '',
+	'openbsd' = '',
+	'sunos' = '',
+	'cygwin' = '',
+	'netbsd' = ''
 }
-

@@ -10,7 +10,7 @@ export interface INamedModuleSpecsWithId extends INamedModuleSpecs {
  * the containing directory of the `tscc.spec.json`.
  */
 export default interface ITsccSpec {
-	getOrderedModuleSpecs(): INamedModuleSpecs[]
+	getOrderedModuleSpecs(): Required<INamedModuleSpecs>[]
 	/**
 	 * Returns an array of external module names.
 	 */

@@ -29,33 +29,39 @@ export default async function spliceSourceMap(content: string, map: RawSourceMap
 	return generator.toJSON();
 }
 
-const mapping: Mapping = {
-	source: undefined,
+const placeholderString = undefined as any as string;
+const placeholderNumber = undefined as any as number;
+
+const mapping = {
+	source: placeholderString,
 	generated: {
-		line: undefined,
-		column: undefined
+		line: placeholderNumber,
+		column: placeholderNumber
 	},
 	original: {
-		line: undefined,
-		column: undefined
+		line: placeholderNumber,
+		column: placeholderNumber
 	},
-	name: undefined
+	name: placeholderString
 };
 
-const mappingWithoutOriginal = <Mapping>{
-	source: undefined,
+const mappingWithoutOriginal = {
+	source: placeholderString,
 	generated: {
-		line: undefined,
-		column: undefined
+		line: placeholderNumber,
+		column: placeholderNumber
 	}
 };
 
-function getMapping(source, generatedLine, generatedColumn, originalLine, originalColumn, name): Mapping {
+function getMapping(
+	source: string, generatedLine: number, generatedColumn: number,
+	originalLine: number, originalColumn: number, name: string
+): Mapping {
 	if (typeof originalLine !== 'number' && typeof originalLine !== 'number') {
 		mappingWithoutOriginal.source = source;
 		mappingWithoutOriginal.generated.line = generatedLine;
 		mappingWithoutOriginal.generated.column = generatedColumn;
-		return mappingWithoutOriginal;
+		return mappingWithoutOriginal as Mapping;
 	}
 	mapping.source = source;
 	mapping.generated.line = generatedLine;
@@ -70,7 +76,7 @@ export function splitWithRegex(contents: string, regex: RegExp) {
 	const intervals: [number, number][] = [];
 	let prevEnd = 0;
 	let replacedContent = '';
-	let execRes: RegExpExecArray
+	let execRes: RegExpExecArray | null
 	while ((execRes = regex.exec(contents)) !== null) {
 		let removeStart = execRes.index;
 		let removeEnd = removeStart + execRes[0].length;

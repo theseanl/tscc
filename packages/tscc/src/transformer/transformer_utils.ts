@@ -19,7 +19,7 @@ type TGoogRequireLike = "require" | "requireType";
  * Verify that the call is a call of a form goog.require(...).
  * @param requireLike require, requireType, provides, ...
  */
-function extractGoogRequireLike(call: ts.CallExpression, requireLike:TGoogRequireLike): string | null {
+function extractGoogRequireLike(call: ts.CallExpression, requireLike: TGoogRequireLike): string | null {
 	let exp = call.expression;
 	if (!ts.isPropertyAccessExpression(exp)) return null;
 	if (!ts.isIdentifier(exp.expression) || exp.expression.escapedText !== 'goog') return null;
@@ -42,7 +42,7 @@ interface IImportedVariable {
 	newIdent: ts.Identifier
 }
 
-function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable {
+function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable | undefined {
 	if (!ts.isVariableStatement(stmt)) return;
 	// Verify it's a single decl (and not "var x = ..., y = ...;").
 	if (stmt.declarationList.declarations.length !== 1) return;
@@ -58,7 +58,7 @@ function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable {
 	return {importedUrl, newIdent: decl.name};
 }
 
-export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike:TGoogRequireLike): IImportedVariable {
+export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike: TGoogRequireLike): IImportedVariable | undefined {
 	if (!ts.isVariableStatement(stmt)) return;
 	// Verify it's a single decl (and not "var x = ..., y = ...;").
 	if (stmt.declarationList.declarations.length !== 1) return;
@@ -74,7 +74,7 @@ export function isGoogRequireLikeStatement(stmt: ts.Statement, requireLike:TGoog
 	return {importedUrl, newIdent: decl.name};
 }
 
-export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier {
+export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier | undefined {
 	for (let stmt of sf.statements) {
 		let _ = isVariableRequireStatement(stmt);
 		if (!_) continue;
@@ -83,7 +83,7 @@ export function findImportedVariable(sf: ts.SourceFile, moduleName: string): ts.
 	}
 }
 
-export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier {
+export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string): ts.Identifier | undefined {
 	for (let stmt of sf.statements) {
 		let _ = isGoogRequireLikeStatement(stmt, "require");
 		if (!_) continue;
@@ -91,7 +91,6 @@ export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string):
 		return _.newIdent;
 	}
 }
-
 
 /**
  * The transformer needs to discern "tslib" function calls (called EmitHelpers in TS),
@@ -101,7 +100,7 @@ export function findGoogRequiredVariable(sf: ts.SourceFile, moduleName: string):
  * This function currently access Node.emitNode.flags to achieve this
  */
 export function identifierIsEmitHelper(ident: ts.Identifier): boolean {
-	let emitNode = ident["emitNode"];
+	let emitNode = (ident as any)["emitNode"];
 	if (emitNode === undefined) return false;
 	let flags = emitNode["flags"];
 	if (typeof flags !== "number") return false;
@@ -130,7 +129,6 @@ export function createSingleQuoteStringLiteral(text: string): ts.StringLiteral {
 	return stringLiteral;
 }
 
-
 export function namespaceToQualifiedName(namespace: string): ts.Expression {
 	let names = namespace.split('.');
 	let l = names.length;
@@ -140,4 +138,3 @@ export function namespaceToQualifiedName(namespace: string): ts.Expression {
 	}
 	return qualifiedName;
 }
-

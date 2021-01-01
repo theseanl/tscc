@@ -1,4 +1,4 @@
-import {IInputTsccSpecJSON, ITsccSpecJSON, primitives, TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
+import {IInputTsccSpecJSON, ITsccSpecJSON, closureCompilerFlags, TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
 import * as ts from 'typescript';
 import ITsccSpecWithTS from './ITsccSpecWithTS';
 import path = require('path');
@@ -33,7 +33,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	}
 	// compilerOptions is a JSON object in the form of tsconfig.json's compilerOption value.
 	// Its value will override compiler options.
-	static loadTsConfigFromPath(tsConfigPath: string, specRoot?: string, compilerOptions?: object) {
+	static loadTsConfigFromPath(tsConfigPath?: string, specRoot?: string, compilerOptions?: object) {
 		const configFileName = TsccSpecWithTS.findConfigFileAndThrow(tsConfigPath, specRoot);
 		let options: ts.CompilerOptions = {}, errors: ts.Diagnostic[];
 		if (compilerOptions) {
@@ -46,12 +46,13 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		}
 		return TsccSpecWithTS.loadTsConfigFromResolvedPath(configFileName, options);
 	}
-	private static findConfigFileAndThrow(searchPath: string, defaultLocation: string) {
+	// At least one among searchPath and defaultLocation must be non-null.
+	private static findConfigFileAndThrow(searchPath?: string, defaultLocation?: string) {
 		const configFileName =
 			TsccSpecWithTS.resolveSpecFile(searchPath, 'tsconfig.json', defaultLocation);
 		if (configFileName === undefined) {
 			throw new TsccSpecError(
-				`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath ?? defaultLocation)}.`
+				`Cannot find tsconfig at ${TsccSpecWithTS.toDisplayedPath(searchPath ?? defaultLocation!)}.`
 			)
 		}
 		return configFileName;
@@ -59,9 +60,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	private static loadTsConfigFromResolvedPath(configFileName: string, options: ts.CompilerOptions) {
 		const compilerHost: ts.ParseConfigFileHost = Object.create(ts.sys);
 		compilerHost.onUnRecoverableConfigFileDiagnostic = (diagnostic) => {throw new TsError([diagnostic]);}
-		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, options, compilerHost);
+		const parsedConfig = ts.getParsedCommandLineOfConfigFile(configFileName, options, compilerHost)!;
 		if (parsedConfig.errors.length) {
-			throw new TsError(parsedConfig.errors);
+			throw new TsError(parsedConfig!.errors);
 		}
 		const projectRoot = path.dirname(configFileName);
 		return {projectRoot, parsedConfig};
@@ -173,6 +174,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2017]: "ECMASCRIPT_2017",
 		[ts.ScriptTarget.ES2018]: "ECMASCRIPT_2018",
 		[ts.ScriptTarget.ES2019]: "ECMASCRIPT_2019",
+		[ts.ScriptTarget.ES2020]: "ECMASCRIPT_2020",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
 	getOutputFileNames(): string[] {
@@ -182,10 +184,14 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				return this.absolute(this.getOutputPrefix('cc')) + moduleName + '.js';
 			});
 	}
-	private getDefaultFlags(): {[flag: string]: primitives | primitives[]} {
-		let {target, sourceMap, inlineSources} = this.parsedConfig.options;
+	private getDefaultFlags(): closureCompilerFlags {
+		// Typescript accepts an undocumented compilation target "json".
+		type DocumentedCompilerOptions = ts.CompilerOptions & {
+			target: Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>
+		}
+		let {target, sourceMap, inlineSources} = this.parsedConfig.options as DocumentedCompilerOptions;
 
-		const defaultFlags = {};
+		const defaultFlags: closureCompilerFlags = {};
 		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[
 			typeof target === 'undefined' ? ts.ScriptTarget.ES3 : target
 		]; // ts default value is ES3.
@@ -255,7 +261,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		);
 		if (resolved && resolved.resolvedTypeReferenceDirective &&
 			resolved.resolvedTypeReferenceDirective.isExternalLibraryImport) {
-			return resolved.resolvedTypeReferenceDirective.resolvedFileName;
+			return resolved.resolvedTypeReferenceDirective.resolvedFileName ?? null;
 		}
 		return null;
 	}

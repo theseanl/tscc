@@ -1,7 +1,7 @@
 import ora = require('ora');
 
-let spinner: ora.Ora;
-let timer: NodeJS.Timer;
+let spinner: ora.Ora | undefined;
+let timer: NodeJS.Timer | undefined;
 
 /**
  * Attach a spinner that sticks at the bottom of the stream,
@@ -15,27 +15,27 @@ export function startTask(text: string) {
 		spinner: "dots12",
 		// See https://github.com/theseanl/tscc/issues/70
 		// If this option is not set, it can lead to very strange behaviors.
-		// 'discarding stdin' does it by overriding globals and it is badly done. 
+		// 'discarding stdin' does it by overriding globals and it is badly done.
 		discardStdin: false
 	});
 	spinner.start();
 	const start = Date.now();
 	timer = setInterval(() => {
-		spinner.text = text + " " + toDDHHMMSS(Date.now() - start);
+		spinner!.text = text + " " + toDDHHMMSS(Date.now() - start);
 	}, 1000);
 }
 
 export function succeed(text?: string) {
 	if (!hasSpinner()) return;
-	spinner.succeed(text);
-	clearInterval(timer);
+	spinner!.succeed(text);
+	clearInterval(timer!);
 	timer = undefined;
 }
 
 export function fail(text?: string) {
 	if (!hasSpinner()) return;
-	spinner.fail(text);
-	clearInterval(timer);
+	spinner!.fail(text);
+	clearInterval(timer!);
 	timer = undefined;
 }
 
@@ -46,7 +46,7 @@ export function fail(text?: string) {
  */
 export function unstick() {
 	if (!hasSpinner()) return;
-	if (spinner.isSpinning) spinner.stop();
+	if (spinner!.isSpinning) spinner!.stop();
 	spinner = undefined;
 	if (timer) {
 		clearInterval(timer);

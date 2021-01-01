@@ -16,7 +16,7 @@ export default function computeChunkAllocation(
 ): MultiMap<string, string> {
 	const chunkMap = MultiMap.fromObject(chunkImportedMap);
 
-	// ChunkGraph is a directed tree where there is an edge from module A to a module B 
+	// ChunkGraph is a directed tree where there is an edge from module A to a module B
 	// iff B imports A.
 	const chunkGraph = new DirectedTreeWithLeafs<string>();
 	for (let chunkName of chunkMap.keys()) {
@@ -44,7 +44,7 @@ export default function computeChunkAllocation(
 
 	for (let chunkName of chunkMap.keys()) {
 		let infimum = leafGraph.getInfimum(chunkGraph.getLeafsOfNode(chunkName));
-		if (infimum === undefined) { throw new ChunkSortError(`Cannot find a common root of a chunk`); }
+		if (infimum === null) {throw new ChunkSortError(`Cannot find a common root of a chunk`);}
 		leafToDependents.add(infimum, chunkName);
 	}
 	for (let entry of entryMap.keys()) {
@@ -57,4 +57,4 @@ export default function computeChunkAllocation(
 	return leafToDependents;
 }
 
-export class ChunkSortError extends Error { }
+export class ChunkSortError extends Error {}

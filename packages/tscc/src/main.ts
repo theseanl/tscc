@@ -12,7 +12,7 @@ import console = require('console');
 /**
  * example: tscc -s src/tscc.spec.json -- --experimentalDecorators -- --assume_function_wrapper
  */
-async function main(args) {
+async function main(args: any) {
 	if (args.clean) {
 		require('rimraf').sync(TEMP_DIR);
 		console.log(`Removed ${TEMP_DIR}.`);
@@ -111,7 +111,7 @@ export function parseTsccCommandLineArgs(args: string[], strict = true): {[key: 
 		.parse(args);
 }
 
-export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
+export function buildTsccSpecJSONAndTsArgsFromArgs(args: any) {
 	const tsArgs = <string[]>args["--"] || [];
 	const closureCompilerArgs: string[] = (<any>yargs()
 		.parserConfiguration({'populate--': true})
@@ -132,7 +132,7 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 		for (let moduleFlag of moduleFlags) {
 			// --modules chunk2:./src/chunk2.ts:chunk0,chunk1:css_renaming_map.js
 			let [moduleName, entry, dependenciesStr, extraSourcesStr] = moduleFlag.split(':');
-			let dependencies: string[], extraSources: string[];
+			let dependencies: string[] | undefined, extraSources: string[] | undefined;
 			if (dependenciesStr) dependencies = dependenciesStr.split(',');
 			if (extraSourcesStr) extraSources = extraSourcesStr.split(',');
 			moduleFlagValue.push({moduleName, entry, dependencies, extraSources})
@@ -159,7 +159,7 @@ export function buildTsccSpecJSONAndTsArgsFromArgs(args) {
 
 	// compilerFlags flags
 	if (closureCompilerArgs.length) {
-		let compilerFlags = yargs().parse(closureCompilerArgs);
+		let compilerFlags: any = yargs().parse(closureCompilerArgs);
 		// delete special args produced by yargs
 		delete compilerFlags["_"];
 		delete compilerFlags["$0"];

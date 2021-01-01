@@ -62,7 +62,7 @@ export default class TypescriptDependencyGraph {
 	private isTslib(fileName: string) {
 		return getPackageBoundary(fileName).endsWith(path.sep + 'tslib' + path.sep);
 	}
-	private walk(fileName: string) {
+	private walk(fileName: string | undefined | null) {
 		if (typeof fileName !== 'string') return;
 		// Typescript may use unix-style path separators in internal APIs even on Windows environment.
 		// We should normalize it because we use string === match on file names, for example in
@@ -110,7 +110,7 @@ export default class TypescriptDependencyGraph {
 			}
 		}
 	}
-	addRootFile(fileName: string) {
+	addRootFile(fileName: string | undefined | null) {
 		this.walk(fileName);
 	}
 	hasFile(fileName: string) {

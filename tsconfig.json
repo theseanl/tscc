@@ -8,6 +8,7 @@
 		],
 		"target": "es2017",
 		"module": "commonjs",
+		"strict": true,
 		"declaration": true,
 		"stripInternal": true,
 		"experimentalDecorators": true,

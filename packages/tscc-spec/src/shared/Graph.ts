@@ -2,7 +2,7 @@ class AssociativeArrayLink<V> {
 	public prev: this
 	public next: this
 	constructor(
-		public value?: V
+		public value: V
 	) {
 		this.prev = this;
 		this.next = this;
@@ -24,24 +24,24 @@ class AssociativeArrayLink<V> {
 class AssociativeArray<K, V> {
 	private $keys: Map<K, AssociativeArrayLink<[K, V]>> = new Map();
 	private $values: Map<V, AssociativeArrayLink<[K, V]>> = new Map();
-	private pivot = new AssociativeArrayLink();
-	hasKey(key: K):boolean {
+	private pivot = new AssociativeArrayLink<[K, V]>(<any>null);
+	hasKey(key: K): boolean {
 		return this.$keys.has(key);
 	}
-	hasValue(value: V):boolean {
+	hasValue(value: V): boolean {
 		return this.$values.has(value)
 	}
-	getValue(key: K):V {
+	getValue(key: K): V | null {
 		let link = this.$keys.get(key);
 		if (!link) return null;
 		return link.value[1];
 	}
-	getKey(value: V):K {
+	getKey(value: V): K | null {
 		let link = this.$values.get(value);
 		if (!link) return null;
 		return link.value[0];
 	}
-	deleteKey(key: K):this {
+	deleteKey(key: K): this {
 		let link = this.$keys.get(key);
 		if (!link) return this;
 		this.$keys.delete(key);
@@ -49,7 +49,7 @@ class AssociativeArray<K, V> {
 		link.remove();
 		return this;
 	}
-	deleteValue(value: V):this {
+	deleteValue(value: V): this {
 		let link = this.$values.get(value);
 		if (!link) return this;
 		this.$keys.delete(link.value[0]);
@@ -104,17 +104,17 @@ class Node {
 	addOutbound(edge: DirectedEdge) {
 		this.outbound.push(edge);
 	}
-	deleteInbound(edge:DirectedEdge) {
+	deleteInbound(edge: DirectedEdge) {
 		let i = this.inbound.indexOf(edge);
 		if (i === -1) return;
 		this.inbound.splice(i, 1);
 	}
 	deleteOutbound(edge: DirectedEdge) {
 		let i = this.outbound.indexOf(edge);
-		if (i === -1)return; 
-			this.outbound.splice(i, 1);
+		if (i === -1) return;
+		this.outbound.splice(i, 1);
 	}
-	isRoot():boolean {
+	isRoot(): boolean {
 		return this.inbound.length === 0;
 	}
 	isLeaf(): boolean {
@@ -126,10 +126,12 @@ class Node {
 	iterateOutboundEdges() {
 		return this.outbound[Symbol.iterator]();
 	}
-	*iterateAncestors() {
+	*iterateAncestors<T extends Node>(this: T): Iterable<T> {
 		yield this;
 		for (let inboundEdge of this.inbound) {
-			yield* inboundEdge.source.iterateAncestors();
+			yield* (inboundEdge.source as T).iterateAncestors();
+			// Classes derived from Node is expected to refine `inbound` and `outbound` fields so
+			// that edges' source and target fields have the type of the derived class.
 		}
 	}
 }
@@ -145,8 +147,8 @@ class DirectedEdge {
 }
 
 class NodeToVisit extends Node {
-	protected inbound: EdgeToVisit[];
-	protected outbound: EdgeToVisit[];
+	declare protected inbound: EdgeToVisit[];
+	declare protected outbound: EdgeToVisit[];
 	protected visitedOutbound: EdgeToVisit[] = [];
 	setAsVisited(edge: EdgeToVisit) {
 		let index = this.outbound.indexOf(edge);
@@ -160,7 +162,8 @@ class NodeToVisit extends Node {
 		this.visitedOutbound = [];
 	}
 	protected decendents: Set<NodeToVisit> = new Set();
-	isDecendent(node: NodeToVisit) {
+	isDecendent(node: NodeToVisit | null) {
+		if (!node) return false;
 		return this.decendents.has(node);
 	}
 	collectDecendentsFromVisitedEdges() {
@@ -175,19 +178,19 @@ class NodeToVisit extends Node {
 }
 
 class EdgeToVisit extends DirectedEdge {
-	public readonly source: NodeToVisit;
-	public readonly target: NodeToVisit;
+	declare public readonly source: NodeToVisit;
+	declare public readonly target: NodeToVisit;
 	setAsVisited() {
 		this.source.setAsVisited(this);
 	}
 }
 
 class NodeWithLeaf extends Node {
-	protected leafs: Set<Node> = new Set();
-	addLeaf(leaf: Node) {
+	protected leafs: Set<NodeWithLeaf> = new Set();
+	addLeaf(leaf: NodeWithLeaf) {
 		this.leafs.add(leaf);
 	}
-	getLeafs(): ReadonlyArray<Node> {
+	getLeafs(): ReadonlyArray<NodeWithLeaf> {
 		return [...this.leafs];
 	}
 }
@@ -209,19 +212,22 @@ export abstract class DirectedTreeBase<I, N extends Node, E extends DirectedEdge
 	protected abstract createNode(): N
 	protected abstract createEdge(source: N, target: N): E
 	addNodeById(id: I) {
-		if (this.map.hasKey(id)) return;
+		if (this.map.hasKey(id)) return null;
 		let node = this.createNode();
 		this.map.set(id, node);
 		return node;
 	}
 	addEdgeById(source: I, target: I) {
-		this.createEdge(this.getNodeById(source), this.getNodeById(target));
+		let sourceNode = this.getNodeById(source);
+		let targetNode = this.getNodeById(target);
+		if (sourceNode === null || targetNode === null) return;
+		this.createEdge(sourceNode, targetNode);
 	}
-	getNodeById(id: I): N {
+	getNodeById(id: I): N | null {
 		if (this.map.hasKey(id)) return this.map.getValue(id);
 		return this.addNodeById(id);
 	}
-	getIdOfNode(node: N): I {
+	getIdOfNode(node: N): I | null {
 		return this.map.getKey(node);
 	}
 	protected static filterLeafs<N extends Node>(node: N): boolean {
@@ -242,9 +248,9 @@ export abstract class DirectedTreeBase<I, N extends Node, E extends DirectedEdge
 		const size = this.map.size;
 		const map = new AssociativeArray<I, N>();
 		const out: I[] = [];
-		let root: N;
+		let root: N | undefined;
 		while (root = this.getARoot()) {
-			let id = this.getIdOfNode(root);
+			let id = this.getIdOfNode(root)!;
 			map.set(id, root);
 			out.push(id);
 			this.map.deleteValue(root);
@@ -297,14 +303,15 @@ export class DirectedTreeWithOrdering<I> extends DirectedTreeBase<I, NodeToVisit
 			node.resetVisited();
 		}
 	}
-	getInfimum(idArray: I[]): I {
+	getInfimum(idArray: I[]): I | null {
 		// Iterating over a topologically sorted nodes
 		// Every edge goes from later nodes to earlier nodes.
 		for (let node of this.reverseIterateNodes()) {
 			if (idArray.every(id => node.isDecendent(this.getNodeById(id)))) {
-				return this.getIdOfNode(node);
+				return this.getIdOfNode(node)!;
 			}
 		}
+		return null;
 	}
 }
 
@@ -328,6 +335,6 @@ export class DirectedTreeWithLeafs<I> extends DirectedTreeBase<I, NodeWithLeaf, 
 		}
 	}
 	getLeafsOfNode(id: I): I[] {
-		return this.getNodeById(id).getLeafs().map(this.getIdOfNode, this);
+		return this.getNodeById(id)!.getLeafs().map(this.getIdOfNode, this) as I[];
 	}
 }

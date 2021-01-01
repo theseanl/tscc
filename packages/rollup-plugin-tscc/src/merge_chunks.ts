@@ -19,15 +19,15 @@ export default async function mergeChunks(
 // so as not to collide with exported names of the entry module. We pass this namespace
 // as rollup's global option in order to reference those from other chunks.
 class ChunkMerger {
-	private entryModuleNamespaces: Map<string, string>
-	private chunkNamespaces: Map<string, string>
-	private unresolveChunk: Map<string, string>;
+	private entryModuleNamespaces!: Map<string, string> // Initialized in getBundleOutput call.
+	private chunkNamespaces!: Map<string, string>
+	private unresolveChunk!: Map<string, string>;
 	constructor(
 		private entry: string,
 		private chunkAllocation: MultiMap<string, string>,
 		private bundle: Readonly<rollup.OutputBundle>,
 		private globals?: {[id: string]: string}
-	) { }
+	) {}
 	private resolveGlobalForMainBuild(id: string) {
 		if (typeof this.globals !== 'object') return;
 		if (!this.globals.hasOwnProperty(id)) return;
@@ -46,7 +46,7 @@ class ChunkMerger {
 		this.chunkNamespaces = new Map();
 		for (let entry of this.chunkAllocation.keys()) {
 			let counter = -1;
-			for (let chunk of this.chunkAllocation.iterateValues(entry)) {
+			for (let chunk of this.chunkAllocation.iterateValues(entry)!) {
 				if (entry === chunk) continue;
 				let namesExportedByEntry = (this.bundle[entry] as rollup.OutputChunk).exports;
 				do {
@@ -68,7 +68,7 @@ class ChunkMerger {
 		const exportStmts: string[] = [];
 		// nodejs specification only allows posix-style path separators in module IDs.
 		exportStmts.push(`export * from '${upath.toUnix(this.entry)}'`);
-		for (let chunk of this.chunkAllocation.iterateValues(this.entry)) {
+		for (let chunk of this.chunkAllocation.iterateValues(this.entry)!) {
 			if (chunk === this.entry) continue;
 			let chunkNs = this.chunkNamespaces.get(chunk);
 			importStmts.push(`import * as ${chunkNs} from '${upath.toUnix(chunk)}'`);
@@ -110,16 +110,19 @@ class ChunkMerger {
 		const name = "tscc-merger";
 		return {name, resolveId, load};
 	}
-	private resolveGlobal(id: string) {
-		if (this.resolveGlobalForMainBuild(id)) return this.globals[id];
+	private resolveGlobal(id: string): string {
+		if (this.resolveGlobalForMainBuild(id)) return this.globals![id]!;
 		if (path.isAbsolute(id)) {
-			id = this.unresolveChunk.get(id);
+			id = this.unresolveChunk.get(id) || ChunkMerger.throwUnexpectedModuleError(id);
 		}
 		let allocated = this.chunkAllocation.findValue(id);
-		if (allocated === undefined) throw new ChunkMergeError(`Unexpected module in output chunk: ${id}`);
-		if (allocated === this.entry) return null; // not global
+		if (allocated === undefined) ChunkMerger.throwUnexpectedModuleError(id);
+		// The below case means that the chunk being queried shouldn't be global. Rollup expects
+		// outputOption.globals to return its input unchanged for non-global module ids, but this
+		// code path won't and shouldn't be taken.
+		if (allocated === this.entry) ChunkMerger.throwUnexpectedModuleError(id);
 		// Resolve to <namespace-of-entry-module-that-our-chunk-is-allocated>.<namespace-of-our-chunk>
-		let ns = this.entryModuleNamespaces.get(allocated);
+		let ns = this.entryModuleNamespaces.get(allocated)!;
 		if (allocated !== id) ns += '.' + this.chunkNamespaces.get(id);
 		return ns;
 	}
@@ -162,14 +165,17 @@ class ChunkMerger {
 
 		return mergedBundle
 	}
+	private static throwUnexpectedModuleError(id: string): never {
+		throw new ChunkMergeError(`Unexpected module in output chunk: ${id}`);
+	}
 }
 
-export class ChunkMergeError extends Error { }
+export class ChunkMergeError extends Error {}
 
 /**
  * Converts SourceMap type used by OutputChunk type to ExistingRawSourceMap type used by load hooks.
  */
-function toInputSourceMap(sourcemap: rollup.SourceMap): rollup.ExistingRawSourceMap {
+function toInputSourceMap(sourcemap: rollup.SourceMap | undefined): rollup.ExistingRawSourceMap | undefined {
 	if (!sourcemap) return;
 	return {...sourcemap};
 }

@@ -29,7 +29,7 @@ export function sourceNodeFactoryFromContent(fileName: string, content: string):
 
 class ClosureSourceLineParser {
 	private isInComment = false;
-	private moduleSymbol: string;
+	private moduleSymbol: string | undefined;
 	private providedSymbols = new Set<string>();
 	private requiredSymbols = new Set<string>();
 	private forwardDeclaredSymbols = new Set<string>();
@@ -64,6 +64,7 @@ class ClosureSourceLineParser {
 		} else if (reGoogRequireType.exec(line)) {
 			this.forwardDeclaredSymbols.add(RegExp.$1);
 		}
+		return false;
 	}
 	getSourceNode(): ISourceNode {
 		if (this.moduleSymbol && this.providedSymbols.size) {

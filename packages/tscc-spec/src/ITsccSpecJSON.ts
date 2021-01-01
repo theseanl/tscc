@@ -47,31 +47,31 @@ declare interface ITsccSpecJSON {
 		 * and to refer modules in IModule.dependencies key.
 		 * It supports path delimiters.
 		 */
-		readonly [moduleName: string]: string|Readonly<IModule>
-	} | 
+		readonly [moduleName: string]: string | Readonly<IModule>
+	} |
 	/**
 	 * Or alternatively, provide then in a custom order with module's name as a key as well,
 	 * it must be topologically sorted
-	 */ 
+	 */
 	INamedModuleSpecs[]
 	/**
 	 * Similar to rollup's input option "external", maps module IDs to global names that's assumed
 	 * to be present in the global scope. Type declaration files must be available in the respective
 	 * npm modules or one must provide them manually with `declare module "moduleName" { }` statements.
 	 */
-	external?:{
-		readonly [moduleName:string]:string
-	}	
+	external?: {
+		readonly [moduleName: string]: string
+	}
 	/**
 	 * Glob of js source files.
 	 */
-	jsFiles?:string[]
+	jsFiles?: string[]
 	/**
 	 * Directory names to emit outputs in, or prefixes for output file names.
 	 * It will just be prepended to module names, so if its last character is not a path separator,
 	 * it will modify the output file's name.
 	 */
-	prefix?: string | { readonly rollup: string, readonly cc: string }
+	prefix?: string | {readonly rollup: string, readonly cc: string}
 	/**
 	 * Compiler flags to be passed to closure compiler. Tscc treats it as an opaque data.
 	 * "js", "chunk", "entry_point": computed from <modules>
@@ -82,7 +82,7 @@ declare interface ITsccSpecJSON {
 	 * Input files, output files, input language, and so on are inferred from other settings,
 	 * and if provided here, it will override the inferred values.
 	 */
-	compilerFlags?:{ [flag:string]:primitives|primitives[] }
+	compilerFlags?: closureCompilerFlags
 	/**
 	 * Array of paths of soy files.
 	 */
@@ -93,21 +93,22 @@ declare interface ITsccSpecJSON {
 		 */
 		[styleName: string]: Readonly<IStyles>
 	}
-	debug?:IDebugOptions
+	debug?: IDebugOptions
 }
 
 export interface IDebugOptions {
 	/**
 	 * Write intermediate tsickle output to disk. Prints closure compiler arguments to stderr.
 	 */
-	persistArtifacts?:boolean,
+	persistArtifacts?: boolean,
 	/**
 	 * Ignore tsickle warnings for specified paths. Default: ["node_modules"]
 	 */
-	ignoreWarningsPath?:string[]
+	ignoreWarningsPath?: string[]
 }
 
 export type primitives = string | boolean | number;
+export type closureCompilerFlags = {[flag: string]: primitives | primitives[]}
 
 export default ITsccSpecJSON;
 

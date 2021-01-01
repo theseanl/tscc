@@ -6,28 +6,28 @@ export default class MultiMap<K, V> {
 			ar = new Set();
 			this.map.set(key, ar);
 		} else {
-			ar = this.map.get(key);
+			ar = this.map.get(key)!;
 		}
 		if (arguments.length > 1) {
-			ar.add(value);
+			ar.add(value!);
 		}
 	}
-	find(key:K, value:V):boolean {
+	find(key: K, value: V): boolean {
 		if (!this.findKey(key)) return false;
-		let values = this.map.get(key);
+		let values = this.map.get(key)!;
 		return values.has(value);
 	}
-	findKey(key:K):boolean {
+	findKey(key: K): boolean {
 		return this.map.has(key);
 	}
-	findValue(value:V):K {
+	findValue(value: V): K | undefined {
 		for (let [key, values] of this.map) {
 			if (values.has(value)) return key;
 		}
 	}
 	get(key: K): V[] {
 		if (!this.map.has(key)) return [];
-		return [...this.map.get(key)];
+		return [...this.map.get(key)!];
 	}
 	putAll(key: K, values: Iterable<V>) {
 		this.map.set(key, new Set(values));
@@ -40,10 +40,9 @@ export default class MultiMap<K, V> {
 			}
 		}
 	}
-	iterateValues(key:K):IterableIterator<V> {
-		if (this.map.get(key)) {
-			return this.map.get(key).values();
-		}
+	iterateValues(key: K): IterableIterator<V> | undefined {
+		let values = this.map.get(key);
+		if (values) return values.values();
 	}
 	keys() {
 		return this.map.keys();
@@ -65,7 +64,7 @@ export default class MultiMap<K, V> {
 	) {
 		const out: {[key: string]: string[]} = {};
 		for (let key of map.keys()) {
-			out[stringifyKey(key)] = [...map.iterateValues(key)].map(stringifyValue);
+			out[stringifyKey(key)] = [...map.iterateValues(key)!].map(stringifyValue);
 		}
 		return out;
 	}

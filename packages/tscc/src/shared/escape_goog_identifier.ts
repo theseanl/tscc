@@ -7,7 +7,7 @@
  */
 import path = require('path');
 
-function codePoint(char: string) {return char.codePointAt(0);}
+function codePoint(char: string) {return char.codePointAt(0)!;}
 /**************************************************************************************************/
 const LOWERCASE_A_CODE_POINT = codePoint('a');
 const LOWERCASE_Z_CODE_POINT = codePoint('z');

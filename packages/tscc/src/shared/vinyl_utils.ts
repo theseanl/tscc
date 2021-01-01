@@ -40,11 +40,11 @@ interface ArrayStreamItem<T> {
 }
 
 abstract class LoggingTransformStream extends stream.Transform {
-	abstract _rawTransform(data: any, encoding: string): any
+	abstract _rawTransform(data: any, encoding: BufferEncoding): any
 	constructor(
 		protected logger: Logger
 	) {super({objectMode: true});}
-	async _transform(data: any, encoding: string, callback: stream.TransformCallback) {
+	async _transform(data: any, encoding: BufferEncoding, callback: stream.TransformCallback) {
 		try {
 			callback(null, await this._rawTransform(data, encoding));
 		} catch (e) {
@@ -57,10 +57,10 @@ abstract class LoggingTransformStream extends stream.Transform {
 
 export class ClosureJsonToVinyl extends LoggingTransformStream {
 	constructor(
-		private applySourceMap: boolean,
+		private applySourceMap: boolean | undefined,
 		logger: Logger
 	) {super(logger)}
-	_rawTransform(data: ArrayStreamItem<IClosureCompilerOutputJson>, encoding) {
+	_rawTransform(data: ArrayStreamItem<IClosureCompilerOutputJson>, encoding: BufferEncoding) {
 		if (!data) return data;
 		const json = data.value;
 		const vinyl = new Vinyl({
@@ -76,9 +76,9 @@ export class ClosureJsonToVinyl extends LoggingTransformStream {
 }
 
 export class RemoveTempGlobalAssignments extends LoggingTransformStream {
-	async _rawTransform(data: Vinyl, encoding) {
+	async _rawTransform(data: Vinyl, encoding: BufferEncoding) {
 		if (data.isNull()) return data;
-		const origContents = data.contents.toString(encoding);
+		const origContents = data.contents!.toString(encoding);
 		// Fast path
 		if (!origContents.includes('__tscc_export_start__')) return data;
 		if (!data[SOURCE_MAP]) { // Simple regex replace

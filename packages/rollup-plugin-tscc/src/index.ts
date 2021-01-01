@@ -6,7 +6,7 @@ import computeChunkAllocation, {ChunkSortError} from './sort_chunks';
 import mergeChunks, {ChunkMergeError} from './merge_chunks';
 import path = require('path');
 
-const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
+const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOptions) => {
 	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(pluginOptions);
 
 	const isManyModuleBuild = spec.getOrderedModuleSpecs().length > 1;
@@ -54,6 +54,12 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		outputOptions.paths = (id) => {
 			if (id in globals) return id;
 			if (typeof orig === 'function') return orig(id);
+			/**
+			 * Rollup's type declaration assumes that `paths` function always returns string, but
+			 * determining from rollup source code, it should return falsy values to trigger its
+			 * default `setRenderPath` behavior, hence we are returning '' here.
+			 */
+			return '';
 		}
 		return outputOptions;
 	};
@@ -72,7 +78,7 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 			return Promise.resolve('');
 		}
 	};
-	const generateBundle = handleError<rollup.Plugin["generateBundle"]>(async function (
+	const generateBundle = handleError<NonNullable<rollup.Plugin["generateBundle"]>>(async function (
 		this: rollup.PluginContext, options, bundle, isWrite
 	) {
 		// Quick path for single-module builds
@@ -82,12 +88,12 @@ const pluginImpl: rollup.PluginImpl = (pluginOptions: IInputTsccSpecJSON) => {
 		const entryDeps = spec.getRollupOutputNameDependencyMap();
 
 		// Get chunk dependency from rollup.OutputBundle
-		const chunkDeps = {};
+		const chunkDeps: {[chunkName: string]: string[]} = {};
 		for (let [fileName, chunkInfo] of Object.entries(bundle)) {
-			// TODO This is a possible source of conflicts with other rollup plugins.
-			// Some plugins may add unexpected chunks. In general, it is not clear what TSCC should do
-			// in such cases. A safe way would be to strip out such chunks and deal only with chunks
-			// that are expected to be emitted. We may trim such chunks here.
+			// TODO This is a possible source of conflicts with other rollup plugins. Some plugins
+			// may add unexpected chunks. In general, it is not clear what TSCC should do in such
+			// cases. A safe way would be to strip out such chunks and deal only with chunks that
+			// are expected to be emitted. We may trim such chunks here.
 			if (!isChunk(chunkInfo)) continue;
 			chunkDeps[fileName] = [];
 			for (let imported of chunkInfo.imports) {
@@ -120,7 +126,7 @@ function isChunk(output: rollup.OutputChunk | rollup.OutputAsset): output is rol
 	return output.type === 'chunk';
 }
 
-function handleError<H extends (this: rollup.PluginContext, ..._: unknown[]) => unknown>(hook: H): H {
+function handleError<H extends (this: rollup.PluginContext, ..._: any[]) => unknown>(hook: H): H {
 	return <H>async function () {
 		try {
 			return await Reflect.apply(hook, this, arguments);

@@ -42,14 +42,20 @@ export default class TsccSpec implements ITsccSpec {
 	 *   1-1. If it is a file, use it.
 	 *   1-2. If it is a directory, use directory/tsconfig.json.
 	 *   1-3. If it is not a file nor a directory, throw an error.
-	 * 2. If it is not supplied (and file arguments are not supplied which is always the case for tscc)
-	 *    it calls ts.findConfigFile to search for tsconfig.json from the current working directory.
+	 * 2. If it is not supplied (and file arguments are not supplied which is always the case for
+	 *    tscc) it calls ts.findConfigFile to search for tsconfig.json from the current working
+	 *    directory.
+	 */
+	/**
+	 * At least one among searchPath and defaultLocation must be non-null. This cannot be expressed
+	 * well with function overloads, because for example when one tries to call it with variables
+	 * satisfying the same contract, TS thinks that the call signature is not visible.
 	 */
 	protected static resolveSpecFile(
 		searchPath: string | undefined,
 		specFileName: string,
 		defaultLocation?: string
-	): string {
+	): string | undefined {
 		if (typeof searchPath === 'string') { // 1
 			try {
 				let stat = fs.statSync(searchPath); // Throws if does not exist
@@ -63,7 +69,7 @@ export default class TsccSpec implements ITsccSpec {
 			return; // 1-3
 		}
 		// Search ancestor directories starting from defaultLocation, similar to ts.findConfigFile
-		let nextPath = defaultLocation;
+		let nextPath = defaultLocation!;
 		while (nextPath !== searchPath) {
 			searchPath = nextPath;
 			try {
@@ -82,7 +88,7 @@ export default class TsccSpec implements ITsccSpec {
 		if (relPath === '.') return "the current working directory";
 		return relPath;
 	}
-	private static findTsccSpecAndThrow(root: string): string {
+	private static findTsccSpecAndThrow(root: string | undefined): string {
 		const specPath = TsccSpec.resolveSpecFile(root, TsccSpec.SPEC_FILE, process.cwd());
 		if (specPath === undefined) {
 			let displayedPath = TsccSpec.toDisplayedPath(root || process.cwd());
@@ -135,7 +141,7 @@ export default class TsccSpec implements ITsccSpec {
 		this.computeOrderedModuleSpecs();
 		this.resolveRelativeExternalModuleNames();
 	}
-	private orderedModuleSpecs: INamedModuleSpecs[];
+	private orderedModuleSpecs!: Required<INamedModuleSpecs>[];
 	private computeOrderedModuleSpecs() {
 		const modules = this.tsccSpec.modules;
 		if (Array.isArray(modules)) {
@@ -165,6 +171,7 @@ export default class TsccSpec implements ITsccSpec {
 			if (e instanceof CycleError) {
 				throw new TsccSpecError(`Circular dependency in modules ${[...e.cycle]}`);
 			}
+			throw e;
 		}
 		this.orderedModuleSpecs = sorted.map(moduleName => {
 			return this.interopModuleSpecs(moduleName, modules[moduleName]);
@@ -173,15 +180,15 @@ export default class TsccSpec implements ITsccSpec {
 	getOrderedModuleSpecs() {
 		return this.orderedModuleSpecs;
 	}
-	private interopModuleSpecs(moduleName: string, moduleSpec: IModule | string): INamedModuleSpecs {
-		let spec: Partial<INamedModuleSpecs> =
+	private interopModuleSpecs(moduleName: string, moduleSpec: IModule | string): Required<INamedModuleSpecs> {
+		let spec: Partial<INamedModuleSpecs> & {entry: string} =
 			typeof moduleSpec === 'string' ? {entry: moduleSpec} : moduleSpec;
 		if (!('dependencies' in spec)) spec.dependencies = [];
 		if (!('extraSources' in spec)) spec.extraSources = [];
 		spec.moduleName = moduleName;
 		// Resolve entry file name to absolute path
 		spec.entry = this.absolute(spec.entry);
-		return <INamedModuleSpecs>spec;
+		return <Required<INamedModuleSpecs>>spec;
 	}
 	/**
 	 * Paths specified in TSCC spec are resolved with following strategy:
@@ -221,7 +228,7 @@ export default class TsccSpec implements ITsccSpec {
 	private external: Map<string, ExternalModuleData> = new Map();
 	private resolveRelativeExternalModuleNames() {
 		if (!('external' in this.tsccSpec)) return;
-		for (let [moduleName, globalName] of Object.entries(this.tsccSpec.external)) {
+		for (let [moduleName, globalName] of Object.entries(this.tsccSpec.external!)) {
 			if (TsccSpec.isDotPath(moduleName)) {
 				this.external.set(this.absolute(moduleName), {globalName, isFilePath: true});
 			} else {
@@ -238,7 +245,7 @@ export default class TsccSpec implements ITsccSpec {
 	getJsFiles() {
 		let jsFiles = this.tsccSpec.jsFiles;
 		if (jsFiles) {
-			return <string[]>fg.sync(this.tsccSpec.jsFiles)
+			return <string[]>fg.sync(jsFiles)
 		}
 		return [];
 	}
