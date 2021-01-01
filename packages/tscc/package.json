@@ -29,12 +29,12 @@
 		"node": ">=10.3.0"
 	},
 	"devDependencies": {
-		"@types/fs-extra": "^9.0.1",
-		"@types/node": "^14.14.8",
+		"@types/fs-extra": "^9.0.6",
+		"@types/node": "^14.14.17",
 		"@types/stream-json": "^1.5.1",
 		"@types/vinyl": "^2.0.4",
 		"@types/vinyl-fs": "^2.4.11",
-		"@types/yargs": "^15.0.10",
+		"@types/yargs": "^15.0.12",
 		"magic-string": "^0.25.4"
 	},
 	"optionalDependencies": {
@@ -58,7 +58,7 @@
 		"upath": "^2.0.1",
 		"vinyl": "^2.2.0",
 		"vinyl-fs": "^3.0.3",
-		"yargs": "^16.0.3"
+		"yargs": "^16.2.0"
 	},
 	"publishConfig": {
 		"access": "public"
