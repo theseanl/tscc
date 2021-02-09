@@ -88,5 +88,5 @@ declare module "goog:goog.reflect" {
 		function cache<K extends string | number, V>(cacheObj: {[key: string]: V}, key: K, valueFn: (key: K) => V): V
 		function cache<K extends string | number, V, L>(cacheObj: {[key: string]: V}, key: L, valueFn: (key: L) => V, opt_keyFn?: (key: L) => K): V
 	}
-	export default goog_reflect;
+	export = goog_reflect;
 }

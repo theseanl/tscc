@@ -9,7 +9,7 @@ import resolve = require('resolve-from');
 // of the caller. (Such file paths might be included in sourcemaps if user have it enabled,
 // so if it uses files in the global npm/yarn installation directory, it may expose file structure
 // of the build machine.)
-// TODO consider providing a dummy path. 
+// TODO consider providing a dummy path.
 function resolveTSCCAssets(relPath: string, projectRoot: string): string {
 	// Below returns `null` when the package is not found.
 	const packageRoot = resolve.silent(projectRoot, `@tscc/tscc/package.json`);

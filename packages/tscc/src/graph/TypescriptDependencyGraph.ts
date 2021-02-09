@@ -62,6 +62,9 @@ export default class TypescriptDependencyGraph {
 	private isTslib(fileName: string) {
 		return getPackageBoundary(fileName).endsWith(path.sep + 'tslib' + path.sep);
 	}
+	private isTsccAsset(fileName: string) {
+		return getPackageBoundary(fileName).endsWith(path.sep + '@tscc' + path.sep + 'tscc' + path.sep)
+	}
 	private walk(fileName: string | undefined | null) {
 		if (typeof fileName !== 'string') return;
 		// Typescript may use unix-style path separators in internal APIs even on Windows environment.
@@ -69,7 +72,7 @@ export default class TypescriptDependencyGraph {
 		// shouldSkipTsickleProcessing.
 		fileName = path.normalize(fileName);
 		// Default libraries (lib.*.d.ts) files and tslib.d.ts are not processed by tsickle.
-		if (this.isDefaultLib(fileName) || this.isTslib(fileName)) return;
+		if (this.isDefaultLib(fileName) || this.isTslib(fileName) || this.isTsccAsset(fileName)) return;
 		// add file to visited set
 		if (this.visited.has(fileName)) return;
 		this.visited.add(fileName);
