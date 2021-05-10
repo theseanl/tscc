@@ -30,7 +30,7 @@
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^9.0.6",
-		"@types/node": "^14.14.25",
+		"@types/node": "^15.0.2",
 		"@types/stream-json": "^1.5.1",
 		"@types/vinyl": "^2.0.4",
 		"@types/vinyl-fs": "^2.4.11",
