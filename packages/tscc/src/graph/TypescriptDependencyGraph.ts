@@ -77,6 +77,12 @@ export default class TypescriptDependencyGraph {
 		if (this.visited.has(fileName)) return;
 		this.visited.add(fileName);
 		const sf = <SourceFileWithInternalAPIs>this.host.getSourceFile(fileName);
+
+		// sometimes the source file returns undefined on certain packages
+		// such as the @types/grecaptcha package
+		if (!sf) {
+			return;
+		}
 		/**
 		 * Files imported to the current file are available in `resolvedModules` property.
 		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processImportedModules`

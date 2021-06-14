@@ -21,7 +21,7 @@
 import * as ts from 'typescript';
 import ITsccSpecWithTS from '../spec/ITsccSpecWithTS';
 import {TsickleHost} from 'tsickle';
-import {moduleNameAsIdentifier} from 'tsickle/src/annotator_host';
+import {moduleNameAsIdentifier} from 'tsickle/build/src/annotator_host';
 import {namespaceToQualifiedName, isGoogRequireLikeStatement} from './transformer_utils';
 import {escapedGoogNameIsDts, unescapeGoogAdmissibleName} from '../shared/escape_goog_identifier';
 import path = require('path');

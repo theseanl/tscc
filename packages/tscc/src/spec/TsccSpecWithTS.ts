@@ -99,10 +99,12 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			onWarning(`--outDir option is ignored. Use prefix option in the spec file.`);
 			options.outDir = undefined;
 		}
-		if (options.rootDir) {
-			onWarning(`--rootDir option is ignored.`);
-			options.rootDir = undefined;
-		}
+		// seems like rootDir is required and no longer ignored
+		// https://github.com/angular/tsickle/blob/master/src/tsickle.ts#L152
+		// if (options.rootDir) {
+		// 	onWarning(`--rootDir option is ignored.`);
+		// 	options.rootDir = undefined;
+		// }
 		if (!options.importHelpers) {
 			onWarning(`tsickle uses a custom tslib optimized for closure compiler. importHelpers flag is set.`);
 			options.importHelpers = true;
@@ -175,6 +177,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2018]: "ECMASCRIPT_2018",
 		[ts.ScriptTarget.ES2019]: "ECMASCRIPT_2019",
 		[ts.ScriptTarget.ES2020]: "ECMASCRIPT_2020",
+		[ts.ScriptTarget.ES2021]: "ECMASCRIPT_2021",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
 	getOutputFileNames(): string[] {
