@@ -56,10 +56,10 @@ function resolveModuleName(
 	return resolvedModule;
 }
 
-let original: typeof import('tsickle/build/src/googmodule').resolveModuleName | undefined;
+let original: typeof import('tsickle/out/src/googmodule').resolveModuleName | undefined;
 export function patchTsickleResolveModule() {
 	if (!original) {
-		const googmodule: typeof import('tsickle/build/src/googmodule') = require('tsickle/build/src/googmodule');
+		const googmodule: typeof import('tsickle/out/src/googmodule') = require('tsickle/out/src/googmodule');
 		original = googmodule.resolveModuleName;
 		googmodule.resolveModuleName = resolveModuleName;
 	}
@@ -67,7 +67,7 @@ export function patchTsickleResolveModule() {
 
 export function restoreTsickleResolveModule() {
 	if (original) {
-		require('tsickle/build/src/googmodule').resolveModuleName = original;
+		require('tsickle/out/src/googmodule').resolveModuleName = original;
 		original = undefined;
 	}
 }
