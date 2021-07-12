@@ -309,7 +309,7 @@ function getWriteFileImpl(spec: ITsccSpecWithTS, tsickleVinylOutput: PartialMap<
 	return {writeFile, writeExterns, externPath}
 }
 
-function pushToStream(stream: stream.Readable, ...args: string[]) {
+function pushToStream(stream: stream.Readable, ...args: (string | null)[]) {
 	for (let arg of args) stream.push(arg);
 }
 
