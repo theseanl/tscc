@@ -355,6 +355,10 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 	const ignoreWarningsPath = tsccSpec.debug().ignoreWarningsPath || ["/node_modules/"];
 
 	const transformerHost: tsickle.TsickleHost = {
+		// required since tsickle 0.41.0, currently only used in transpiling `goog.tsMigration*ExportsShim`.
+		rootDirsRelative(filename: string) {
+			return filename;
+		},
 		shouldSkipTsickleProcessing(fileName: string) {
 			// Non-absolute files are resolved relative to a typescript project root.
 			const absFileName = path.resolve(tsccSpec.getTSRoot(), fileName);

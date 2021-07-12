@@ -99,10 +99,20 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			onWarning(`--outDir option is ignored. Use prefix option in the spec file.`);
 			options.outDir = undefined;
 		}
+		/**
+		 * {@link https://github.com/angular/tsickle/commit/2050e902ea0fa59aa36f414cab192155167a9b06}
+		 * tsickle throws if `rootDir` is not provided, for presumably "internal" reasons. In tscc,
+		 * it normalizes paths to absolute paths, so the presence of `rootDir` does not have any
+		 * visible effect. If it is not supplied, we provide a default value of the config file's
+		 * containing root directory. Note that ts.CompilerOptions.configFilePath is an internal
+		 * property.
+		 */
+		const {configFilePath} = options;
+		const rootDir = configFilePath ? path.parse(configFilePath as string).root : '/';
 		if (options.rootDir) {
-			onWarning(`--rootDir option is ignored.`);
-			options.rootDir = undefined;
+			onWarning(`--rootDir option is ignored. It will internally set to ${rootDir}.`);
 		}
+		options.rootDir = rootDir;
 		if (!options.importHelpers) {
 			onWarning(`tsickle uses a custom tslib optimized for closure compiler. importHelpers flag is set.`);
 			options.importHelpers = true;
@@ -175,6 +185,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2018]: "ECMASCRIPT_2018",
 		[ts.ScriptTarget.ES2019]: "ECMASCRIPT_2019",
 		[ts.ScriptTarget.ES2020]: "ECMASCRIPT_2020",
+		[ts.ScriptTarget.ES2021]: "ECMASCRIPT_2021",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
 	getOutputFileNames(): string[] {

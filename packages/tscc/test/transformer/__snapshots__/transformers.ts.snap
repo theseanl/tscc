@@ -155,7 +155,8 @@ A = tslib_1.__decorate([
 exports[`dts_requiretype_transformer modifies requireType calls to a global variable: dts_requiretype/entry.ts 1`] = `
 "/**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * Generated from: dts_requiretype/entry.ts
+ * @suppress {checkTypes,extraRequire,missingOverride,missingRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
 goog.module('dts_requiretype.entry$.ts');
 var module = module || { id: '' };
