@@ -43,5 +43,6 @@ enum PlatformToCompilerPackageName {
 	'openbsd' = '',
 	'sunos' = '',
 	'cygwin' = '',
-	'netbsd' = ''
+	'netbsd' = '',
+	'haiku' = '',
 }
