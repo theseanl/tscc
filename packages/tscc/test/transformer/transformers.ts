@@ -156,6 +156,7 @@ function emit(
 		googmodule: false,
 		pathToModuleName: x => x,
 		fileNameToModuleId: x => x,
+		rootDirsRelative: x => x,
 		moduleResolutionHost: ts.createCompilerHost(parsedConfig.options),
 		options,
 	}, tsickleHostOverride);

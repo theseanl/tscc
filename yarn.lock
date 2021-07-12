@@ -6910,10 +6910,10 @@ ts-jest@^24.3.0:
     semver "^5.5"
     yargs-parser "10.x"
 
-tsickle@^0.41.0:
-  version "0.41.0"
-  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.41.0.tgz#ab4f168a7168db6ce8fcdd306a44fa07270368ee"
-  integrity sha512-IRfRP3efl6E19MxqOwkty/hoqudAxd91tO75VmIZqXtVeiDyi3l3b8OqrC0/JagnJvqe+fHyefM5cbMR2lyEjw==
+tsickle@^0.43.0:
+  version "0.43.0"
+  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.43.0.tgz#d53501ee54932382c4923a77de9ab5a82abd9e98"
+  integrity sha512-n0lgIQBLliB7EFVTDpqrd/GjyB9I3NCodfX4R3NE/H73PQvGjgrkSZc8RVcWBG6s1MDiFjYDHIezYkuh8GYslw==
   dependencies:
     "@types/minimist" "^1.2.1"
 
@@ -6971,7 +6971,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.3.2, typescript@~4.3:
+typescript@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.2.tgz#399ab18aac45802d6f2498de5054fcbbe716a805"
   integrity sha512-zZ4hShnmnoVnAHpVHWpTcxdv7dWP60S2FsydQLV8V5PbS3FifjWFFRiHSWpDJahly88PRyV5teTSLoq4eG7mKw==

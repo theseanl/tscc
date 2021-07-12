@@ -1,6 +1,7 @@
 {
 	"extends": "../tsconfig.test_files.json",
 	"compilerOptions": {
-		"experimentalDecorators": true
+		"experimentalDecorators": true,
+		"rootDir": "."
 	}
 }
