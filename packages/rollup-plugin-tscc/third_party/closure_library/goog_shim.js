@@ -4,7 +4,9 @@
  */
 export const global = this || self;
 
-export function define() {}
+export function define(name, defaultValue) {
+	return defaultValue;
+}
 
 export let DEBUG = true;
 
