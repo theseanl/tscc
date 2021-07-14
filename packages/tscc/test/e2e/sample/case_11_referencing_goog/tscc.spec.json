@@ -8,8 +8,5 @@
 			]
 		}
 	},
-	"prefix": ".tscc_temp/case_11_referencing_goog/",
-	"debug": {
-		"persistArtifacts": true
-	}
+	"prefix": ".tscc_temp/case_11_referencing_goog/"
 }
