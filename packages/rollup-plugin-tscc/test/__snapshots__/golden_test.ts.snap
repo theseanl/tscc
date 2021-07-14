@@ -55,6 +55,66 @@ exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json 2`] 
 "
 `;
 
+exports[`Golden Tests: goog-shim/tscc.spec.json 1`] = `
+"var generated_entry = (function (exports) {
+	'use strict';
+
+	/**
+	 * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
+	 * global \`goog\` variables have been removed.
+	 */
+	const global =  self;
+
+	let DEBUG = true;
+
+	function isDebugging() {
+		return DEBUG;
+	}
+
+	{
+		console.log(\\"Debugging\\");
+	}
+
+	var _ = {
+		__proto__: null,
+		g: global,
+		i: isDebugging
+	};
+
+	exports.$0 = _;
+	exports.isDebugging = isDebugging;
+
+	return exports;
+
+}({}));
+"
+`;
+
+exports[`Golden Tests: goog-shim/tscc.spec.json 2`] = `
+"(function (_) {
+	'use strict';
+
+	/**
+	 * @fileoverview Hand-modified shim file for Closure Library \`goog/reflect.js\`. References to the
+	 * global \`goog\` variables have been removed.
+	 */
+
+	function objectProperty(prop, object) {
+		return prop;
+	}
+
+	var dictionary = {
+		\\"key\\": \\"value\\"
+	};
+
+	if ( _.g.name === objectProperty(\\"key\\")) {
+		console.log(dictionary[_.g.name]);
+	}
+
+}(generated_entry.$0));
+"
+`;
+
 exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
 "var generated_entry = (function (exports) {
 	'use strict';

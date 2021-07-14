@@ -43,7 +43,7 @@ class DecoratorTransformer extends TsHelperTransformer {
 	}
 	private counter = 1;
 
-	protected onHelperCall(node: ts.CallExpression, googReflectImport:ts.Identifier) {
+	protected onHelperCall(node: ts.CallExpression, googReflectImport: ts.Identifier) {
 		// Found a candidate. Decorator helper call signature:
 		// __decorate([decoratorsArray], <target>, <propertyName>, <desc>)
 		// Note that class decorator only has 2 arguments.
@@ -54,14 +54,14 @@ class DecoratorTransformer extends TsHelperTransformer {
 		// Create goog.reflect.objectProperty
 		const target = node.arguments[1];
 		const googReflectObjectProperty = ts.setTextRange(
-			ts.createCall(
-				ts.createPropertyAccess(
+			this.factory.createCallExpression(
+				this.factory.createPropertyAccessExpression(
 					googReflectImport,
-					ts.createIdentifier('objectProperty')
+					this.factory.createIdentifier('objectProperty')
 				),
 				undefined,
 				[
-					ts.createStringLiteral(propName),
+					this.factory.createStringLiteral(propName),
 					ts.getMutableClone(target)
 				]
 			),
@@ -74,33 +74,33 @@ class DecoratorTransformer extends TsHelperTransformer {
 		const caller = node.expression;
 		const decorateArgs = node.arguments.slice();
 		decorateArgs.splice(2, 1, googReflectObjectProperty);
-		const newCallExpression = ts.createCall(caller, undefined, decorateArgs);
-		const globalAssignment = ts.createBinary(
-			ts.createElementAccess(
-				ts.createIdentifier("self"),
-				ts.createStringLiteral(this.getId())
+		const newCallExpression = this.factory.createCallExpression(caller, undefined, decorateArgs);
+		const globalAssignment = this.factory.createBinaryExpression(
+			this.factory.createElementAccessExpression(
+				this.factory.createIdentifier("self"),
+				this.factory.createStringLiteral(this.getId())
 			),
-			ts.createToken(ts.SyntaxKind.FirstAssignment),
-			ts.createPropertyAccess(
-				ts.createParen(ts.getMutableClone(target)),
-				ts.createIdentifier(propName)
+			this.factory.createToken(ts.SyntaxKind.FirstAssignment),
+			this.factory.createPropertyAccessExpression(
+				this.factory.createParenthesizedExpression(ts.getMutableClone(target)),
+				this.factory.createIdentifier(propName)
 			)
 		);
 		this.tempGlobalAssignments.push(
 			ts.setEmitFlags(
-				ts.createExpressionStatement(globalAssignment),
+				this.factory.createExpressionStatement(globalAssignment),
 				ts.EmitFlags.NoSourceMap | ts.EmitFlags.NoTokenSourceMaps | ts.EmitFlags.NoNestedSourceMaps
 			)
 		);
 		return newCallExpression;
 	}
 
-	protected combineStatements(stmts:ts.Statement[], googReflectImport:ts.Identifier) {
+	protected combineStatements(stmts: ts.Statement[], googReflectImport: ts.Identifier) {
 		super.combineStatements(stmts, googReflectImport);
 		stmts.push(
-			ts.createExpressionStatement(ts.createStringLiteral("__tscc_export_start__")),
-			ts.createBlock(this.tempGlobalAssignments),
-			ts.createExpressionStatement(ts.createStringLiteral('__tscc_export_end__'))
+			this.factory.createExpressionStatement(this.factory.createStringLiteral("__tscc_export_start__")),
+			this.factory.createBlock(this.tempGlobalAssignments),
+			this.factory.createExpressionStatement(this.factory.createStringLiteral('__tscc_export_end__'))
 		);
 		return stmts;
 	}

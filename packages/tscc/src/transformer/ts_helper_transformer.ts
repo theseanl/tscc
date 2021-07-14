@@ -4,7 +4,7 @@
  */
 import * as ts from 'typescript';
 import {TsickleHost} from 'tsickle';
-import {createGoogCall, findImportedVariable, findGoogRequiredVariable, identifierIsEmitHelper} from './transformer_utils'
+import {findImportedVariable, findGoogRequiredVariable, identifierIsEmitHelper, NodeFactoryHelper} from './transformer_utils'
 
 export default abstract class TsHelperTransformer {
 	constructor(
@@ -12,7 +12,7 @@ export default abstract class TsHelperTransformer {
 		private context: ts.TransformationContext,
 		private sf: ts.SourceFile
 	) {}
-
+	protected factory = this.context.factory;
 	protected abstract readonly HELPER_NAME: string;
 
 	/**
@@ -51,7 +51,7 @@ export default abstract class TsHelperTransformer {
 			findGoogRequiredVariable(sf, 'goog.reflect');
 		const googReflectImport =
 			existingGoogReflectImport ||
-			ts.createIdentifier(`tscc_goog_reflect_injected`);
+			this.factory.createIdentifier(`tscc_goog_reflect_injected`);
 
 		let foundTransformedDecorateCall = false;
 		const visitor = (node: ts.Node): ts.Node => {
@@ -70,7 +70,9 @@ export default abstract class TsHelperTransformer {
 			existingGoogReflectImport ? undefined : googReflectImport
 		);
 
-		return ts.updateSourceFileNode(newSf, ts.setTextRange(ts.createNodeArray(stmts), newSf.statements));
+		return this.factory.updateSourceFile(
+			newSf, ts.setTextRange(this.factory.createNodeArray(stmts), newSf.statements)
+		);
 	}
 
 	protected combineStatements(stmts: ts.Statement[], googReflectImport?: ts.Identifier) {
@@ -81,17 +83,11 @@ export default abstract class TsHelperTransformer {
 	}
 
 	private createGoogReflectRequire(ident: ts.Identifier) {
-		return ts.createVariableStatement(
-			undefined,
-			ts.createVariableDeclarationList(
-				[
-					ts.createVariableDeclaration(
-						ident,
-						undefined,
-						createGoogCall("require", ts.createStringLiteral('goog.reflect'))
-					)
-				],
-				this.tsickleHost.es5Mode ? undefined : ts.NodeFlags.Const)
+		const fh = new NodeFactoryHelper(this.factory);
+		return fh.createVariableAssignment(
+			ident,
+			fh.createGoogCall("require", this.factory.createStringLiteral('goog.reflect')),
+			!this.tsickleHost.es5Mode
 		);
 	}
 }

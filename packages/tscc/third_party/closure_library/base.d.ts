@@ -8,6 +8,20 @@
  */
 
 declare namespace goog {
+
+	/**
+	 * Reference to the global object.
+	 * https://www.ecma-international.org/ecma-262/9.0/index.html#sec-global-object
+	 *
+	 * More info on this implementation here:
+	 * https://docs.google.com/document/d/1NAeW4Wk7I7FV0Y2tcUFvQdGMc89k2vdgSXInw8_nvCI/edit
+	 *
+	 * @const
+	 * @suppress {undefinedVars} self won't be referenced unless `this` is falsy.
+	 * @type {!Global}
+	 */
+	const global: typeof globalThis;
+
 	/**
 	 * Handles strings that are intended to be used as CSS class names.
 	 *
@@ -269,3 +283,12 @@ declare namespace goog {
 	function isObject(x: any): x is NonNullable<object> | Function;
 }
 
+// This module name is a tsickle primitive, see `googmodule.ts` of tsickle. Instead of exposing
+// `goog` to the global scope, we let users to write (precisely)
+//
+// import * as goog from 'goog:google3.javascript.closure.goog';
+//
+// to get a handle of a goog namespace.
+declare module "goog:goog" {
+	export = goog;
+}

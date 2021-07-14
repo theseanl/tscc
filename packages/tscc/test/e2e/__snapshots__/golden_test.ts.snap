@@ -137,3 +137,20 @@ exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_10_unsafe_modu
 "console.log(unsafeModuleName.variableNameThatShouldntBeMangled.propertyNameThatShouldntBeMangled);
 "
 `;
+
+exports[`tscc e2e case_11_referencing_goog: case_11_referencing_goog 1`] = `
+Array [
+  "dependent.js",
+  "entry.js",
+]
+`;
+
+exports[`tscc e2e case_11_referencing_goog: case_11_referencing_goog/dependent.js 1`] = `
+"var b={key:\\"value\\"};\\"key\\"===a[\\" \\"]&&console.log(b[a[\\" \\"]]);
+"
+`;
+
+exports[`tscc e2e case_11_referencing_goog: case_11_referencing_goog/entry.js 1`] = `
+"var goog=goog||{},a=this||self;console.log(\\"Debugging\\");
+"
+`;

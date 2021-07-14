@@ -2,6 +2,7 @@ import * as rollup from 'rollup';
 import MultiMap from './MultiMap';
 import path = require('path');
 import upath = require('upath');
+import {googShimMixin} from './goog_shim_mixin';
 
 export default async function mergeChunks(
 	entry: string,
@@ -108,7 +109,7 @@ class ChunkMerger {
 			throw new ChunkMergeError(`Unexpected module in output chunk: ${id}`);
 		};
 		const name = "tscc-merger";
-		return {name, resolveId, load};
+		return googShimMixin({name, resolveId, load});
 	}
 	private resolveGlobal(id: string): string {
 		if (this.resolveGlobalForMainBuild(id)) return this.globals![id]!;

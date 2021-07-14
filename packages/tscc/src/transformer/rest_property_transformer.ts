@@ -13,7 +13,7 @@ export default function decoratorPropertyTransformer(tsickleHost: TsickleHost):
 
 class RestHelperTransformer extends TsHelperTransformer {
 	protected HELPER_NAME = "__rest";
-	/**	
+	/**
 	 * Rest helper call signature:
 	 * __rest(<target>, [propertiesArray])
 	 */
@@ -29,18 +29,18 @@ class RestHelperTransformer extends TsHelperTransformer {
 		// typeof _p === 'symbol' ? _c : _c + ""
 		// ```
 		const convertedArray = ts.setTextRange(
-			ts.createArrayLiteral(
+			this.factory.createArrayLiteralExpression(
 				propertiesArray.elements.map((propNameLiteral: ts.Expression) => {
 					if (!ts.isStringLiteral(propNameLiteral)) return propNameLiteral;
 					const googReflectObjectProperty = ts.setTextRange(
-						ts.createCall(
-							ts.createPropertyAccess(
+						this.factory.createCallExpression(
+							this.factory.createPropertyAccessExpression(
 								googReflectImport,
-								ts.createIdentifier('objectProperty')
+								this.factory.createIdentifier('objectProperty')
 							),
 							undefined,
 							[
-								ts.createStringLiteral(propNameLiteral.text),
+								this.factory.createStringLiteral(propNameLiteral.text),
 								ts.getMutableClone(target)
 							]
 						),
@@ -53,7 +53,7 @@ class RestHelperTransformer extends TsHelperTransformer {
 		);
 		const restArgs = node.arguments.slice();
 		restArgs.splice(1, 1, convertedArray);
-		const newCallExpression = ts.createCall(caller, undefined, restArgs);
+		const newCallExpression = this.factory.createCallExpression(caller, undefined, restArgs);
 		return newCallExpression;
 	}
 }

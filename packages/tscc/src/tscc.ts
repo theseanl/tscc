@@ -30,6 +30,7 @@ import fsExtra = require('fs-extra');
 import vfs = require('vinyl-fs');
 import upath = require('upath');
 import chalk = require('chalk');
+import {googNamespaceTransformer} from './transformer/goog_namespace_transformer';
 
 
 export const TEMP_DIR = ".tscc_temp";
@@ -140,6 +141,7 @@ export default async function tscc(
 		applyPatches();
 		result = tsickle.emit(program, transformerHost, writeFile, undefined, undefined, false, {
 			afterTs: [
+				googNamespaceTransformer,
 				dtsRequireTypeTransformer(tsccSpec, transformerHost),
 				decoratorPropertyTransformer(transformerHost),
 				restPropertyTransformer(transformerHost)

@@ -5,15 +5,13 @@ import ITsccSpecRollupFacade from './spec/ITsccSpecRollupFacade';
 import computeChunkAllocation, {ChunkSortError} from './sort_chunks';
 import mergeChunks, {ChunkMergeError} from './merge_chunks';
 import path = require('path');
+import {googShimMixin} from './goog_shim_mixin';
 
 const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOptions) => {
 	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(pluginOptions);
 
 	const isManyModuleBuild = spec.getOrderedModuleSpecs().length > 1;
 	const globals = spec.getRollupExternalModuleNamesToGlobalMap();
-
-	// virtual modules, see https://rollupjs.org/guide/en#conventions
-	const EMPTY_BUNDLE_ID = "\0empty_bundle_id";
 
 	/* Plugin methods start */
 	const name = "rollup-plugin-tscc";
@@ -69,15 +67,10 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 			return path.resolve(process.cwd(), depsPath);
 			// Using 'posix' does not work well with rollup internals
 		}
-		if (source.startsWith(EMPTY_BUNDLE_ID)) {
-			return source;
-		}
 	};
-	const load: rollup.LoadHook = (id: string) => {
-		if (id.startsWith(EMPTY_BUNDLE_ID)) {
-			return Promise.resolve('');
-		}
-	};
+	// Returning null defers to other load functions, see https://rollupjs.org/guide/en/#load
+	const load: rollup.LoadHook = (id: string) => null;
+
 	const generateBundle = handleError<NonNullable<rollup.Plugin["generateBundle"]>>(async function (
 		this: rollup.PluginContext, options, bundle, isWrite
 	) {
@@ -119,7 +112,7 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 		}));
 	});
 
-	return {name, generateBundle, options, outputOptions, resolveId, load};
+	return googShimMixin({name, generateBundle, options, outputOptions, resolveId, load});
 };
 
 function isChunk(output: rollup.OutputChunk | rollup.OutputAsset): output is rollup.OutputChunk {

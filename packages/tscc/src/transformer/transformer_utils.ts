@@ -42,7 +42,7 @@ interface IImportedVariable {
 	newIdent: ts.Identifier
 }
 
-function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable | undefined {
+export function isVariableRequireStatement(stmt: ts.Statement): IImportedVariable | undefined {
 	if (!ts.isVariableStatement(stmt)) return;
 	// Verify it's a single decl (and not "var x = ..., y = ...;").
 	if (stmt.declarationList.declarations.length !== 1) return;
@@ -108,33 +108,83 @@ export function identifierIsEmitHelper(ident: ts.Identifier): boolean {
 }
 
 /**
- * Codes below this line in this file are content of tsickle source files, available at
- * {@link https://github.com/angular/tsickle/blob/e873704a48760f2911bf484a1b4e389d3a1805f3/src/transformer_util.ts}
- *
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * A helper class that provides several helper functions related to TS node factory functions. In
+ * body of TS transformers, TS recommends to use ts.Factory object available at transformer context
+ * object, and one shall instantiate this class with the context object available to call helper
+ * functions.
  */
-/** Creates a call expression corresponding to `goog.${methodName}(${literal})`. */
-export function createGoogCall(methodName: string, literal: ts.StringLiteral): ts.CallExpression {
-	return ts.createCall(
-		ts.createPropertyAccess(ts.createIdentifier('goog'), methodName), undefined, [literal]
-	);
-}
-export function createSingleQuoteStringLiteral(text: string): ts.StringLiteral {
-	const stringLiteral = ts.createLiteral(text);
-	(stringLiteral as any).singleQuote = true;
-	return stringLiteral;
+export class NodeFactoryHelper {
+	constructor(
+		public readonly factory: ts.NodeFactory
+	) {}
+	/** Creates a call expression corresponding to `goog.${methodName}(${literal})`. */
+	createGoogCall(methodName: string, literal: ts.StringLiteral): ts.CallExpression {
+		return this.factory.createCallExpression(
+			this.factory.createPropertyAccessExpression(
+				this.factory.createIdentifier('goog'), methodName
+			),
+			undefined,
+			[literal]
+		);
+	}
+	// Creates a variable assignment var ${newIdent} = ${initializer}. Set constant = true to have
+	// const instead of var.
+	createVariableAssignment(newIdent: ts.Identifier, initializer: ts.Expression, constant: boolean = false) {
+		return this.factory.createVariableStatement(
+			undefined,
+			this.factory.createVariableDeclarationList(
+				[
+					this.factory.createVariableDeclaration(
+						newIdent,
+						undefined,
+						undefined,
+						initializer
+					)
+				],
+				constant ? ts.NodeFlags.Const : undefined
+			)
+		)
+	}
+	createSingleQuoteStringLiteral(text: string): ts.StringLiteral {
+		const stringLiteral = this.factory.createStringLiteral(text);
+		(stringLiteral as any)['singleQuote'] = true;
+		return stringLiteral;
+	}
+	namespaceToQualifiedName(namespace: string): ts.Expression {
+		let names = namespace.split('.');
+		let l = names.length;
+		let qualifiedName: ts.Expression = this.factory.createIdentifier(names[0]);
+		for (let i = 1; i < l; i++) {
+			qualifiedName = this.factory.createPropertyAccessExpression(
+				qualifiedName, this.factory.createIdentifier(names[i])
+			);
+		}
+		return qualifiedName;
+	}
 }
 
-export function namespaceToQualifiedName(namespace: string): ts.Expression {
-	let names = namespace.split('.');
-	let l = names.length;
-	let qualifiedName: ts.Expression = ts.createIdentifier(names[0]);
-	for (let i = 1; i < l; i++) {
-		qualifiedName = ts.createPropertyAccess(qualifiedName, ts.createIdentifier(names[i]));
+/**
+ * A factory function that produces ts.TransformerFactory which iterates over a ts.SourceFile's
+ * statements and replacing it if needed.
+ */
+export function topLevelStatementTransformerFactory(
+	transformStatement: (stmt: ts.Statement, fh: NodeFactoryHelper) => ts.Statement | void
+): ts.TransformerFactory<ts.SourceFile> {
+	return (context) => {
+		const factoryHelper = new NodeFactoryHelper(context.factory);
+		return (sf) => {
+			const stmts: ts.Statement[] = [];
+			for (const stmt of sf.statements) {
+				let newStmt = transformStatement(stmt, factoryHelper);
+				stmts.push((newStmt ?? stmt) as ts.Statement);
+			}
+			return context.factory.updateSourceFile(
+				sf,
+				ts.setTextRange(
+					context.factory.createNodeArray(stmts),
+					sf.statements
+				)
+			);
+		}
 	}
-	return qualifiedName;
 }
