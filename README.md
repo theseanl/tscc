@@ -263,7 +263,7 @@ Best practice is to provide them as a separate script tag instead of bundling it
     ```
     tsickle writes module-scoped externs to certain mangled namespace like this, so by declaring a global variable to be a type of that namespace, this provides type information of the external module to Closure Compiler.
 
-#### How compilation source files are determined
+### How compilation source files are determined
 
 In order to generate externs for external modules, TSCC has to provide declaration files to tsickle. Which files are provided? Typescript compiler's default behavior is hidden in most of cases, because `.d.ts` files does not anyway affect the compilation output. However, `.d.ts` files are used to generate externs in TSCC, so sometimes you may need to know this for troubleshooting.
 
@@ -274,9 +274,30 @@ In comparison, TSCC will only include a file when it is reachable from _root fil
  - external module's base type declaration files,
  - modules included in tsconfig.json `types` key.
 
-#### Importing typescript sources in node_modules
+### Importing typescript sources in node_modules
 
 In order for typescript sources in node_modules directory to be compiled, you need to explicitly include those files in your `tsconfig.json`. This is a rule imposed by the typescript compiler; it has some special handling for files in node_modules directory, it won't transpile such files unlike usual transitive dependencies (that is, files not explicitly included in `tsconfig.json` via `"files"` or `"include"` keys, but is referenced via `import` or `///<reference path="..." />` from a file that is included in `tsconfig.json`). In order to have them compiled, you need to explicitly mention those files in node_modules directory. For instance, if you are using a package `my_package` that contains typescript sources, you can add a key `{"include": ["node_modules/my_package/**/*.ts"]}` to your tsconfig.
+
+### Using closure compiler primitives
+
+Certain JS expressions, such as `goog.define(...)` or `goog.reflect.objectProperty(...)`, get special treatment from Closure Compiler. In order to use them, you need access to the `goog` variable or the export object of `goog.reflect` closure library module.
+
+In order to access `goog`, first include a triple slash directive that points to a `base.d.ts` file that comes with the npm package.
+```ts
+///<reference path="node_modules/@tscc/tscc/third_party/closure_library/base.d.ts" >
+```
+The exact path may differ in your configuration. This file contains a declaration for a module `"goog:goog"`, so you can now write 
+```ts
+import * as goog from 'goog:goog'
+```
+to obtain a reference to the `goog` object. In order for this to work, the imported namespace's name should be `goog` as in above. As a matter of good practice, it'd better not to use `goog` as a variable name unless it _is_ the closure compiler's goog object.
+
+Similarly, to use `goog.reflect`, reference `reflect.d.ts`, and then write
+```ts
+import * as googReflect from 'goog:goog.reflect';
+```
+
+`rollup-plugin-tscc` will wire these module to an appropriate 'polyfill' modules so that runtime behaviors are unchanged.
 
 ### Things to know
 
