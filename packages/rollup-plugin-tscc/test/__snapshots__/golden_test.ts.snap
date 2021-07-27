@@ -63,7 +63,7 @@ exports[`Golden Tests: goog-shim/tscc.spec.json 1`] = `
 	 * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
 	 * global \`goog\` variables have been removed.
 	 */
-	const global =  self;
+	const global =  self; // Use rollup \\"context\\" option to prevent \`this\` rewrite
 
 	let DEBUG = true;
 

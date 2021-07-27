@@ -2,10 +2,14 @@
  * @fileoverview Hand-modified shim file for Closure Library `goog/goog.js`. References to the
  * global `goog` variables have been removed.
  */
-export const global = this || self;
+export const global = this || self; // Use rollup "context" option to prevent `this` rewrite
 
-export function define(name, defaultValue) {
-	return defaultValue;
+export function define(name, value) {
+	var uncompiledDefines = global.CLOSURE_UNCOMPILED_DEFINES;
+	var defines = global.CLOSURE_DEFINES;
+	if (uncompiledDefines) value = uncompiledDefines[name];
+	else if (defines) value = defines[name];
+	return value;
 }
 
 export let DEBUG = true;
