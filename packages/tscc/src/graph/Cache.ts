@@ -9,6 +9,7 @@ export class Cache<T> {
 			mtime: number
 		}
 	}
+	private dirty = false;
 	constructor(
 		private cacheFilePath: string
 	) {
@@ -26,23 +27,25 @@ export class Cache<T> {
 		return this.cache[key] && this.cache[key].mtime;
 	}
 	put(key: string, content: T, mtime: number) {
+		this.dirty = true;
 		this.cache[key] = {content, mtime};
 	}
 	remove(key: string) {
 		delete this.cache[key];
 	}
 	async commit() {
-		fsp.writeFile(this.cacheFilePath, JSON.stringify(this.cache));
+		if (!this.dirty) return;
+		await fsp.writeFile(this.cacheFilePath, JSON.stringify(this.cache));
 	}
 }
 
 export class FSCacheAccessor<T> {
 	constructor(
 		private cache: Cache<T>,
-		private dataFactory:(path:string)=>Promise<T>
+		private dataFactory: (path: string) => Promise<T>
 	) {}
 	async getFileData(path: string) {
-		let stat:fs.Stats;
+		let stat: fs.Stats;
 		try {
 			stat = await fsp.stat(path);
 		} catch (e) {
@@ -54,7 +57,7 @@ export class FSCacheAccessor<T> {
 			throw new FSCacheAccessError(`${path}: not a file`);
 		}
 		let cacheMtime = this.cache.getMtime(path);
-		if (stat.mtimeMs > cacheMtime) {
+		if (!cacheMtime || stat.mtimeMs > cacheMtime) {
 			let content = await this.dataFactory(path);
 			this.cache.put(path, content, stat.mtimeMs);
 			return content;

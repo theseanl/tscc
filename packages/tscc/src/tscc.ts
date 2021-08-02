@@ -110,6 +110,7 @@ export default async function tscc(
 		const fileAccessor = new FSCacheAccessor<ISourceNode>(jsFileCache, sourceNodeFactory);
 		// async operation
 		await closureDepsGraph.addSourceByFileNames(tsccSpec.getJsFiles(), fileAccessor);
+		await fileAccessor.updateCache();
 	}
 
 	const tsickleOutput: PartialMap<string, IClosureCompilerInputJson> = new PartialMap();
