@@ -244,10 +244,13 @@ export default class TsccSpec implements ITsccSpec {
 	}
 	getJsFiles() {
 		let jsFiles = this.tsccSpec.jsFiles;
-		if (jsFiles) {
-			return <string[]>fg.sync(jsFiles)
+		if (!jsFiles) return [];
+		if (typeof jsFiles === 'string') {
+			jsFiles = [jsFiles];
 		}
-		return [];
+		// resolve globs according to TSCC's convention
+		jsFiles = jsFiles.map(this.absolute, this);
+		return <string[]>fg.sync(jsFiles)
 	}
 	debug(): Readonly<IDebugOptions> {
 		return this.tsccSpec.debug || {};

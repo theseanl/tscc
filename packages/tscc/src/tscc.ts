@@ -3,11 +3,8 @@ import * as StreamArray from 'stream-json/streamers/StreamArray';
 import * as tsickle from "tsickle";
 import * as ts from "typescript";
 import getDefaultLibs from './default_libs';
-import {Cache, FSCacheAccessor} from './graph/Cache';
 import ClosureDependencyGraph from './graph/ClosureDependencyGraph';
 import TypescriptDependencyGraph from './graph/TypescriptDependencyGraph';
-import {ISourceNode} from './graph/ISourceNode';
-import {sourceNodeFactory} from './graph/source_node_factory';
 import Logger from './log/Logger';
 import * as spinner from './log/spinner';
 import {applyPatches, restorePatches} from './tsickle_patches/facade'
@@ -21,6 +18,7 @@ import TsccSpecWithTS, {TsError} from "./spec/TsccSpecWithTS";
 import decoratorPropertyTransformer from './transformer/decorator_property_transformer';
 import restPropertyTransformer from './transformer/rest_property_transformer';
 import dtsRequireTypeTransformer from './transformer/dts_requiretype_transformer';
+import {googNamespaceTransformer} from './transformer/goog_namespace_transformer';
 import {getExternsForExternalModules, getGluingModules} from './external_module_support';
 import fs = require('fs');
 import path = require('path');
@@ -30,7 +28,6 @@ import fsExtra = require('fs-extra');
 import vfs = require('vinyl-fs');
 import upath = require('upath');
 import chalk = require('chalk');
-import {googNamespaceTransformer} from './transformer/goog_namespace_transformer';
 
 
 export const TEMP_DIR = ".tscc_temp";
@@ -105,14 +102,6 @@ export default async function tscc(
 	 * codes from closure-tools-helper.
 	 */
 	const closureDepsGraph = new ClosureDependencyGraph();
-	if (tsccSpec.getJsFiles().length) {
-		const jsFileCache = new Cache<ISourceNode>(path.join(TEMP_DIR, "jscache.json"));
-		const fileAccessor = new FSCacheAccessor<ISourceNode>(jsFileCache, sourceNodeFactory);
-		// async operation
-		await closureDepsGraph.addSourceByFileNames(tsccSpec.getJsFiles(), fileAccessor);
-		await fileAccessor.updateCache();
-	}
-
 	const tsickleOutput: PartialMap<string, IClosureCompilerInputJson> = new PartialMap();
 
 	const {writeFile, writeExterns, externPath} =
@@ -136,6 +125,14 @@ export default async function tscc(
 	getGluingModules(tsccSpec, transformerHost).forEach(({path, content}) => {
 		writeFile(path, content)
 	})
+
+	// Manually push jsFiles, if there are any
+	const jsFiles = tsccSpec.getJsFiles();
+	if (jsFiles.length) {
+		jsFiles.forEach(path => {
+			writeFile(path, fs.readFileSync(path, 'utf8'));
+		})
+	}
 
 	let result: tsickle.EmitResult;
 	try {

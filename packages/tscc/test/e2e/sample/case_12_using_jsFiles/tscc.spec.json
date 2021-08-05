@@ -1,0 +1,9 @@
+{
+	"modules": {
+		"entry": "./entry.ts"
+	},
+	"prefix": ".tscc_temp/case_12_using_jsFiles/",
+	"jsFiles": [
+		"./*.js"
+	]
+}

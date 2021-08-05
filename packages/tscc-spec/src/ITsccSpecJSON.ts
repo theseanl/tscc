@@ -65,7 +65,7 @@ declare interface ITsccSpecJSON {
 	/**
 	 * Glob of js source files.
 	 */
-	jsFiles?: string[]
+	jsFiles?: string | string[]
 	/**
 	 * Directory names to emit outputs in, or prefixes for output file names.
 	 * It will just be prepended to module names, so if its last character is not a path separator,

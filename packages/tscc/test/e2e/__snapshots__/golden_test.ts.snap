@@ -154,3 +154,14 @@ exports[`tscc e2e case_11_referencing_goog: case_11_referencing_goog/entry.js 1`
 "var goog=goog||{},a=this||self;console.log(\\"Debugging\\");
 "
 `;
+
+exports[`tscc e2e case_12_using_jsFiles: case_12_using_jsFiles 1`] = `
+Array [
+  "entry.js",
+]
+`;
+
+exports[`tscc e2e case_12_using_jsFiles: case_12_using_jsFiles/entry.js 1`] = `
+"console.log(1);
+"
+`;
