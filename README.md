@@ -167,6 +167,7 @@ Tscc spec file is a single source of truth of your bundling information. It desc
     external,
     prefix,
     compilerFlags,
+	jsFiles,
     debug
 }
 ```
@@ -226,6 +227,16 @@ CLI equivalent is `--prefix dist/` (or `--prefix.rollup dev/ --prefix.cc dist/`)
     }
 ```
 It is a key-value pair of flags to be passed to the closure compiler. Keys are literally [closure compiler options](https://github.com/google/closure-compiler/wiki/Flags-and-Options) minus the leading `--`. flags which accepts multiple values can be represented as an array of values. TSCC sets default values for many flags, in particular, the compilation works even without the `compilerOptions` key in the spec. Any values provided here will override default flags. TSCC will treat these values as opaque data.
+
+### `jsFiles`
+
+```jsonc
+	"jsFiles": [
+		"./glob/*/for/js/files.js"
+	]
+```
+
+It is a string or an array of string, containing glob expressions of JS files to be provided to closure compiler. In order to import closure-style JS to TS file, use `import "goog:moduleName"` in TS, and provide the JS file declaring `goog.module('moduleName')` via this flag. A difference with `extraSources` in module spec is that these files will be included in dependency graph just like other TS files, but extraSources will be included in the compilation even if they are not reachable from entry files.
 
 ### `debug`
 
