@@ -9,7 +9,7 @@ module.exports = {
 	reporters: ["default", "jest-junit"],
 	globals: {
 		'ts-jest': {
-			tsConfig: compilerOptions
+			tsconfig: compilerOptions
 		}
 	}
 };
