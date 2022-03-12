@@ -18,6 +18,14 @@ describe(`escape_goog_identifier`, () => {
 				}
 			}
 		);
+		test(`it converts periods and path separators to a string that does not contain consecutive periods`,
+			() => {
+				let escaped = escapeGoogAdmissibleName(
+					`./../.../..../...../..`.replace(/\//g, require('path').sep)
+				);
+				expect(escaped.includes('..')).toBe(false);
+			}
+		)
 	});
 	describe(`escapedGoogNameIsDts`, () => {
 		test(`detects if an original(unescaped) string ends with .d.ts.`, () => {

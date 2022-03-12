@@ -158,10 +158,10 @@ exports[`dts_requiretype_transformer modifies requireType calls to a global vari
  * Generated from: dts_requiretype/entry.ts
  * @suppress {checkTypes,extraRequire,missingOverride,missingRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-goog.module('dts_requiretype.entry$.ts');
+goog.module('dts_requiretype.entry$_ts');
 var module = module || { id: '' };
 goog.require('tslib');
-const tsickle_required_1 = dts_requiretype$required$$d$$ts;
+const tsickle_required_1 = dts_requiretype$required$_d$_ts;
 const required = goog.require('dts_requiretype.required');
 /** @type {!tsickle_required_1.I} */
 var a = required.func();

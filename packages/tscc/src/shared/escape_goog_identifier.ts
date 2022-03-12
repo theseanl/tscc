@@ -1,9 +1,12 @@
 /**
- * @fileoverview A valid goog.module name must start with [a-zA-Z_$] end only contain [a-zA-Z0-9._$].
+ * @fileoverview A valid goog.module name is a dot-separated sequence of legal property. Legal
+ * property is a name that consists only of [a-zA-Z0-9._$]. Trailing, leading dots, or consecutive
+ * dots are not allowed. Source: com.google.javascript.jscomp.GatherModuleMetadata.java error
+ * message for JSC_INVALID_NAMESPACE_OR_MODULE_ID.
+ *
  * This file provides an analogue of Javascript escape/unescape function pair for string identifiers
- * for goog.module, goog.provide, etc.
- * One does not lose information after escaping so that we can faithfully map converted module names
- * to the original TS source file's name.
+ * for goog.module, goog.provide, etc. One does not lose information after escaping so that we can
+ * faithfully map converted module names to the original TS source file's name.
  */
 import path = require('path');
 
@@ -42,7 +45,7 @@ function isDollarSign(code: number) {
  *                  number  ⟹  number
  *                     "_"  ⟹  "_"
  *          path separator  ⟹  "." (for ergonomical reason)
- *                     "."  ⟹  "$."
+ *                     "."  ⟹  "$_"
  *     Any other character  ⟹  "$" followed by length 4 base36 representation of its code point,
  *                              left-padded with 0.
  *
@@ -60,7 +63,7 @@ export function escapeGoogAdmissibleName(name: string): string {
 		} else if (char === SEP) {
 			out += ".";
 		} else if (isPeriod(code)) {
-			out += "$.";
+			out += "$_";
 		} else {
 			out += "$" + code.toString(36).padStart(4, "0");
 		}
@@ -80,8 +83,8 @@ export function unescapeGoogAdmissibleName(escapedName: string): string {
 			out += SEP;
 			i++;
 		} else if (isDollarSign(code)) {
-			// If the next character is ".", add "."
-			if (isPeriod(escapedName.charCodeAt(i + 1))) {
+			// If the next character is "_", add "."
+			if (isLowerDash(escapedName.charCodeAt(i + 1))) {
 				out += ".";
 				i += 2;
 			} else {
@@ -102,5 +105,5 @@ export function unescapeGoogAdmissibleName(escapedName: string): string {
 	return out;
 }
 export function escapedGoogNameIsDts(escapedName: string) {
-	return escapedName.endsWith("$.d$.ts");
+	return escapedName.endsWith("$_d$_ts");
 }
