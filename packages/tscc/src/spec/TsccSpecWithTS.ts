@@ -218,7 +218,11 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 
 		const defaultFlags: closureCompilerFlags = {};
 		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[target];
-		defaultFlags["language_out"] = "ECMASCRIPT5";
+		// Closure compiler's default behavior is to output ECMASCRIPT_NEXT so that transpilation is
+		// applied only when users explicitly request it. See:
+		// https://github.com/google/closure-compiler/wiki/Releases#november-7-2021-v20211107
+		// In version <=0.7.5, we had this set to ECMASCRIPT5.
+		defaultFlags["language_out"] = "ECMASCRIPT_NEXT";
 		defaultFlags["compilation_level"] = "ADVANCED";
 		if (this.getOrderedModuleSpecs().length > 1) {
 			// Multi-chunk build uses --chunk and --chunk_output_path_prefix.

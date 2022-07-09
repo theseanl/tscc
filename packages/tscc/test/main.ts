@@ -1,3 +1,4 @@
+///<reference types="jest" />
 import {parseTsccCommandLineArgs, buildTsccSpecJSONAndTsArgsFromArgs} from '../src/main'
 
 

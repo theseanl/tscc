@@ -9,7 +9,7 @@ export default interface ITsccSpecWithTS extends ITsccSpec {
 	/**
 	 * --compilation_level: defaults to ADVANCED
 	 * --language_in: Derived from tsconfig's `target`
-	 * --language_out: defaults to ECMASCRIPT5
+	 * --language_out: defaults to ECMASCRIPT_NEXT
 	 * --chunk_output_prefix: determined from `prefix` key of tscc spec.
 	 */
 	getBaseCompilerFlags(): string[]

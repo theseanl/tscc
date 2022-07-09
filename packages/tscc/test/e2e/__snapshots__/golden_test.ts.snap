@@ -46,12 +46,12 @@ Array [
 `;
 
 exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js 1`] = `
-"function d(){}d.prototype.b=function(){console.log(\\"a\\")};(function(e,b,c,f){var g=arguments.length,a=3>g?b:null===f?f=Object.getOwnPropertyDescriptor(b,c):f,h;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(e,b,c,f);else for(var k=e.length-1;0<=k;k--)if(h=e[k])a=(3>g?h(a):3<g?h(b,c,a):h(b,c))||a;return 3<g&&a&&Object.defineProperty(b,c,a),a})([function(e,b,c){return c}],d.prototype,\\"b\\",null);(new d).b();
+"var h=class{b(){console.log(\\"a\\")}};(function(d,b,c,e){var f=arguments.length,a=3>f?b:null===e?e=Object.getOwnPropertyDescriptor(b,c):e,g;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)a=Reflect.decorate(d,b,c,e);else for(var k=d.length-1;0<=k;k--)if(g=d[k])a=(3>f?g(a):3<f?g(b,c,a):g(b,c))||a;return 3<f&&a&&Object.defineProperty(b,c,a),a})([function(d,b,c){return c}],h.prototype,\\"b\\",null);(new h).b();
 //# sourceMappingURL=a.js.map
 "
 `;
 
-exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js.map 1`] = `"{\\"version\\":3,\\"sources\\":[\\"a.ts\\",\\"../../../../third_party/tsickle/third_party/tslib/tslib.js\\"],\\"names\\":[\\"module$exports$a$_ts.A\\",\\"b\\",\\"console\\",\\"log\\",\\"exports.__decorate\\",\\"decorators\\",\\"target\\",\\"key\\",\\"desc\\",\\"c\\",\\"arguments\\",\\"length\\",\\"r\\",\\"Object\\",\\"getOwnPropertyDescriptor\\",\\"d\\",\\"Reflect\\",\\"i\\",\\"defineProperty\\",\\"decorator\\",\\"prop\\",\\"prototype\\"],\\"mappings\\":\\"AAIA,QAAA,EAAA,EAAA,EAECA,CAAA,CAAA,SAAA,CAAA,CAAAC,CAAAA,QAAC,EAAA,CAAIC,OAAQC,CAAAA,GAAR,CAAY,GAAZ,CAAJ,CCoDmBC,UAAS,CAACC,CAAD,CAAaC,CAAb,CAAqBC,CAArB,CAA0BC,CAA1B,CAAgC,CAAA,IACtDC,EAAIC,SAAUC,CAAAA,MADwC,CAChCC,EAAQ,CAAJ,CAAAH,CAAA,CAAQH,CAAR,CAA0B,IAAT,GAAAE,CAAA,CAAgBA,CAAhB,CAAuBK,MAAOC,CAAAA,wBAAP,CAAgCR,CAAhC,CAAwCC,CAAxC,CAAvB,CAAsEC,CAD3D,CACiEO,CAG3H,IAAuB,QAAvB,GAAI,MAAOC,QAAX,EAAmCA,OAAnC,EAA6E,UAA7E,GAA8C,MAAOA,QAAA,CAAA,QAArD,CAAyFJ,CAAA,CAAII,OAAA,CAAA,QAAA,CAAoBX,CAApB,CAAgCC,CAAhC,CAAwCC,CAAxC,CAA6CC,CAA7C,CAA7F,KACK,KAAK,IAAIS,EAAIZ,CAAWM,CAAAA,MAAfM,CAAwB,CAAjC,CAAyC,CAAzC,EAAoCA,CAApC,CAA4CA,CAAA,EAA5C,CAAiD,GAAIF,CAAJ,CAAQV,CAAA,CAAWY,CAAX,CAAR,CAAuBL,CAAA,EAAS,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAEH,CAAF,CAAR,CAAmB,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAeK,CAAf,CAAR,CAA4BG,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAhD,GAAmEK,CAChJ,OAAW,EAAJ,CAAAH,CAAA,EAASG,CAAT,EAAcC,MAAOK,CAAAA,cAAP,CAAsBZ,CAAtB,CAA8BC,CAA9B,CAAmCK,CAAnC,CAAd,CAAqDA,CANF,CAAzCR,CDnDpB,CAAA,CAPDe,QAAkB,CAACb,CAAD,CAASc,CAAT,CAA2BZ,CAA3B,CAAkD,CACnE,MAAOA,EAD4D,CAOnE,CAAA,CAFUR,CAAAqB,CAAAA,SAEV,CAFU,GAEV,CAFU,IAEV,CAEOpB,EAAP,IAAID,CAAGC,EAAAA,CAAR\\",\\"file\\":\\".tscc_temp/case_3_sourcemaps_with_decorators/a.js\\"}"`;
+exports[`tscc e2e case_3_sourcemaps_with_decorators: case_3_sourcemaps_with_decorators/a.js.map 1`] = `"{\\"version\\":3,\\"sources\\":[\\"a.ts\\",\\"../../../../third_party/tsickle/third_party/tslib/tslib.js\\"],\\"names\\":[\\"module$exports$a$_ts.A\\",\\"b\\",\\"console\\",\\"log\\",\\"exports.__decorate\\",\\"decorators\\",\\"target\\",\\"key\\",\\"desc\\",\\"c\\",\\"arguments\\",\\"length\\",\\"r\\",\\"Object\\",\\"getOwnPropertyDescriptor\\",\\"d\\",\\"Reflect\\",\\"i\\",\\"defineProperty\\",\\"decorator\\",\\"prop\\",\\"prototype\\"],\\"mappings\\":\\"AAIA,IAAAA,EAAA,KAAA,CAECC,CAAC,EAAA,CAAIC,OAAQC,CAAAA,GAAR,CAAY,GAAZ,CAAJ,CAFF,CCsDqBC,UAAS,CAACC,CAAD,CAAaC,CAAb,CAAqBC,CAArB,CAA0BC,CAA1B,CAAgC,CAAA,IACtDC,EAAIC,SAAUC,CAAAA,MADwC,CAChCC,EAAQ,CAAJ,CAAAH,CAAA,CAAQH,CAAR,CAA0B,IAAT,GAAAE,CAAA,CAAgBA,CAAhB,CAAuBK,MAAOC,CAAAA,wBAAP,CAAgCR,CAAhC,CAAwCC,CAAxC,CAAvB,CAAsEC,CAD3D,CACiEO,CAG3H,IAAuB,QAAvB,GAAI,MAAOC,QAAX,EAAmCA,OAAnC,EAA6E,UAA7E,GAA8C,MAAOA,QAAA,CAAA,QAArD,CAAyFJ,CAAA,CAAII,OAAA,CAAA,QAAA,CAAoBX,CAApB,CAAgCC,CAAhC,CAAwCC,CAAxC,CAA6CC,CAA7C,CAA7F,KACK,KAAK,IAAIS,EAAIZ,CAAWM,CAAAA,MAAfM,CAAwB,CAAjC,CAAyC,CAAzC,EAAoCA,CAApC,CAA4CA,CAAA,EAA5C,CAAiD,GAAIF,CAAJ,CAAQV,CAAA,CAAWY,CAAX,CAAR,CAAuBL,CAAA,EAAS,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAEH,CAAF,CAAR,CAAmB,CAAJ,CAAAH,CAAA,CAAQM,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAeK,CAAf,CAAR,CAA4BG,CAAA,CAAET,CAAF,CAAUC,CAAV,CAAhD,GAAmEK,CAChJ,OAAW,EAAJ,CAAAH,CAAA,EAASG,CAAT,EAAcC,MAAOK,CAAAA,cAAP,CAAsBZ,CAAtB,CAA8BC,CAA9B,CAAmCK,CAAnC,CAAd,CAAqDA,CANF,CAAzCR,CDnDpB,CAAA,CAPDe,QAAkB,CAACb,CAAD,CAASc,CAAT,CAA2BZ,CAA3B,CAAkD,CACnE,MAAOA,EAD4D,CAOnE,CAAA,CAFUR,CAAAqB,CAAAA,SAEV,CAFU,GAEV,CAFU,IAEV,CAEOpB,EAAP,IAAID,CAAGC,EAAAA,CAAR\\",\\"file\\":\\".tscc_temp/case_3_sourcemaps_with_decorators/a.js\\"}"`;
 
 exports[`tscc e2e case_4_external: case_4_external 1`] = `
 Array [
@@ -71,9 +71,8 @@ Array [
 `;
 
 exports[`tscc e2e case_5_object_spread: case_5_object_spread/a.js 1`] = `
-"function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};function k(){}k.prototype.g=function(a,c){a=c.b;h(c,[\\"b\\"]);c=h(a,[\\"d\\"]);console.log(c)};
-(function(a,c,e,b){var f=arguments.length,g=3>f?c:null===b?b=Object.getOwnPropertyDescriptor(c,e):b,l;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,c,e,b);else for(var m=a.length-1;0<=m;m--)if(l=a[m])g=(3>f?l(g):3<f?l(c,e,g):l(c,e))||g;return 3<f&&g&&Object.defineProperty(c,e,g),g})([function(a,c,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],k.prototype,\\"g\\",null);(new k).g({},{b:{c:{},d:{}},e:{},f:{},h:{}});var n={a:{},b:{},c:{}},p=h(n,[\\"c\\"]);
-window.d=p;
+"function h(a,c){var e={},b;for(b in a)Object.prototype.hasOwnProperty.call(a,b)&&0>c.indexOf(b)&&(e[b]=a[b]);if(null!=a&&\\"function\\"===typeof Object.getOwnPropertySymbols){var f=0;for(b=Object.getOwnPropertySymbols(a);f<b.length;f++)0>c.indexOf(b[f])&&Object.prototype.propertyIsEnumerable.call(a,b[f])&&(e[b[f]]=a[b[f]])}return e};class l{g(a,c){({b:a}=c);h(c,[\\"b\\"]);c=h(a,[\\"d\\"]);console.log(c)}}(function(a,c,e,b){var f=arguments.length,g=3>f?c:null===b?b=Object.getOwnPropertyDescriptor(c,e):b,k;if(\\"object\\"===typeof Reflect&&Reflect&&\\"function\\"===typeof Reflect.decorate)g=Reflect.decorate(a,c,e,b);else for(var m=a.length-1;0<=m;m--)if(k=a[m])g=(3>f?k(g):3<f?k(c,e,g):k(c,e))||g;return 3<f&&g&&Object.defineProperty(c,e,g),g})([function(a,c,e){a=h(e,[\\"value\\"]);console.log(a);e.value={}}],l.prototype,\\"g\\",null);
+(new l).g({},{b:{c:{},d:{}},e:{},f:{},h:{}});const n={a:{},b:{},c:{}},p=h(n,[\\"c\\"]);window.d=p;
 "
 `;
 
@@ -85,12 +84,12 @@ Array [
 `;
 
 exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/1.js 1`] = `
-"window.b=function(c){c({b:function(){}})};
+"window.b=a=>{a({b(){}})};
 "
 `;
 
 exports[`tscc e2e case_6_type_only_references: case_6_type_only_references/2.js 1`] = `
-"function a(){}a.prototype.b=function(){console.log(\\"boo\\")};(new a).b();
+"(new class{b(){console.log(\\"boo\\")}}).b();
 "
 `;
 
