@@ -1,3 +1,4 @@
+///<reference types="jest" />
 import {getPackageBoundary} from '../../src/tsickle_patches/patch_tsickle_module_resolver';
 import path = require('path');
 

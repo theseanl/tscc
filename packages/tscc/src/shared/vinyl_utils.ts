@@ -45,13 +45,17 @@ abstract class LoggingTransformStream extends stream.Transform {
 		protected logger: Logger
 	) {super({objectMode: true});}
 	async _transform(data: any, encoding: BufferEncoding, callback: stream.TransformCallback) {
+		let transformed: any;
 		try {
-			callback(null, await this._rawTransform(data, encoding));
+			transformed = await this._rawTransform(data, encoding);
 		} catch (e) {
+			const error = e instanceof Error ? e : new Error(String(e));
 			this.logger.log(chalk.red('Error during post-transformation: '));
-			this.logger.log(e.stack)
-			callback(e);
+			this.logger.log(error.stack!);
+			callback(error);
+			return;
 		}
+		callback(null, transformed);
 	}
 }
 

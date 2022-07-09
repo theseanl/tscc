@@ -65,7 +65,8 @@ export default function dtsRequireTypeTransformer(spec: ITsccSpecWithTS, tsickle
 		// `const importedName = mangledNamespace;`
 		return setOriginalNode(
 			fh.createVariableAssignment(
-				newIdent, fh.namespaceToQualifiedName(mangledNamespace), !tsickleHost.es5Mode
+				newIdent, fh.namespaceToQualifiedName(mangledNamespace),
+				/* useConst */ tsickleHost.options.target !== ts.ScriptTarget.ES5
 			),
 			node
 		);

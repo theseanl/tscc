@@ -86,17 +86,19 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	/**
 	 * Prune compiler options
 	 *  - "module" to "commonjs"
-	 *  - Get values of outDir, strip it, and pass it to closure compiler
-	 *  - Warn when rootDir is used - it is of no use.
+	 *  - Warn when rootDir or outDir is used - these options are about `tsc` output directory structure,
+	 *    which is of no use with tscc.
+	 *  - Warn when target language is ES3 – Tsickle does not assume that the output can be lower than ES5,
 	 */
 	private static pruneCompilerOptions(options: ts.CompilerOptions, onWarning: TWarningCallback) {
-		if (options.module !== ts.ModuleKind.CommonJS) {
-			onWarning(`tsickle converts TypeScript modules to Closure modules via CommonJS internally.`
-				+ `"module" flag is overridden to "commonjs".`);
+		if (typeof options.module !== 'undefined' && options.module !== ts.ModuleKind.CommonJS) {
+			onWarning(`Module option is set. tsickle converts TypeScript modules to Closure modules`
+				+ `via CommonJS internally, so it will be overridden to "commonjs".`);
 			options.module = ts.ModuleKind.CommonJS;
 		}
 		if (options.outDir) {
-			onWarning(`--outDir option is ignored. Use prefix option in the spec file.`);
+			onWarning(`--outDir option is set, but it is no-op for tscc.` +
+				`Use prefix option in spec file to control output directory.`);
 			options.outDir = undefined;
 		}
 		/**
@@ -110,9 +112,20 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		const {configFilePath} = options;
 		const rootDir = configFilePath ? path.parse(configFilePath as string).root : '/';
 		if (options.rootDir) {
-			onWarning(`--rootDir option is ignored. It will internally set to ${rootDir}.`);
+			onWarning(`--rootDir is set, but it is no-op for tscc. It will internally set to ${rootDir}.`);
 		}
 		options.rootDir = rootDir;
+
+		// See https://github.com/angular/tsickle/commit/c0123da31e2924ad45c3f0a02d536e750028de7b,
+		// where a check to emit `const` declaration is done by target === ScriptTarget.ES5.
+		if (options.target === ts.ScriptTarget.ES3) {
+			onWarning(`tsickle does not support targetting ES3, and it will be overridden to ES5`
+				+ `Consider setting compilationFlags.language_out to ECMASCRIPT3`);
+			options.target = ts.ScriptTarget.ES5;
+		} else if (typeof options.target === 'undefined') {
+			// Prevent TS from treating unspecified target as a default value ES3.
+			options.target = ts.ScriptTarget.ES5;
+		}
 		if (!options.importHelpers) {
 			onWarning(`tsickle uses a custom tslib optimized for closure compiler. importHelpers flag is set.`);
 			options.importHelpers = true;
@@ -145,7 +158,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		}
 	}
 	private tsCompilerHost: ts.CompilerHost = ts.createCompilerHost(this.parsedConfig.options);
-	constructor(
+	private constructor(
 		tsccSpec: ITsccSpecJSON,
 		basePath: string,
 		private parsedConfig: ts.ParsedCommandLine,
@@ -177,7 +190,6 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		return this.tsCompilerHost;
 	}
 	private static readonly tsTargetToCcTarget = {
-		[ts.ScriptTarget.ES3]: "ECMASCRIPT3",
 		[ts.ScriptTarget.ES5]: "ECMASCRIPT5_STRICT",
 		[ts.ScriptTarget.ES2015]: "ECMASCRIPT_2015",
 		[ts.ScriptTarget.ES2016]: "ECMASCRIPT_2016",
@@ -186,6 +198,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2019]: "ECMASCRIPT_2019",
 		[ts.ScriptTarget.ES2020]: "ECMASCRIPT_2020",
 		[ts.ScriptTarget.ES2021]: "ECMASCRIPT_2021",
+		[ts.ScriptTarget.ES2022]: "ECMASCRIPT_NEXT",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
 	getOutputFileNames(): string[] {
@@ -196,16 +209,15 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 			});
 	}
 	private getDefaultFlags(): closureCompilerFlags {
-		// Typescript accepts an undocumented compilation target "json".
-		type DocumentedCompilerOptions = ts.CompilerOptions & {
-			target: Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>
+		// Certain compiler options are guarded in pruneCompilerOptions method.
+		type PrunedCompilerOptions = ts.CompilerOptions & {
+			// Typescript accepts an undocumented compilation target "json".
+			target: Exclude<Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>, ts.ScriptTarget.ES3>
 		}
-		let {target, sourceMap, inlineSources} = this.parsedConfig.options as DocumentedCompilerOptions;
+		let {target, sourceMap, inlineSources} = this.parsedConfig.options as PrunedCompilerOptions;
 
 		const defaultFlags: closureCompilerFlags = {};
-		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[
-			typeof target === 'undefined' ? ts.ScriptTarget.ES3 : target
-		]; // ts default value is ES3.
+		defaultFlags["language_in"] = TsccSpecWithTS.tsTargetToCcTarget[target];
 		defaultFlags["language_out"] = "ECMASCRIPT5";
 		defaultFlags["compilation_level"] = "ADVANCED";
 		if (this.getOrderedModuleSpecs().length > 1) {

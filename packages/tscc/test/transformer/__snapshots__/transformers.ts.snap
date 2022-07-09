@@ -1,60 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates.ts - es3 1`] = `
-"const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
-\\"use strict\\";
-exports.__esModule = true;
-var tslib_1 = require(\\"tslib\\");
-var adornClass = function (target) { return target; };
-var adornProperty = function (target, prop) { };
-var adornMethod = function (target, prop, desc) { return desc; };
-var adornParameter = function (target, prop, paramIndex) { };
-var A = /** @class */ (function () {
-    function A() {
-    }
-    A.prototype.aMethod = function () {
-    };
-    Object.defineProperty(A.prototype, \\"anAccessor\\", {
-        get: function () {
-            return NaN;
-        },
-        set: function (v) {
-        },
-        enumerable: false,
-        configurable: true
-    });
-    A.prototype.aMethodWithParams = function (param) {
-    };
-    tslib_1.__decorate([
-        adornMethod
-    ], A.prototype, tscc_goog_reflect_injected.objectProperty(\\"aMethod\\", A.prototype));
-    tslib_1.__decorate([
-        adornProperty
-    ], A.prototype, tscc_goog_reflect_injected.objectProperty(\\"aProperty\\", A.prototype));
-    tslib_1.__decorate([
-        adornMethod
-    ], A.prototype, tscc_goog_reflect_injected.objectProperty(\\"anAccessor\\", A.prototype));
-    tslib_1.__decorate([
-        tslib_1.__param(0, adornParameter)
-    ], A.prototype, tscc_goog_reflect_injected.objectProperty(\\"aMethodWithParams\\", A.prototype));
-    A = tslib_1.__decorate([
-        adornClass
-    ], A);
-    return A;
-}());
-\\"__tscc_export_start__\\";
-{
-    self[\\"tscc_global_access_name_1\\"] = (A.prototype).aMethod;
-    self[\\"tscc_global_access_name_2\\"] = (A.prototype).aProperty;
-    self[\\"tscc_global_access_name_3\\"] = (A.prototype).anAccessor;
-    self[\\"tscc_global_access_name_4\\"] = (A.prototype).aMethodWithParams;
-}
-\\"__tscc_export_end__\\";
-"
-`;
-
 exports[`decoratorPropertyTransformer modifies property name access to goog.reflect.objectProperty, add @nocollapse to jsdoc: decorator/decorates.ts - es5 1`] = `
-"const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
+"var tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var tslib_1 = require(\\"tslib\\");
@@ -156,7 +103,7 @@ exports[`dts_requiretype_transformer modifies requireType calls to a global vari
 "/**
  * @fileoverview added by tsickle
  * Generated from: dts_requiretype/entry.ts
- * @suppress {checkTypes,extraRequire,missingOverride,missingRequire,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * @suppress {checkTypes,const,extraRequire,missingOverride,missingRequire,missingReturn,unusedPrivateMembers,uselessCode}
  */
 goog.module('dts_requiretype.entry$_ts');
 var module = module || { id: '' };
@@ -168,49 +115,8 @@ var a = required.func();
 "
 `;
 
-exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1.ts - es3 1`] = `
-"const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
-\\"use strict\\";
-var _a;
-exports.__esModule = true;
-var tslib_1 = require(\\"tslib\\");
-var o = (_a = {
-        a: {},
-        b: {},
-        \\"c\\": {}
-    },
-    _a[\\"d\\"] = {},
-    _a[Symbol('foo')] = {},
-    _a[Math.random() > .5 ? \\"foo\\" : \\"bar\\"] = {},
-    _a);
-var a = o.a, c = o.c, d = o.d, foo = o.foo, rest = tslib_1.__rest(o, [tscc_goog_reflect_injected.objectProperty(\\"a\\", o), tscc_goog_reflect_injected.objectProperty(\\"c\\", o), tscc_goog_reflect_injected.objectProperty(\\"d\\", o), tscc_goog_reflect_injected.objectProperty(\\"foo\\", o)]);
-function A(a, _a) {
-    var b = _a.b, c = _a.c, d = tslib_1.__rest(_a, [tscc_goog_reflect_injected.objectProperty(\\"b\\", _a), tscc_goog_reflect_injected.objectProperty(\\"c\\", _a)]);
-    console.log(d);
-}
-// From what's new in Typescript 2.1
-(function () {
-    var original = { a: {}, b: {}, c: {} };
-    var copy = tslib_1.__assign({}, original);
-})();
-(function () {
-    var foo = {}, bar = {}, baz = {};
-    var merged = tslib_1.__assign(tslib_1.__assign(tslib_1.__assign({}, foo), bar), baz);
-})();
-(function () {
-    var obj = { x: 1, y: \\"string\\" };
-    var newObj = tslib_1.__assign(tslib_1.__assign({}, obj), { z: 3, y: 4 }); // { x: number, y: number, z: number }
-})();
-(function () {
-    var obj = { x: 1, y: 1, z: 1 };
-    var z = obj.z, obj1 = tslib_1.__rest(obj, [tscc_goog_reflect_injected.objectProperty(\\"z\\", obj)]);
-    obj1; // {x: number, y:number};
-})();
-"
-`;
-
 exports[`restPropertyTransformer modifies property name access to goog.reflect.objectProperty: rest/case_1.ts - es5 1`] = `
-"const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
+"var tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 var _a;
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
@@ -289,39 +195,8 @@ function A(a, _a) {
 "
 `;
 
-exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators.ts - es3 1`] = `
-"const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
-\\"use strict\\";
-exports.__esModule = true;
-var tslib_1 = require(\\"tslib\\");
-function myDecorator(target, prop, desc) {
-    var value = desc.value, rest = tslib_1.__rest(desc, [tscc_goog_reflect_injected.objectProperty(\\"value\\", desc)]);
-    console.log(rest);
-    desc.value = {};
-}
-var A = /** @class */ (function () {
-    function A() {
-    }
-    A.prototype.myMethod = function () { };
-    tslib_1.__decorate([
-        myDecorator
-    ], A.prototype, tscc_goog_reflect_injected.objectProperty(\\"myMethod\\", A.prototype));
-    return A;
-}());
-var b = new A();
-window.a = b.myMethod();
-var _a = { a: {}, b: {}, c: {} }, c = _a.c, rest = tslib_1.__rest(_a, [tscc_goog_reflect_injected.objectProperty(\\"c\\", _a)]);
-window.d = rest;
-\\"__tscc_export_start__\\";
-{
-    self[\\"tscc_global_access_name_1\\"] = (A.prototype).myMethod;
-}
-\\"__tscc_export_end__\\";
-"
-`;
-
 exports[`restPropertyTransformer works well when combined with decorators: rest/combined_with_decorators.ts - es5 1`] = `
-"const tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
+"var tscc_goog_reflect_injected = goog.require(\\"goog.reflect\\");
 \\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var tslib_1 = require(\\"tslib\\");

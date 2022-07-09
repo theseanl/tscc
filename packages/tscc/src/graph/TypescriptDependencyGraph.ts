@@ -43,9 +43,12 @@ import * as ts from 'typescript';
 import {getPackageBoundary} from '../tsickle_patches/patch_tsickle_module_resolver';
 import path = require('path');
 
+
 interface SourceFileWithInternalAPIs extends ts.SourceFile {
-	resolvedModules?: Map<string, ts.ResolvedModuleFull | undefined>;
-	resolvedTypeReferenceDirectiveNames: Map<string, ts.ResolvedTypeReferenceDirective | undefined>
+	// Internal fields which exists, but not declared in .d.ts. See SourceFile interface declaration
+	// at Microsoft/Typescript/src/compiler/types.ts.
+	resolvedModules?: ts.ModeAwareCache<ts.ResolvedModuleFull | undefined>;
+	resolvedTypeReferenceDirectiveNames: ts.ModeAwareCache<ts.ResolvedTypeReferenceDirective | undefined>;
 }
 
 export default class TypescriptDependencyGraph {
@@ -84,9 +87,7 @@ export default class TypescriptDependencyGraph {
 		 * This is the (only, presumably) place where all the external module references are available.
 		 */
 		if (sf.resolvedModules) {
-			for (let entry of sf.resolvedModules) {
-				this.walk(entry?.[1]?.resolvedFileName);
-			}
+			sf.resolvedModules.forEach(this.walkModeAwareResolvedFileCache);
 		}
 		/**
 		 * Files referenced from the current file via /// <reference path="...." /> are available in
@@ -103,16 +104,17 @@ export default class TypescriptDependencyGraph {
 		/**
 		 * Files referenced from the current file via /// <reference type="..." /> are available in
 		 * `resolvedTypeReferenceDirectiveNames` internal API. This is also available in `typeReferencedFile`,
-		 * but it does not contain information about the file path a type reference is resolved.
+		 * but it does not contain information about the file path a type reference is resolved to.
 		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processTypeReferenceDirectives`
 		 * see how this function calls `setResolvedTypeReferenceDirective` to mutate `sf.resolvedTypeRefernceDirectiveNames`.
 		 */
 		if (sf.resolvedTypeReferenceDirectiveNames) {
-			for (let entry of sf.resolvedTypeReferenceDirectiveNames) {
-				this.walk(entry?.[1]?.resolvedFileName);
-			}
+			sf.resolvedTypeReferenceDirectiveNames.forEach(this.walkModeAwareResolvedFileCache);
 		}
 	}
+	private walkModeAwareResolvedFileCache = (elem: {resolvedFileName?: string} | undefined) => {
+		this.walk(elem?.resolvedFileName);
+	};
 	addRootFile(fileName: string | undefined | null) {
 		this.walk(fileName);
 	}

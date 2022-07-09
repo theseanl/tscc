@@ -108,10 +108,9 @@ export function identifierIsEmitHelper(ident: ts.Identifier): boolean {
 }
 
 /**
- * A helper class that provides several helper functions related to TS node factory functions. In
- * body of TS transformers, TS recommends to use ts.Factory object available at transformer context
- * object, and one shall instantiate this class with the context object available to call helper
- * functions.
+ * A helper class that provides methods related to TS node factory functions. In body of TS
+ * transformers, TS recommends to use ts.Factory object available as a property of a transformer
+ * context object.
  */
 export class NodeFactoryHelper {
 	constructor(
@@ -129,7 +128,7 @@ export class NodeFactoryHelper {
 	}
 	// Creates a variable assignment var ${newIdent} = ${initializer}. Set constant = true to have
 	// const instead of var.
-	createVariableAssignment(newIdent: ts.Identifier, initializer: ts.Expression, constant: boolean = false) {
+	createVariableAssignment(newIdent: ts.Identifier, initializer: ts.Expression, useConst: boolean = false) {
 		return this.factory.createVariableStatement(
 			undefined,
 			this.factory.createVariableDeclarationList(
@@ -141,7 +140,7 @@ export class NodeFactoryHelper {
 						initializer
 					)
 				],
-				constant ? ts.NodeFlags.Const : undefined
+				useConst ? ts.NodeFlags.Const : undefined
 			)
 		)
 	}

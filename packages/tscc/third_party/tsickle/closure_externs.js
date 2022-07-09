@@ -52,26 +52,11 @@ var NodeListOf;
  */
 var RegExpExecArray;
 
-/**
- * @record
- * @template T
- * @extends {Array<T>}
- */
-function ReadonlyArray() {}
+/** @typedef {!Map} */
+var ReadonlyMap;
 
-/**
- * @constructor
- * @template K, V
- * @extends {Map<K, V>}
- */
-function ReadonlyMap() {}
-
-/**
- * @constructor
- * @template T
- * @extends {Set<T>}
- */
-function ReadonlySet() {}
+/** @typedef {!Set} */
+var ReadonlySet;
 
 /**
  * @record
@@ -110,5 +95,34 @@ function CryptoKeyPair() {};
 /** @typedef {!{handleEvent: function(Event):void}} */
 var EventListenerObject;
 
+/** @typedef {!ITemplateArray} */
+var TemplateStringsArray;
+
+/** @typedef {!RegExpResult} */
+var RegExpMatchArray;
+
 /** @record */
 function ImportMeta() {};
+
+// Representations for TS' EventMap objects.
+// These are types that contain a mapping from event names to event object
+// types. User code can augment them, which produces externs.js files that then
+// reference the EventMap types - even though they are not defined in Closure.
+// Defining them here works around the problem.
+
+// Modification made for TSCC: classes were replaced with functions for compatibility with ES5
+
+/** @interface */
+function HTMLElementEventMap() {}
+/** @interface */
+function ElementEventMap() {}
+/** @interface */
+function DocumentEventMap() {}
+/** @interface */
+function WindowEventMap() {}
+/** @interface */
+function GlobalEventHandlersEventMap() {}
+/** @interface */
+function DocumentAndElementEventHandlersEventMap() {}
+/** @interface */
+function EventSourceEventMap() {}

@@ -33,11 +33,6 @@ describe(`decoratorPropertyTransformer`, function () {
 		for (let testFile of testFiles) {
 			expect(es5Out.get(testFile)).toMatchSnapshot(testFile + ' - es5');
 		}
-
-		const {out: es3Out} = emitWithDecoratorTransformations({target: ts.ScriptTarget.ES3});
-		for (let testFile of testFiles) {
-			expect(es3Out.get(testFile)).toMatchSnapshot(testFile + ' - es3');
-		}
 	})
 })
 
@@ -61,11 +56,6 @@ describe(`restPropertyTransformer`, function () {
 		const {out: es5Out} = emitWithRestTransformations({target: ts.ScriptTarget.ES5});
 		for (let testFile of testFiles) {
 			expect(es5Out.get(testFile)).toMatchSnapshot(testFile + ' - es5');
-		}
-
-		const {out: es3Out} = emitWithRestTransformations({target: ts.ScriptTarget.ES3});
-		for (let testFile of testFiles) {
-			expect(es3Out.get(testFile)).toMatchSnapshot(testFile + ' - es3');
 		}
 	});
 
@@ -92,11 +82,6 @@ describe(`restPropertyTransformer`, function () {
 		for (let testFile of testFiles) {
 			expect(es5Out.get(testFile)).toMatchSnapshot(testFile + ' - es5');
 		}
-
-		const {out: es3Out} = emitWithRestTransformations({target: ts.ScriptTarget.ES3});
-		for (let testFile of testFiles) {
-			expect(es3Out.get(testFile)).toMatchSnapshot(testFile + ' - es3');
-		}
 	})
 });
 
@@ -105,7 +90,7 @@ describe(`dts_requiretype_transformer`, () => {
 		const testFiles = [
 			"dts_requiretype/entry.ts"
 		];
-		const mockSpec = <ITsccSpecWithTS>{
+		const mockSpec = <ITsccSpecWithTS><unknown>{
 			getTSRoot() {
 				return samplesRoot;
 			},
@@ -159,19 +144,17 @@ function emit(
 		rootDirsRelative: x => x,
 		moduleResolutionHost: ts.createCompilerHost(parsedConfig.options),
 		options,
+		generateExtraSuppressions: true
 	}, tsickleHostOverride);
 
 	const out = new Map<string, string>();
-	const {externs} = tsickle.emitWithTsickle(
-		program, transformerHost, host, options, undefined,
-		(fileName, data) => {
-			fileName = path.relative(samplesRoot, fileName);
-			fileName = fileName.slice(0, -path.extname(fileName).length) + '.ts';
-			fileName = upath.toUnix(fileName); // so that test outputs are independent of platforms
-			out.set(fileName, data);
-		},
-		undefined /* cancellationtoken */, false /* emitOnlyDtsFiles */,
-		transformerFactory(transformerHost)
-	);
+
+	const {externs} = tsickle.emit(program, transformerHost, (fileName, data) => {
+		fileName = path.relative(samplesRoot, fileName);
+		fileName = fileName.slice(0, -path.extname(fileName).length) + '.ts';
+		fileName = upath.toUnix(fileName); // so that test outputs are independent of platforms
+		out.set(fileName, data);
+	}, /* targetSourceFile */ undefined, /* cancellationToken */ undefined, false,
+		transformerFactory(transformerHost));
 	return {out, externs}
 }

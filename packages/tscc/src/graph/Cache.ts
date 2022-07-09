@@ -50,7 +50,7 @@ export class FSCacheAccessor<T> {
 			stat = await fsp.stat(path);
 		} catch (e) {
 			this.cache.remove(path);
-			throw new FSCacheAccessError(`${path}: ${e.code}`);
+			throw new FSCacheAccessError(`${path}: ${(e as NodeJS.ErrnoException).code}`);
 		}
 		if (!stat.isFile()) {
 			this.cache.remove(path);

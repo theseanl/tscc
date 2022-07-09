@@ -87,7 +87,7 @@ export default abstract class TsHelperTransformer {
 		return fh.createVariableAssignment(
 			ident,
 			fh.createGoogCall("require", this.factory.createStringLiteral('goog.reflect')),
-			!this.tsickleHost.es5Mode
+			this.tsickleHost.options.target !== ts.ScriptTarget.ES5
 		);
 	}
 }

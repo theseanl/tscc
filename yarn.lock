@@ -6504,10 +6504,10 @@ ts-jest@^27.1.3:
     semver "7.x"
     yargs-parser "20.x"
 
-tsickle@^0.43.0:
-  version "0.43.0"
-  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.43.0.tgz#d53501ee54932382c4923a77de9ab5a82abd9e98"
-  integrity sha512-n0lgIQBLliB7EFVTDpqrd/GjyB9I3NCodfX4R3NE/H73PQvGjgrkSZc8RVcWBG6s1MDiFjYDHIezYkuh8GYslw==
+tsickle@^0.46.3:
+  version "0.46.3"
+  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.46.3.tgz#b74918a77e3ca1310a2ce4d019f5d6294360b56d"
+  integrity sha512-9PDXxOrtn2AdpvDin6FLGveXVGg8ec3ga8fh8mPR5lz9KtitW6riVgxgagicdfF1rgiBxDeH+5hVowPXhmZbYQ==
   dependencies:
     "@types/minimist" "^1.2.1"
 
@@ -6587,10 +6587,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.3.2:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.2.tgz#399ab18aac45802d6f2498de5054fcbbe716a805"
-  integrity sha512-zZ4hShnmnoVnAHpVHWpTcxdv7dWP60S2FsydQLV8V5PbS3FifjWFFRiHSWpDJahly88PRyV5teTSLoq4eG7mKw==
+typescript@~4.7.2:
+  version "4.7.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
+  integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
 
 uglify-js@^3.1.4:
   version "3.11.0"

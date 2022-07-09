@@ -376,11 +376,13 @@ function getTsickleHost(tsccSpec: ITsccSpecWithTS, tsDependencyGraph: Typescript
 			return true; // Just a stub, maybe add configuration later.
 			// controls whether a warning will cause compilation failure.
 		},
-		// This affects, for example, usage of const in const mod = goog.require('..').
-		es5Mode: options.target === undefined || options.target === ts.ScriptTarget.ES3 || options.target === ts.ScriptTarget.ES5,
 		googmodule: true,
 		transformDecorators: true,
 		transformTypesToClosure: true,
+		// This controlls whether @suppress annotation will be added to fileoverview comments or
+		// not. https://github.com/angular/tsickle/commit/e83542d20cfabb17b2012013917d8c6df35fd227
+		// Prior to this commit, tsickle had added @suppress annotations unconditionally.
+		generateExtraSuppressions: true,
 		typeBlackListPaths: new Set(),
 		untyped: false,
 		logWarning(warning) {
