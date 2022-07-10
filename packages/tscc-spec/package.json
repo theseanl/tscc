@@ -8,7 +8,7 @@
 		"clean": "rm -rf dist"
 	},
 	"dependencies": {
-		"fast-glob": "^3.2.7",
-		"fs-extra": "^9.0.1"
+		"fast-glob": "^3.2.11",
+		"fs-extra": "^10.1.0"
 	}
 }

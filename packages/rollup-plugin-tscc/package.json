@@ -22,9 +22,6 @@
 	"scripts": {
 		"clean": "rm -rf dist"
 	},
-	"devDependencies": {
-		"rollup-plugin-virtual": "^1.0.1"
-	},
 	"publishConfig": {
 		"access": "public"
 	},
