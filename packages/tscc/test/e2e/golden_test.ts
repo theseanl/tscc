@@ -12,7 +12,7 @@ describe(`tscc e2e`, function () {
 		.filter(dirent => dirent.isDirectory())
 		.map(dirent => dirent.name);
 
-	const TIMEOUT = 20 * 1000; // 20 seconds
+	const TIMEOUT = 30 * 1000; // 20 seconds
 
 	test.each(directories)(`%s`, async function (dirName) {
 		const projectRoot = path.join(samplesRoot, dirName);
@@ -31,4 +31,3 @@ describe(`tscc e2e`, function () {
 		}))
 	}, TIMEOUT)
 })
-

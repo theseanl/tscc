@@ -38,15 +38,15 @@
 		"magic-string": "^0.25.4"
 	},
 	"optionalDependencies": {
-		"google-closure-compiler-linux": "^20220301.0.0",
-		"google-closure-compiler-osx": "^20220301.0.0",
-		"google-closure-compiler-windows": "^20220301.0.0"
+		"google-closure-compiler-linux": "^20220601.0.0",
+		"google-closure-compiler-osx": "^20220601.0.0",
+		"google-closure-compiler-windows": "^20220601.0.0"
 	},
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.7.3",
 		"chalk": "^4.1.1",
 		"fs-extra": "^10.0.1",
-		"google-closure-compiler-java": "^20220301.0.0",
+		"google-closure-compiler-java": "^20220601.0.0",
 		"ora": "^5.4.1",
 		"resolve-from": "^5.0.0",
 		"rimraf": "^3.0.2",
