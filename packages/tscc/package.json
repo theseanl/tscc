@@ -32,10 +32,10 @@
 		"@types/fs-extra": "^9.0.13",
 		"@types/node": "^18.0.3",
 		"@types/stream-json": "^1.7.1",
-		"@types/vinyl": "^2.0.5",
+		"@types/vinyl": "^2.0.6",
 		"@types/vinyl-fs": "^2.4.12",
 		"@types/yargs": "^17.0.9",
-		"magic-string": "^0.25.4"
+		"magic-string": "^0.26.2"
 	},
 	"optionalDependencies": {
 		"google-closure-compiler-linux": "^20220601.0.0",
@@ -50,7 +50,7 @@
 		"ora": "^5.4.1",
 		"resolve-from": "^5.0.0",
 		"rimraf": "^3.0.2",
-		"source-map": "^0.7.3",
+		"source-map": "^0.7.4",
 		"stream-json": "^1.7.2",
 		"tsickle": "^0.46.3",
 		"tslib": "^2.3.0",
