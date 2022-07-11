@@ -44,5 +44,40 @@ describe(`TsccSpecWithTS`, () => {
 			expect(parsedConfig.options.downlevelIteration).toBe(false);
 		})
 	})
+	describe(`pruneCompilerOptions`, () => {
+		test(`Overrides "module" to "commonjs"`, () => {
+			{
+				const options: ts.CompilerOptions = {
+					module: ts.ModuleKind.ESNext
+				};
+				TsccSpecWithTS.pruneCompilerOptions(options, noop);
+				expect(options.module).toBe(ts.ModuleKind.CommonJS);
+			}
+			{
+				const options2: ts.CompilerOptions = {
+					module: undefined
+				};
+				TsccSpecWithTS.pruneCompilerOptions(options2, noop);
+				expect(options2.module).toBe(ts.ModuleKind.CommonJS);
+			}
+		});
+		test(`Make sure "target" is greater than ES3`, () => {
+			{
+				const options: ts.CompilerOptions = {
+					target: ts.ScriptTarget.ES3
+				};
+				TsccSpecWithTS.pruneCompilerOptions(options, noop);
+				expect(options.target).not.toBe(ts.ScriptTarget.ES3);
+			}
+			{
+				const options2: ts.CompilerOptions = {
+					target: undefined
+				};
+				TsccSpecWithTS.pruneCompilerOptions(options2, noop);
+				expect(options2.target).toBeDefined();
+			}
+		})
+	})
 });
 
+function noop() {}

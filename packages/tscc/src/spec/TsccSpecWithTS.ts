@@ -90,10 +90,12 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 	 *    which is of no use with tscc.
 	 *  - Warn when target language is ES3 – Tsickle does not assume that the output can be lower than ES5,
 	 */
-	private static pruneCompilerOptions(options: ts.CompilerOptions, onWarning: TWarningCallback) {
-		if (typeof options.module !== 'undefined' && options.module !== ts.ModuleKind.CommonJS) {
-			onWarning(`Module option is set. tsickle converts TypeScript modules to Closure modules`
-				+ `via CommonJS internally, so it will be overridden to "commonjs".`);
+	static pruneCompilerOptions(options: ts.CompilerOptions, onWarning: TWarningCallback) {
+		if (options.module !== ts.ModuleKind.CommonJS) {
+			if (typeof options.module !== 'undefined') {
+				onWarning(`Module option is set. tsickle converts TypeScript modules to Closure modules`
+					+ `via CommonJS internally, so it will be overridden to "commonjs".`);
+			}
 			options.module = ts.ModuleKind.CommonJS;
 		}
 		if (options.outDir) {
