@@ -40,7 +40,7 @@
 	"optionalDependencies": {
 		"google-closure-compiler-linux": "^20220601.0.0",
 		"google-closure-compiler-osx": "^20220601.0.0",
-		"google-closure-compiler-windows": "^20220601.0.0"
+		"google-closure-compiler-windows": "^20220719.0.0"
 	},
 	"dependencies": {
 		"@tscc/tscc-spec": "^0.8.0",
