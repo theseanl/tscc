@@ -90,7 +90,7 @@ class ChunkMerger {
 				if (typeof unresolved === 'string') {
 					let allocatedEntry = this.chunkAllocation.findValue(unresolved);
 					if (allocatedEntry === this.entry) return unresolved;
-					return {id: resolved, external: true}
+					return {id: resolved, external: "absolute"}
 				}
 			}
 			// This code path should not be taken

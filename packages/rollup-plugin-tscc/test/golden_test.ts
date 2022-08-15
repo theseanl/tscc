@@ -19,11 +19,14 @@ describe(`Golden Tests:`, () => {
 		});
 		const {output} = await bundle.generate({
 			dir: '.',
-			format: 'iife'
+			format: 'iife',
+			interop: 'esModule'
 		});
+
+
 		Object.keys(output).sort().forEach(name => {
 			let chunk = output[name];
-			expect(chunk.code).toMatchSnapshot();
+			expect(chunk.code).toMatchSnapshot(chunk.name);
 		})
 	})
 })

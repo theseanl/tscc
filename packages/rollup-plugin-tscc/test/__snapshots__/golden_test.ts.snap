@@ -1,24 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Golden Tests: external-modules/tscc.spec.json 1`] = `
+exports[`Golden Tests: external-modules/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules/golden/generated_entry 1`] = `
 "(function (externalInNodeModules, externalWithFilePaths) {
 	'use strict';
 
 	console.log(externalInNodeModules.someProperty);
 	console.log(externalWithFilePaths.anotherProperty);
 
-}(externalInNodeModules, externalWithFilePaths));
+})(externalInNodeModules, externalWithFilePaths);
 "
 `;
 
-exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json 1`] = `
-"var generated_entry = (function (exports, common$1, a) {
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_dependent 1`] = `
+"(function (_, b) {
+	'use strict';
+
+	_.c();
+	_.e();
+	console.log(b);
+
+})(generated_entry.$0, b);
+"
+`;
+
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_entry 1`] = `
+"var generated_entry = (function (exports, c, a) {
 	'use strict';
 
 	function common(n) {
 		console.log(\\"common\\");
 	}
-	console.log(common$1.a);
+	console.log(c.a);
 
 	function entry() {
 		common();
@@ -39,23 +51,36 @@ exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json 1`] 
 
 	return exports;
 
-}({}, c, a));
+})({}, c, a);
 "
 `;
 
-exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json 2`] = `
-"(function (common, _, externalEntry, b) {
+exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_dependent 1`] = `
+"(function (_) {
 	'use strict';
 
-	_.c();
-	_.e();
-	console.log(b);
+	/**
+	 * @fileoverview Hand-modified shim file for Closure Library \`goog/reflect.js\`. References to the
+	 * global \`goog\` variables have been removed.
+	 */
 
-}(c, generated_entry.$0, a, b));
+	function objectProperty(prop, object) {
+		return prop;
+	}
+
+	var dictionary = {
+		\\"key\\": \\"value\\"
+	};
+
+	if (_.g.name === objectProperty(\\"key\\")) {
+		console.log(dictionary[_.g.name]);
+	}
+
+})(generated_entry.$0);
 "
 `;
 
-exports[`Golden Tests: goog-shim/tscc.spec.json 1`] = `
+exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_entry 1`] = `
 "var generated_entry = (function (exports) {
 	'use strict';
 
@@ -63,7 +88,7 @@ exports[`Golden Tests: goog-shim/tscc.spec.json 1`] = `
 	 * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
 	 * global \`goog\` variables have been removed.
 	 */
-	const global =  self; // Use rollup \\"context\\" option to prevent \`this\` rewrite
+	const global = self; // Use rollup \\"context\\" option to prevent \`this\` rewrite
 
 	let DEBUG = true;
 
@@ -86,36 +111,21 @@ exports[`Golden Tests: goog-shim/tscc.spec.json 1`] = `
 
 	return exports;
 
-}({}));
+})({});
 "
 `;
 
-exports[`Golden Tests: goog-shim/tscc.spec.json 2`] = `
+exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_dependent 1`] = `
 "(function (_) {
 	'use strict';
 
-	/**
-	 * @fileoverview Hand-modified shim file for Closure Library \`goog/reflect.js\`. References to the
-	 * global \`goog\` variables have been removed.
-	 */
+	console.log(_.s([1, _.b]));
 
-	function objectProperty(prop, object) {
-		return prop;
-	}
-
-	var dictionary = {
-		\\"key\\": \\"value\\"
-	};
-
-	if ( _.g.name === objectProperty(\\"key\\")) {
-		console.log(dictionary[_.g.name]);
-	}
-
-}(generated_entry.$0));
+})(generated_entry.$0);
 "
 `;
 
-exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
+exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_entry 1`] = `
 "var generated_entry = (function (exports) {
 	'use strict';
 
@@ -143,16 +153,6 @@ exports[`Golden Tests: many-module-build/tscc.spec.json 1`] = `
 
 	return exports;
 
-}({}));
-"
-`;
-
-exports[`Golden Tests: many-module-build/tscc.spec.json 2`] = `
-"(function (_) {
-	'use strict';
-
-	console.log(_.s([1, _.b]));
-
-}(generated_entry.$0));
+})({});
 "
 `;

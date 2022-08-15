@@ -31,38 +31,44 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 			// Intermediate build format is 'es'.
 			outputOptions.format = 'es';
 		}
-		/**
-		 * "paths" option is mainly intended to replace external module paths to 3rd-party CDN urls
-		 * in the bundle output.
-		 *
-		 * Why are we doing this? Currently rollup's handling of external modules provided via
-		 * absolute path is somewhat buggy. I haven't tracked down the exact cause, but sometimes
-		 * external modules' paths are relative to CWD, sometimes relative to the common demoninator
-		 * of files (check inputBase of rollup source). It seems that this is consistent internally,
-		 * but not when user-provided absolute paths are involved. In particular the
-		 * "external-modules-in-many-module-build" test case fails.
-		 *
-		 * One place where one replaces an absolute path to a relative path is
-		 * `ExternalModule.setRenderPath` which sets `renderPath` which is later resolved relatively
-		 * from certain path to compute final path in import statements. If outputOption.path
-		 * function is provided, the value produced by this function is used as `renderPath`
-		 * instead, so we are hooking into it so that `renderPath` is set to an absolute path.
-		 */
-		const orig = outputOptions.paths;
-		outputOptions.paths = (id) => {
-			if (id in globals) return id;
-			if (typeof orig === 'function') return orig(id);
-			/**
-			 * Rollup's type declaration assumes that `paths` function always returns string, but
-			 * determining from rollup source code, it should return falsy values to trigger its
-			 * default `setRenderPath` behavior, hence we are returning '' here.
-			 */
-			return '';
-		}
 		return outputOptions;
 	};
-	const resolveId: rollup.ResolveIdHook = (source) => {
-		let depsPath = spec.resolveRollupExternalDeps(source);
+	const resolveId: rollup.ResolveIdHook = (id, importer) => {
+
+		/**
+		 * Getting absolute paths for external modules working has been pretty tricky. I haven't
+		 * tracked down the exact cause, but sometimes external modules' paths are relative to CWD,
+		 * sometimes relative to the common demoninator of files (check inputBase of rollup source).
+		 * It seems that this is consistent internally, but not when user-provided absolute paths
+		 * are involved. In particular the "external-modules-in-many-module-build" test case fails.
+		 *
+		 * Prior to rollup 2.44.0, we have used "paths" output option to force rollup to keep use
+		 * absolute paths for external modules internally. "paths" option is mainly intended to
+		 * replace external module paths to 3rd-party CDN urls in the bundle output, so our use is
+		 * more like an 'exploit'. One place where one replaces an absolute path to a relative path
+		 * is `ExternalModule.setRenderPath` which sets `renderPath` which is later resolved
+		 * relatively from certain path to compute final path in import statements. If
+		 * outputOption.path function is provided, the value produced by this function is used as
+		 * `renderPath` instead, so we are hooking into it so that `renderPath` is set to an
+		 * absolute path.
+		 *
+		 * Since 2.44.0, it has supported returning {external: 'absolute'} value from `resolveId`
+		 * hook, which seems to be achieving what we have done using `output.paths` option. In
+		 * particular it disables rollup's 'helpful' renormalization of paths, see
+		 * https://github.com/rollup/rollup/blob/a8647dac0fe46c86183be8596ef7de25bc5b4e4b/src/ExternalModule.ts#L94,
+		 * https://github.com/rollup/rollup/blob/983c0cac83727a13af834fe79dfeef89da4fb84b/src/Chunk.ts#L699.
+		 * The related PR is https://github.com/rollup/rollup/pull/4021.
+		 *
+		 * These paths are then used in intermediate chunks, and will not be emitted in final bundle
+		 * due to the helpful renormalization which we do not disable in the secondary bundling.
+		 */
+		if (importer) {
+			const resolved = path.resolve(path.dirname(importer), id);
+			if (resolved in globals) {
+				return {id: resolved, external: "absolute"};
+			}
+		}
+		let depsPath = spec.resolveRollupExternalDeps(id);
 		if (depsPath) {
 			return path.resolve(process.cwd(), depsPath);
 			// Using 'posix' does not work well with rollup internals
@@ -71,7 +77,7 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 	// Returning null defers to other load functions, see https://rollupjs.org/guide/en/#load
 	const load: rollup.LoadHook = (id: string) => null;
 
-	const generateBundle = handleError<NonNullable<rollup.Plugin["generateBundle"]>>(async function (
+	const generateBundle = handleError<NonNullable<rollup.OutputPluginHooks["generateBundle"]>>(async function (
 		this: rollup.PluginContext, options, bundle, isWrite
 	) {
 		// Quick path for single-module builds
