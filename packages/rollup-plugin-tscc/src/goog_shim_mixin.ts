@@ -3,7 +3,7 @@
  * These are goog.goog and goog.reflect, which are always included if one is bundling with
  * @tscc/tscc.
  */
-import {Plugin} from 'rollup';
+import {Plugin, FunctionPluginHooks} from 'rollup';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,7 +17,7 @@ const moduleNameToShim = new Map([
 // Rollup convention, see https://rollupjs.org/guide/en/#conventions
 const PREFIX = "\0tscc\0";
 
-export function googShimMixin(plugin: Plugin): Plugin {
+export function googShimMixin<T extends {resolveId: FunctionPluginHooks["resolveId"], load: FunctionPluginHooks["load"]}>(plugin: T): T {
 	const {resolveId, load} = plugin;
 	plugin.resolveId = function (id, importer) {
 		if (moduleNameToShim.has(id)) return PREFIX + id;

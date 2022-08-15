@@ -77,7 +77,7 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 	// Returning null defers to other load functions, see https://rollupjs.org/guide/en/#load
 	const load: rollup.LoadHook = (id: string) => null;
 
-	const generateBundle = handleError<NonNullable<rollup.OutputPluginHooks["generateBundle"]>>(async function (
+	const generateBundle = handleError<NonNullable<rollup.FunctionPluginHooks["generateBundle"]>>(async function (
 		this: rollup.PluginContext, options, bundle, isWrite
 	) {
 		// Quick path for single-module builds
