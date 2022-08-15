@@ -25,21 +25,6 @@ export interface INamedModuleSpecs extends IModule {
 	moduleName: string
 }
 
-export declare interface IStyles {
-	/**
-	 * A list of file paths, which will be compiled to a single css file.
-	 */
-	src: ReadonlyArray<string>
-	/**
-	 * A prefix that will be prepended to renamed class names.
-	 */
-	prefix?: string
-	/**
-	 * A list of module names in which the renaming map will be injected.
-	 */
-	modules?: ReadonlyArray<string>
-}
-
 declare interface ITsccSpecJSON {
 	modules: {
 		/**
@@ -77,7 +62,7 @@ declare interface ITsccSpecJSON {
 	 * "js", "chunk", "entry_point": computed from <modules>
 	 * "chunk_output_path_prefix": computed from <prefix>
 	 * "language_in": computed from "compilerOption.target" of tsconfig
-	 * "language_out:; defaults to "ECMASCRIPT5".
+	 * "language_out:; defaults to "ECMASCRIPT_NEXT".
 	 * "compilation_level": defaults to "ADVANCED".
 	 * Input files, output files, input language, and so on are inferred from other settings,
 	 * and if provided here, it will override the inferred values.
@@ -87,12 +72,6 @@ declare interface ITsccSpecJSON {
 	 * Array of paths of soy files.
 	 */
 	templates?: ReadonlyArray<string>
-	styles?: {
-		/**
-		 * A file path of the output css. It supports path delimiters.
-		 */
-		[styleName: string]: Readonly<IStyles>
-	}
 	debug?: IDebugOptions
 }
 
