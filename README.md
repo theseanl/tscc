@@ -222,7 +222,7 @@ CLI equivalent is `--prefix dist/` (or `--prefix.rollup dev/ --prefix.cc dist/`)
 ```jsonc
     "chunkFormat": "global" /* default */ | "module"
 ```
-It is a value of `"global"` or `"module"` designating the output chunks' format. In case of `"global"`, which is the default behavior if this key isn't specified, output chunks will be a plain Javascript that is suitable for `<script src="">` HTML tag, and cross-chunk references will be done by exposing it to the global scope. In case of `"module"`, output chunks will be [Javascript modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), that is suitable for `<script type="module" src="">` tags, and cross-chunk references will be done by `import` and `export` statements. Currently, when `"module"` option is used, `external` option cannot be used – use `"global"` instead.
+It is a value of `"global"` or `"module"` designating the output chunks' format. In case of `"global"`, which is the default behavior if this key isn't specified, output chunks will be plain Javascript that is suitable for `<script src="">` HTML tag, and cross-chunk references will be done by exposing them to the global scope. In case of `"module"`, output chunks will be [Javascript modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) which has to be included via `<script type="module" src="">` tags, and cross-chunk references will be done by `import` and `export` statements. Currently, when `"module"` option is used, `external` option cannot be used.
 
 ### `compilerFlags`
 
