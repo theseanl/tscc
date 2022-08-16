@@ -1,29 +1,10 @@
 import * as rollup from 'rollup';
+import {googShimMixin} from './goog_shim_mixin';
 import MultiMap from './MultiMap';
 import path = require('path');
 import upath = require('upath');
-import {googShimMixin} from './goog_shim_mixin';
 
 type CodeSplittableModuleFormat = Exclude<rollup.ModuleFormat, 'iife' | 'umd'>;
-
-export async function mergeIIFE(
-	entry: string,
-	chunkAllocation: MultiMap<string, string>,
-	bundle: Readonly<rollup.OutputBundle>,
-	globals?: {[id: string]: string},
-	format: rollup.ModuleFormat = 'iife'
-) {
-	return await new ChunkMerger(chunkAllocation, bundle, globals).performSingleEntryBuild(entry, format);
-}
-
-export async function mergeAllES(
-	chunkAllocation: MultiMap<string, string>,
-	bundle: Readonly<rollup.OutputBundle>,
-	globals?: {[id: string]: string},
-	format: CodeSplittableModuleFormat = 'es'
-) {
-	return await new ChunkMerger(chunkAllocation, bundle, globals).performCodeSplittingBuild(format);
-}
 
 // Merge chunks to their allocated entry chunk.
 // For each entry module, create a facade module that re-exports everything from chunks
@@ -43,7 +24,7 @@ export class ChunkMerger {
 		this.populateEntryModuleNamespaces();
 		this.populateUnresolveChunk();
 	}
-	private resolveGlobalForMainBuild(id: string) {
+	private resolveGlobalForPrimaryBuild(id: string) {
 		if (typeof this.globals !== 'object') return;
 		if (!this.globals.hasOwnProperty(id)) return;
 		return this.globals[id];
@@ -92,67 +73,47 @@ export class ChunkMerger {
 		const facadeModuleCode = [...importStmts, ...exportStmts].join('\n');
 		return facadeModuleCode;
 	}
-	private createLoaderPlugin(entry: string): rollup.Plugin {
-		const {bundle} = this;
+	private createFacadeModuleLoaderPlugin(entry: string): rollup.Plugin {
 		const resolveId: rollup.ResolveIdHook = (id, importer) => {
 			if (id === ChunkMerger.FACADE_MODULE_ID) return id;
-			if (this.resolveGlobalForMainBuild(id)) {return {id, external: true}}
-			if (this.chunkAllocation.find(entry, id)) return id;
+		};
+		const load: rollup.LoadHook = (id) => {
+			if (id === ChunkMerger.FACADE_MODULE_ID) return this.createFacadeModuleCode(entry);
+		}
+		const name = "tscc-facade-loader";
+		return {name, resolveId, load};
+	}
+	private createLoaderPlugin(shouldLoadID: (id: string) => boolean): rollup.Plugin {
+		const resolveId: rollup.ResolveIdHook = (id, importer) => {
+			if (this.resolveGlobalForPrimaryBuild(id)) {return {id, external: true}}
+			if (shouldLoadID(id)) return id;
 			if (importer) {
 				const resolved = path.resolve(path.dirname(importer), id);
 				let unresolved = this.unresolveChunk.get(resolved);
 				if (typeof unresolved === 'string') {
-					let allocatedEntry = this.chunkAllocation.findValue(unresolved);
-					if (allocatedEntry === entry) return unresolved;
-					return {id: resolved, external: "absolute"}
+					if (shouldLoadID(unresolved)) return unresolved;
+					return {id: resolved, external: "absolute"};
 				}
 			}
-			// This code path should not be taken
+			// This code path should not be taken.
 			ChunkMerger.throwUnexpectedModuleError(id, importer);
 		};
 		const load: rollup.LoadHook = (id) => {
-			if (id === ChunkMerger.FACADE_MODULE_ID) return this.createFacadeModuleCode(entry);
-			if (this.chunkAllocation.find(entry, id)) {
-				let outputChunk = <rollup.OutputChunk>bundle[id];
+			if (shouldLoadID(id)) {
+				let outputChunk = this.bundle[id] as rollup.OutputChunk;
 				return {
 					code: outputChunk.code,
 					map: toInputSourceMap(outputChunk.map)
-				}
+				};
 			}
-			// This code path should not be taken
+			// This code path should not be taken.
 			ChunkMerger.throwUnexpectedModuleError(id);
 		};
 		const name = "tscc-merger";
 		return googShimMixin({name, resolveId, load});
 	}
-	private createLoaderPlugin2(): rollup.Plugin {
-		const resolveId: rollup.ResolveIdHook = (id, importer) => {
-			if (this.resolveGlobalForMainBuild(id)) {return {id, external: true}}
-			if (this.bundle[id]) return id;
-			if (importer) {
-				const resolved = path.resolve(path.dirname(importer), id);
-				let unresolved = this.unresolveChunk.get(resolved);
-				if (typeof unresolved === 'string') {
-					if (this.bundle[unresolved]) return unresolved;
-					return {id: resolved, external: "absolute"};
-				}
-			}
-			// This code path should not be taken
-			ChunkMerger.throwUnexpectedModuleError(id, importer);
-		};
-		const load: rollup.LoadHook = (id) => {
-			let outputChunk = this.bundle[id] as rollup.OutputChunk | undefined;
-			if (!outputChunk) ChunkMerger.throwUnexpectedModuleError(id);
-			return {
-				code: outputChunk.code,
-				map: toInputSourceMap(outputChunk.map)
-			};
-		};
-		const name = "tscc-merger";
-		return googShimMixin({name, resolveId, load});
-	}
-	private resolveGlobal(id: string): string {
-		if (this.resolveGlobalForMainBuild(id)) return this.globals![id]!;
+	private resolveGlobalForSecondaryBuild(id: string): string {
+		if (this.resolveGlobalForPrimaryBuild(id)) return this.globals![id]!;
 		if (path.isAbsolute(id)) {
 			id = this.unresolveChunk.get(id) || ChunkMerger.throwUnexpectedModuleError(id);
 		}
@@ -176,14 +137,17 @@ export class ChunkMerger {
 		this.populateChunkNamespaces();
 		const myBundle = await rollup.rollup({
 			input: ChunkMerger.FACADE_MODULE_ID,
-			plugins: [this.createLoaderPlugin(entry)]
+			plugins: [
+				this.createFacadeModuleLoaderPlugin(entry),
+				this.createLoaderPlugin(id => this.chunkAllocation.find(entry, id))
+			]
 		});
 		const {output} = await myBundle.generate({
 			...ChunkMerger.baseOutputOption,
 			name: this.entryModuleNamespaces.get(entry),
 			file: ChunkMerger.FACADE_MODULE_ID,
 			format,
-			globals: (id) => this.resolveGlobal(id),
+			globals: (id) => this.resolveGlobalForSecondaryBuild(id),
 		});
 		if (output.length > 1) {
 			ChunkMerger.throwUnexpectedChunkInSecondaryBundleError(output);
@@ -213,7 +177,9 @@ export class ChunkMerger {
 	async performCodeSplittingBuild(format: CodeSplittableModuleFormat) {
 		const myBundle = await rollup.rollup({
 			input: [...this.chunkAllocation.keys()],
-			plugins: [this.createLoaderPlugin2()],
+			plugins: [
+				this.createLoaderPlugin(id => !!this.bundle[id])
+			],
 			// If this is not set, rollup may create "facade modules" for each of entry modules,
 			// which somehow "leaks" from `manualChunks`. On the other hand, setting this may make
 			// rollup to drop `export` statements in entry files from final chunks. However, Closure

@@ -124,31 +124,6 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 		}
 
 		return;
-
-		if (spec.getRollupOutputModuleFormat() === 'iife') {
-			await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
-				// 0. Merge bundles that ought to be merged with this entry point
-				const mergedBundle = await chunkMerger.performSingleEntryBuild(entry, 'iife');
-				// 1. Delete keys for chunks that are included in this merged chunks
-				for (let chunk of chunkAllocation.get(entry)) {
-					delete bundle[chunk];
-				}
-				// 2. Add the merged bundle object
-				bundle[entry] = mergedBundle;
-			}));
-		} else {
-			const mergedChunks = await chunkMerger.performCodeSplittingBuild('es');
-			// 0. Delete keys for chunks that are included in this merged chunks
-			for (let entry of chunkAllocation.keys()) {
-				for (let chunk of chunkAllocation.iterateValues(entry)!) {
-					delete bundle[chunk];
-				}
-			}
-			// 1. Add the merged chunks to the bundle object
-			for (let chunk of mergedChunks) {
-				bundle[chunk.fileName] = chunk;
-			}
-		}
 	});
 
 	return googShimMixin({name, generateBundle, options, outputOptions, resolveId, load});

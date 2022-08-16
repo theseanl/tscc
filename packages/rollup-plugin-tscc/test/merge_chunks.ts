@@ -1,8 +1,25 @@
 ///<reference types="jest"/>
-import {mergeAllES, mergeIIFE} from "../src/merge_chunks";
+import {ChunkMerger} from "../src/merge_chunks";
 import MultiMap from "../src/MultiMap";
 import * as rollup from "rollup";
 import path = require("path");
+
+async function mergeIIFE(
+	entry: string,
+	chunkAllocation: MultiMap<string, string>,
+	bundle: Readonly<rollup.OutputBundle>,
+	globals?: {[id: string]: string}
+) {
+	return await new ChunkMerger(chunkAllocation, bundle, globals).performSingleEntryBuild(entry, 'iife');
+}
+
+async function mergeES(
+	chunkAllocation: MultiMap<string, string>,
+	bundle: Readonly<rollup.OutputBundle>,
+	globals?: {[id: string]: string}
+) {
+	return await new ChunkMerger(chunkAllocation, bundle, globals).performCodeSplittingBuild('es');
+}
 
 describe(`mergeChunk`, function () {
 	test(`merges chunks for a single entry`, async function () {
@@ -444,11 +461,10 @@ describe(`mergeChunk`, function () {
 				exports: ["a", "b"],
 			}),
 		};
-		const [mergedESModuleChunk, mergedESModuleChunk2] = await mergeAllES(
+		const [mergedESModuleChunk, mergedESModuleChunk2] = await mergeES(
 			chunkAllocation,
 			bundle,
-			{},
-			"es"
+			{}
 		);
 		expect(mergedESModuleChunk.code).toMatchInlineSnapshot(`
 		"const a = 3; function sum(a, b) { return a + b; }
@@ -501,11 +517,10 @@ describe(`mergeChunk`, function () {
 		const globals = {
 			[externalNonAbsolute]: "ExternalNonAbsolute",
 		};
-		const [mergedESModuleChunk, mergedESModuleChunk2] = await mergeAllES(
+		const [mergedESModuleChunk, mergedESModuleChunk2] = await mergeES(
 			chunkAllocation,
 			bundle,
-			globals,
-			"es"
+			globals
 		);
 		expect(mergedESModuleChunk.code).toMatchInlineSnapshot(`
 		"import { sum } from 'external';
