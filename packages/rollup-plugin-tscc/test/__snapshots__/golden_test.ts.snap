@@ -11,6 +11,17 @@ exports[`Golden Tests: external-modules/tscc.spec.json: packages/rollup-plugin-t
 "
 `;
 
+exports[`Golden Tests: external-modules/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\external-modules\\golden\\generated_entry 1`] = `
+"(function (externalInNodeModules, externalWithFilePaths) {
+	'use strict';
+
+	console.log(externalInNodeModules.someProperty);
+	console.log(externalWithFilePaths.anotherProperty);
+
+})(externalInNodeModules, externalWithFilePaths);
+"
+`;
+
 exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_dependent 1`] = `
 "(function (_, b) {
 	'use strict';
@@ -24,6 +35,50 @@ exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: pac
 `;
 
 exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_entry 1`] = `
+"var generated_entry = (function (exports, c, a) {
+	'use strict';
+
+	function common(n) {
+		console.log(\\"common\\");
+	}
+	console.log(c.a);
+
+	function entry() {
+		common();
+		console.log(\\"entry\\");
+	}
+
+	entry();
+	console.log(a);
+
+	var _ = {
+		__proto__: null,
+		c: common,
+		e: entry
+	};
+
+	exports.$0 = _;
+	exports.entry = entry;
+
+	return exports;
+
+})({}, c, a);
+"
+`;
+
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\external-modules-in-many-module-build\\golden\\generated_dependent 1`] = `
+"(function (_, b) {
+	'use strict';
+
+	_.c();
+	_.e();
+	console.log(b);
+
+})(generated_entry.$0, b);
+"
+`;
+
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\external-modules-in-many-module-build\\golden\\generated_entry 1`] = `
 "var generated_entry = (function (exports, c, a) {
 	'use strict';
 
@@ -115,6 +170,103 @@ exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/tes
 "
 `;
 
+exports[`Golden Tests: goog-shim/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\goog-shim\\golden\\generated_dependent 1`] = `
+"(function (_) {
+	'use strict';
+
+	/**
+	 * @fileoverview Hand-modified shim file for Closure Library \`goog/reflect.js\`. References to the
+	 * global \`goog\` variables have been removed.
+	 */
+
+	function objectProperty(prop, object) {
+		return prop;
+	}
+
+	var dictionary = {
+		\\"key\\": \\"value\\"
+	};
+
+	if (_.g.name === objectProperty(\\"key\\")) {
+		console.log(dictionary[_.g.name]);
+	}
+
+})(generated_entry.$0);
+"
+`;
+
+exports[`Golden Tests: goog-shim/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\goog-shim\\golden\\generated_entry 1`] = `
+"var generated_entry = (function (exports) {
+	'use strict';
+
+	/**
+	 * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
+	 * global \`goog\` variables have been removed.
+	 */
+	const global = self; // Use rollup \\"context\\" option to prevent \`this\` rewrite
+
+	let DEBUG = true;
+
+	function isDebugging() {
+		return DEBUG;
+	}
+
+	{
+		console.log(\\"Debugging\\");
+	}
+
+	var _ = {
+		__proto__: null,
+		g: global,
+		i: isDebugging
+	};
+
+	exports.$0 = _;
+	exports.isDebugging = isDebugging;
+
+	return exports;
+
+})({});
+"
+`;
+
+exports[`Golden Tests: goog-shim/tscc.spec.module.json module: generated_dependent 1`] = `
+"import { g as global } from './generated_entry.js';
+
+/**
+ * @fileoverview Hand-modified shim file for Closure Library \`goog/reflect.js\`. References to the
+ * global \`goog\` variables have been removed.
+ */
+
+function objectProperty(prop, object) {
+	return prop;
+}
+
+var dictionary = {
+	\\"key\\": \\"value\\"
+};
+
+if (global.name === objectProperty(\\"key\\")) {
+	console.log(dictionary[global.name]);
+}
+"
+`;
+
+exports[`Golden Tests: goog-shim/tscc.spec.module.json module: generated_entry 1`] = `
+"/**
+ * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
+ * global \`goog\` variables have been removed.
+ */
+const global = self; // Use rollup \\"context\\" option to prevent \`this\` rewrite
+
+{
+	console.log(\\"Debugging\\");
+}
+
+export { global as g };
+"
+`;
+
 exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_dependent 1`] = `
 "(function (_) {
 	'use strict';
@@ -154,5 +306,72 @@ exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-
 	return exports;
 
 })({});
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\many-module-build\\golden\\generated_dependent 1`] = `
+"(function (_) {
+	'use strict';
+
+	console.log(_.s([1, _.b]));
+
+})(generated_entry.$0);
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.json: packages\\rollup-plugin-tscc\\test\\sample\\many-module-build\\golden\\generated_entry 1`] = `
+"var generated_entry = (function (exports) {
+	'use strict';
+
+	function swap([a, b]) {
+		return [b, a];
+	}
+
+	function sort([a, b]) {
+		return a > b ? [a, b] : swap([a, b]);
+	}
+
+	const a = [1, 2];
+	const b = swap(a);
+
+	console.log(b);
+
+	var _ = {
+		__proto__: null,
+		b: b,
+		s: sort
+	};
+
+	exports.$0 = _;
+	exports.b = b;
+
+	return exports;
+
+})({});
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.module.json module: generated_dependent 1`] = `
+"import { s as sort, b } from './generated_entry.js';
+
+console.log(sort([1, b]));
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.module.json module: generated_entry 1`] = `
+"function swap([a, b]) {
+	return [b, a];
+}
+
+function sort([a, b]) {
+	return a > b ? [a, b] : swap([a, b]);
+}
+
+const a = [1, 2];
+const b = swap(a);
+
+console.log(b);
+
+export { b, sort as s };
 "
 `;

@@ -203,6 +203,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2022]: "ECMASCRIPT_NEXT",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
+	private static readonly chunkFormatToCcType = {
+		['global']: "GLOBAL_NAMEESPACE",
+		['module']: "ES_MODULES"
+	}
 	getOutputFileNames(): string[] {
 		return this.getOrderedModuleSpecs()
 			.map(moduleSpec => {
@@ -237,6 +241,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				this.relativeFromCwd(this.getOutputPrefix('cc')) +
 				this.getOrderedModuleSpecs()[0].moduleName + '.js';
 		}
+		defaultFlags["chunk_output_type"] =
+			this.tsccSpec.chunkFormat && TsccSpecWithTS.chunkFormatToCcType[this.tsccSpec.chunkFormat] ||
+			"GLOBAL_NAMESPACE";
 		defaultFlags["generate_exports"] = true;
 		defaultFlags["export_local_property_definitions"] = true;
 

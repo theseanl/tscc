@@ -1,11 +1,11 @@
-import * as rollup from 'rollup';
 import {IInputTsccSpecJSON} from '@tscc/tscc-spec';
-import TsccSpecRollupFacade from './spec/TsccSpecRollupFacade';
-import ITsccSpecRollupFacade from './spec/ITsccSpecRollupFacade';
-import computeChunkAllocation, {ChunkSortError} from './sort_chunks';
-import mergeChunks, {ChunkMergeError} from './merge_chunks';
-import path = require('path');
+import * as rollup from 'rollup';
 import {googShimMixin} from './goog_shim_mixin';
+import {ChunkMergeError, ChunkMerger} from './merge_chunks';
+import computeChunkAllocation, {ChunkSortError} from './sort_chunks';
+import ITsccSpecRollupFacade from './spec/ITsccSpecRollupFacade';
+import TsccSpecRollupFacade from './spec/TsccSpecRollupFacade';
+import path = require('path');
 
 const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOptions) => {
 	const spec: ITsccSpecRollupFacade = TsccSpecRollupFacade.loadSpec(pluginOptions);
@@ -30,11 +30,12 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 			// For many-module build, currently only iife builds are available.
 			// Intermediate build format is 'es'.
 			outputOptions.format = 'es';
+		} else {
+			outputOptions.format = spec.getRollupOutputModuleFormat();
 		}
 		return outputOptions;
 	};
 	const resolveId: rollup.ResolveIdHook = (id, importer) => {
-
 		/**
 		 * Getting absolute paths for external modules working has been pretty tricky. I haven't
 		 * tracked down the exact cause, but sometimes external modules' paths are relative to CWD,
@@ -102,20 +103,52 @@ const pluginImpl: (options: IInputTsccSpecJSON) => rollup.Plugin = (pluginOption
 
 		// Compute chunk allocation
 		const chunkAllocation = computeChunkAllocation(chunkDeps, entryDeps);
-
+		const chunkMerger = new ChunkMerger(chunkAllocation, bundle, globals);
 		/**
 		 * Hack `bundle` object, as described in {@link https://github.com/rollup/rollup/issues/2938}
 		 */
-		await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
-			// 0. Merge bundles that ought to be merged with this entry point
-			const mergedBundle = await mergeChunks(entry, chunkAllocation, bundle, globals);
-			// 1. Delete keys for chunks that are included in this merged chunks
-			for (let chunk of chunkAllocation.get(entry)) {
+		// 0. Merge intermediate chunks to appropriate entry chunk
+		const mergedChunks = spec.getRollupOutputModuleFormat() === 'iife' ?
+			await Promise.all([...entryDeps.keys()]
+				.map((entry: string) => chunkMerger.performSingleEntryBuild(entry, 'iife'))) :
+			await chunkMerger.performCodeSplittingBuild('es');
+		// 1. Delete keys for intermediate chunks
+		for (let entry of chunkAllocation.keys()) {
+			for (let chunk of chunkAllocation.iterateValues(entry)!) {
 				delete bundle[chunk];
 			}
-			// 2. Add the merged bundle object
-			bundle[entry] = mergedBundle;
-		}));
+		}
+		// 2. Add the merged chunks to the bundle object
+		for (let chunk of mergedChunks) {
+			bundle[chunk.fileName] = chunk;
+		}
+
+		return;
+
+		if (spec.getRollupOutputModuleFormat() === 'iife') {
+			await Promise.all([...entryDeps.keys()].map(async (entry: string) => {
+				// 0. Merge bundles that ought to be merged with this entry point
+				const mergedBundle = await chunkMerger.performSingleEntryBuild(entry, 'iife');
+				// 1. Delete keys for chunks that are included in this merged chunks
+				for (let chunk of chunkAllocation.get(entry)) {
+					delete bundle[chunk];
+				}
+				// 2. Add the merged bundle object
+				bundle[entry] = mergedBundle;
+			}));
+		} else {
+			const mergedChunks = await chunkMerger.performCodeSplittingBuild('es');
+			// 0. Delete keys for chunks that are included in this merged chunks
+			for (let entry of chunkAllocation.keys()) {
+				for (let chunk of chunkAllocation.iterateValues(entry)!) {
+					delete bundle[chunk];
+				}
+			}
+			// 1. Add the merged chunks to the bundle object
+			for (let chunk of mergedChunks) {
+				bundle[chunk.fileName] = chunk;
+			}
+		}
 	});
 
 	return googShimMixin({name, generateBundle, options, outputOptions, resolveId, load});

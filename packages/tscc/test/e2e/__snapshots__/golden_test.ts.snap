@@ -126,6 +126,29 @@ exports[`tscc e2e case_9_ts_in_node_modules: case_9_ts_in_node_modules/index.js 
 "
 `;
 
+exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_1 1`] = `
+Array [
+  "a.js",
+  "b.js",
+  "c.js",
+]
+`;
+
+exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_1/a.js 1`] = `
+"var b=new (function(){function a(){}a.prototype.g=function(){console.log(\\"methodUsedByA\\")};a.prototype.h=function(){console.log(\\"methodUsedByB\\")};return a}());b.g();console.log(\\"ac\\");
+"
+`;
+
+exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_1/b.js 1`] = `
+"b.h();console.log(\\"bba\\");console.log(\\"bc\\");
+"
+`;
+
+exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_1/c.js 1`] = `
+"console.log(\\"ac\\");console.log(\\"bc\\");console.log(\\"cc\\");
+"
+`;
+
 exports[`tscc e2e case_10_unsafe_module_name_and_script_dts: case_10_unsafe_module_name_and_script_dts 1`] = `
 Array [
   "index.js",

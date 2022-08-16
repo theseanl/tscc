@@ -1,6 +1,7 @@
 import {TsccSpec, TsccSpecError} from '@tscc/tscc-spec';
 import ITsccSpecRollupFacade from './ITsccSpecRollupFacade'
 import MultiMap from '../MultiMap';
+import {ModuleFormat} from 'rollup';
 
 export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecRollupFacade {
 	resolveRollupExternalDeps(moduleId: string) {
@@ -55,6 +56,15 @@ export default class TsccSpecRollupFacade extends TsccSpec implements ITsccSpecR
 			globals[moduleName] = globalName;
 		}
 		return globals;
+	}
+	getRollupOutputModuleFormat(): ModuleFormat {
+		switch (this.tsccSpec.chunkFormat) {
+			case 'module':
+				return 'es';
+			case 'global':
+			default:
+				return 'iife';
+		}
 	}
 }
 

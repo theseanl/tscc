@@ -47,6 +47,9 @@ export default class MultiMap<K, V> {
 	keys() {
 		return this.map.keys();
 	}
+	get size() {
+		return this.map.size;
+	}
 	static fromObject<V>(object: {[key: string]: V[]}): MultiMap<string, V> {
 		const map = new MultiMap<string, V>();
 		for (let [key, values] of Object.entries(object)) {
