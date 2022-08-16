@@ -6,6 +6,7 @@ import fs = require('fs');
 import process = require('process');
 import {readJsonSync} from 'fs-extra';
 import fg = require('fast-glob');
+import upath = require('upath');
 
 // "modules" key is no longer required
 interface IInputTsccSpecJSONWithSpecFile extends Partial<ITsccSpecJSON> {
@@ -248,8 +249,12 @@ export default class TsccSpec implements ITsccSpec {
 		if (typeof jsFiles === 'string') {
 			jsFiles = [jsFiles];
 		}
-		// resolve globs according to TSCC's convention
-		jsFiles = jsFiles.map(this.absolute, this);
+		/**
+		 * Resolve globs following TSCC's convention of using the spec file's path as a base path.
+		 * fast-glob expects Unix-style paths. See:
+		 * {@link https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows}
+		 */
+		jsFiles = jsFiles.map(jsFile => upath.toUnix(this.absolute(jsFile)));
 		return <string[]>fg.sync(jsFiles)
 	}
 	debug(): Readonly<IDebugOptions> {

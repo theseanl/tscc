@@ -1,5 +1,5 @@
 ///<reference types="jest"/>
-import { mergeAllES, mergeIIFE } from "../src/merge_chunks";
+import {mergeAllES, mergeIIFE} from "../src/merge_chunks";
 import MultiMap from "../src/MultiMap";
 import * as rollup from "rollup";
 import path = require("path");
@@ -328,7 +328,7 @@ describe(`mergeChunk`, function () {
 		const entry2 = "entry2.js";
 		const chunk1 = "chunk1.js";
 		const externalRelative = "external_relative";
-		const externalAbsolute = path.resolve("external/absolute.js");
+		const externalAbsolute = path.posix.resolve("external/absolute.js"); // Always use forward slash
 		const chunkAllocation = MultiMap.fromObject({
 			[entry]: [chunk1, entry],
 			[entry2]: [entry2],

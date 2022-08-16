@@ -3,6 +3,7 @@ import * as ts from 'typescript';
 import ITsccSpecWithTS from './ITsccSpecWithTS';
 import path = require('path');
 
+
 export class TsError extends Error {
 	constructor(
 		public diagnostics: ReadonlyArray<ts.Diagnostic>

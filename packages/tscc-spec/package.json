@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"fast-glob": "^3.2.11",
-		"fs-extra": "^10.1.0"
+		"fs-extra": "^10.1.0",
+		"upath": "^2.0.1"
 	}
 }
