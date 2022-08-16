@@ -27,7 +27,13 @@ async function testBundle(specPath: string) {
 	const bundle = await rollup.rollup({
 		plugins: [
 			tsccPlugin({specFile})
-		]
+		],
+		onwarn(warning, warn) {
+			// Silence warning "The 'this' keyword is equivalent to 'undefined' at the top level of
+			// an ES module, and has been rewritten"
+			if (warning.code === 'THIS_IS_UNDEFINED') return;
+			warn(warning);
+		}
 	});
 	const {output} = await bundle.generate({
 		dir: '.',
@@ -36,6 +42,7 @@ async function testBundle(specPath: string) {
 
 	Object.keys(output).sort().forEach(name => {
 		let chunk = output[name];
-		expect(chunk.code).toMatchSnapshot(chunk.name);
+		let normalizedChunkFileName = upath.toUnix(chunk.fileName);
+		expect(chunk.code).toMatchSnapshot(normalizedChunkFileName);
 	})
 }
