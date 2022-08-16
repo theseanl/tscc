@@ -141,6 +141,23 @@ export default class TsccSpec implements ITsccSpec {
 	) {
 		this.computeOrderedModuleSpecs();
 		this.resolveRelativeExternalModuleNames();
+		this.validateSpec();
+	}
+	private validateSpec() {
+		// Validates chunkFormat field.
+		const {chunkFormat} = this.tsccSpec;
+		if (typeof chunkFormat === 'string') {
+			if (chunkFormat !== 'global' && chunkFormat !== 'module') {
+				throw new TsccSpecError(`Invalid value of "chunkFormat": ${chunkFormat}, only "global" or "module" is allowed.`);
+			}
+			/**
+			 * {@link https://github.com/theseanl/tscc/issues/724} External module support for
+			 * "chunkFormat": "module" is incomplete. TODO: implement it and remove the validation here.
+			 */
+			if (chunkFormat === 'module' && this.tsccSpec.external) {
+				throw new TsccSpecError(`External modules support is not implemented for "chunkFormat": "module".`);
+			}
+		}
 	}
 	private orderedModuleSpecs!: Required<INamedModuleSpecs>[];
 	private computeOrderedModuleSpecs() {

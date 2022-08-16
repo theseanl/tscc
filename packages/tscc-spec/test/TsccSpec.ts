@@ -66,6 +66,14 @@ describe(`TsccSpec`, () => {
 				TsccSpec.loadSpec({specFile: invalidSpecJSONPath})
 			}).toThrowError(TsccSpecError);
 		});
+
+		const unsupportedJSONPath = path.join(__dirname, 'sample/unsupported_spec.json');
+
+		test(`throws when "chunkFormat" value is "module" and "external" option is used.`, () => {
+			expect(() => {
+				TsccSpec.loadSpec({specFile: unsupportedJSONPath})
+			}).toThrowError(TsccSpecError);
+		})
 	});
 	describe(`getExternalModulenames`, () => {
 		const externalModuleSpecPath = path.join(__dirname, 'sample/spec_with_relative_external.json');

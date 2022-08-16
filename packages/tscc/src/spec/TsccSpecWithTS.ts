@@ -168,9 +168,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		private projectRoot: string
 	) {
 		super(tsccSpec, basePath);
-		this.validateSpec();
+		this.validateSpecWithTS();
 	}
-	protected validateSpec() {
+	private validateSpecWithTS() {
 		// Checks that each of entry files is provided in tsConfig.
 		const fileNames = this.getAbsoluteFileNamesSet();
 		const modules = this.getOrderedModuleSpecs();
