@@ -3,6 +3,7 @@ import * as ts from 'typescript';
 import ITsccSpecWithTS from './ITsccSpecWithTS';
 import path = require('path');
 
+
 export class TsError extends Error {
 	constructor(
 		public diagnostics: ReadonlyArray<ts.Diagnostic>
@@ -167,9 +168,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		private projectRoot: string
 	) {
 		super(tsccSpec, basePath);
-		this.validateSpec();
+		this.validateSpecWithTS();
 	}
-	protected validateSpec() {
+	private validateSpecWithTS() {
 		// Checks that each of entry files is provided in tsConfig.
 		const fileNames = this.getAbsoluteFileNamesSet();
 		const modules = this.getOrderedModuleSpecs();
@@ -202,6 +203,10 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ES2021]: "ECMASCRIPT_2021",
 		[ts.ScriptTarget.ES2022]: "ECMASCRIPT_NEXT",
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
+	}
+	private static readonly chunkFormatToCcType = {
+		['global']: "GLOBAL_NAMEESPACE",
+		['module']: "ES_MODULES"
 	}
 	getOutputFileNames(): string[] {
 		return this.getOrderedModuleSpecs()
@@ -237,6 +242,9 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 				this.relativeFromCwd(this.getOutputPrefix('cc')) +
 				this.getOrderedModuleSpecs()[0].moduleName + '.js';
 		}
+		defaultFlags["chunk_output_type"] =
+			this.tsccSpec.chunkFormat && TsccSpecWithTS.chunkFormatToCcType[this.tsccSpec.chunkFormat] ||
+			"GLOBAL_NAMESPACE";
 		defaultFlags["generate_exports"] = true;
 		defaultFlags["export_local_property_definitions"] = true;
 

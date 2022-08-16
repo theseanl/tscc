@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Golden Tests: external-modules/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules/golden/generated_entry 1`] = `
+exports[`Golden Tests: external-modules/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules/golden/generated_entry.js 1`] = `
 "(function (externalInNodeModules, externalWithFilePaths) {
 	'use strict';
 
@@ -11,7 +11,7 @@ exports[`Golden Tests: external-modules/tscc.spec.json: packages/rollup-plugin-t
 "
 `;
 
-exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_dependent 1`] = `
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_dependent.js 1`] = `
 "(function (_, b) {
 	'use strict';
 
@@ -23,7 +23,7 @@ exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: pac
 "
 `;
 
-exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_entry 1`] = `
+exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/external-modules-in-many-module-build/golden/generated_entry.js 1`] = `
 "var generated_entry = (function (exports, c, a) {
 	'use strict';
 
@@ -55,7 +55,7 @@ exports[`Golden Tests: external-modules-in-many-module-build/tscc.spec.json: pac
 "
 `;
 
-exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_dependent 1`] = `
+exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_dependent.js 1`] = `
 "(function (_) {
 	'use strict';
 
@@ -80,7 +80,7 @@ exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/tes
 "
 `;
 
-exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_entry 1`] = `
+exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_entry.js 1`] = `
 "var generated_entry = (function (exports) {
 	'use strict';
 
@@ -115,7 +115,44 @@ exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/tes
 "
 `;
 
-exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_dependent 1`] = `
+exports[`Golden Tests: goog-shim/tscc.spec.module.json module: generated_dependent.js 1`] = `
+"import { g as global } from './generated_entry.js';
+
+/**
+ * @fileoverview Hand-modified shim file for Closure Library \`goog/reflect.js\`. References to the
+ * global \`goog\` variables have been removed.
+ */
+
+function objectProperty(prop, object) {
+	return prop;
+}
+
+var dictionary = {
+	\\"key\\": \\"value\\"
+};
+
+if (global.name === objectProperty(\\"key\\")) {
+	console.log(dictionary[global.name]);
+}
+"
+`;
+
+exports[`Golden Tests: goog-shim/tscc.spec.module.json module: generated_entry.js 1`] = `
+"/**
+ * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
+ * global \`goog\` variables have been removed.
+ */
+const global = self; // Use rollup \\"context\\" option to prevent \`this\` rewrite
+
+{
+	console.log(\\"Debugging\\");
+}
+
+export { global as g };
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_dependent.js 1`] = `
 "(function (_) {
 	'use strict';
 
@@ -125,7 +162,7 @@ exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-
 "
 `;
 
-exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_entry 1`] = `
+exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_entry.js 1`] = `
 "var generated_entry = (function (exports) {
 	'use strict';
 
@@ -154,5 +191,30 @@ exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-
 	return exports;
 
 })({});
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.module.json module: generated_dependent.js 1`] = `
+"import { s as sort, b } from './generated_entry.js';
+
+console.log(sort([1, b]));
+"
+`;
+
+exports[`Golden Tests: many-module-build/tscc.spec.module.json module: generated_entry.js 1`] = `
+"function swap([a, b]) {
+	return [b, a];
+}
+
+function sort([a, b]) {
+	return a > b ? [a, b] : swap([a, b]);
+}
+
+const a = [1, 2];
+const b = swap(a);
+
+console.log(b);
+
+export { b, sort as s };
 "
 `;

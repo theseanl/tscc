@@ -2,6 +2,7 @@
 import TsccSpecWithTS from '../../src/spec/TsccSpecWithTS';
 import * as ts from 'typescript';
 import path = require('path');
+import {TsccSpecError} from '@tscc/tscc-spec';
 
 describe(`TsccSpecWithTS`, () => {
 	describe(`loadTsConfigFromArgs`, () => {
@@ -42,6 +43,17 @@ describe(`TsccSpecWithTS`, () => {
 			expect(parsedConfig.options.moduleResolution).toBe(ts.ModuleResolutionKind.NodeJs);
 			expect(parsedConfig.options.target).toBe(ts.ScriptTarget.ES2016);
 			expect(parsedConfig.options.downlevelIteration).toBe(false);
+		})
+	})
+	describe(`validateSpecWithTS`, () => {
+		test(`throws an error when entry files in the spec isn't included in tsconfig`, () => {
+			expect(() => {
+				TsccSpecWithTS.loadSpecWithTS({
+					modules: {
+						"entry": "./non_existing_file.ts"
+					}
+				}, path.join(__dirname, 'sample/tsconfig.1.json'))
+			}).toThrowError(TsccSpecError);
 		})
 	})
 	describe(`pruneCompilerOptions`, () => {

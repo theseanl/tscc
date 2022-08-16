@@ -1,0 +1,16 @@
+{
+	"modules": {
+		"entry": "./entry.js",
+		"dependent": {
+			"entry": "./dependent.js",
+			"dependencies": [
+				"entry"
+			]
+		}
+	},
+	"prefix": {
+		"rollup": "./golden/generated_",
+		"cc": "."
+	},
+	"chunkFormat": "module"
+}

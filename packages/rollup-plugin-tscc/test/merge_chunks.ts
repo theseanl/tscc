@@ -1,7 +1,25 @@
 ///<reference types="jest"/>
-import mergeChunk from "../src/merge_chunks";
+import {ChunkMerger} from "../src/merge_chunks";
 import MultiMap from "../src/MultiMap";
 import * as rollup from "rollup";
+import path = require("path");
+
+async function mergeIIFE(
+	entry: string,
+	chunkAllocation: MultiMap<string, string>,
+	bundle: Readonly<rollup.OutputBundle>,
+	globals?: {[id: string]: string}
+) {
+	return await new ChunkMerger(chunkAllocation, bundle, globals).performSingleEntryBuild(entry, 'iife');
+}
+
+async function mergeES(
+	chunkAllocation: MultiMap<string, string>,
+	bundle: Readonly<rollup.OutputBundle>,
+	globals?: {[id: string]: string}
+) {
+	return await new ChunkMerger(chunkAllocation, bundle, globals).performCodeSplittingBuild('es');
+}
 
 describe(`mergeChunk`, function () {
 	test(`merges chunks for a single entry`, async function () {
@@ -29,7 +47,7 @@ describe(`mergeChunk`, function () {
 				name: "chunk-1",
 			}),
 		};
-		const mergedChunk = await mergeChunk(entry, chunkAllocation, bundle);
+		const mergedChunk = await mergeIIFE(entry, chunkAllocation, bundle);
 
 		expect(mergedChunk.name).toBe("entry");
 		expect(mergedChunk.code).toMatchInlineSnapshot(`
@@ -92,7 +110,7 @@ describe(`mergeChunk`, function () {
 				name: "chunk-1",
 			}),
 		};
-		const mergedChunk = await mergeChunk(entry, chunkAllocation, bundle);
+		const mergedChunk = await mergeIIFE(entry, chunkAllocation, bundle);
 
 		expect(mergedChunk.name).toBe("entry");
 		expect(mergedChunk.code).toMatchInlineSnapshot(`
@@ -190,8 +208,8 @@ describe(`mergeChunk`, function () {
 				name: "chunk-4",
 			}),
 		};
-		const mergedChunk = await mergeChunk(entry, chunkAllocation, bundle);
-		const anotherMergedChunk = await mergeChunk(anotherEntry, chunkAllocation, bundle);
+		const mergedChunk = await mergeIIFE(entry, chunkAllocation, bundle);
+		const anotherMergedChunk = await mergeIIFE(anotherEntry, chunkAllocation, bundle);
 		expect(mergedChunk.code).toMatchInlineSnapshot(`
 		"var entry = (function (exports, chunk2_js, chunk3_js) {
 			'use strict';
@@ -276,8 +294,8 @@ describe(`mergeChunk`, function () {
 	});
 	test(`Correctly merge chunks referencing external modules`, async function () {
 		const chunkAllocation = MultiMap.fromObject({
-			"entry.js": ["external", "entry.js"],
-			"entry2.js": ["external", "entry2.js"],
+			"entry.js": ["entry.js"],
+			"entry2.js": ["entry2.js"],
 		});
 		const bundle: rollup.OutputBundle = {
 			"entry.js": mockChunk({
@@ -296,15 +314,14 @@ describe(`mergeChunk`, function () {
 		const globals = {
 			external: "External",
 		};
-		const mergedChunk = await mergeChunk("entry.js", chunkAllocation, bundle, globals);
-		const anotherMergedChunk = await mergeChunk("entry2.js", chunkAllocation, bundle, globals);
+		const mergedChunk = await mergeIIFE("entry.js", chunkAllocation, bundle, globals);
+		const anotherMergedChunk = await mergeIIFE("entry2.js", chunkAllocation, bundle, globals);
 		expect(mergedChunk.code).toMatchInlineSnapshot(`
 		"var entry = (function (exports, A) {
 			'use strict';
 
 			console.log(A); const a = 1;
 
-			exports.$0 = A;
 			exports.a = a;
 
 			return exports;
@@ -313,19 +330,221 @@ describe(`mergeChunk`, function () {
 		"
 	`);
 		expect(anotherMergedChunk.code).toMatchInlineSnapshot(`
-		"var entry2 = (function (exports, A, entry_js) {
+		"(function (A, entry_js) {
 			'use strict';
 
 			console.warn(A); console.log(entry_js.a);
 
-			exports.$0 = A;
-
-			return exports;
-
-		})({}, External, entry);
+		})(External, entry);
 		"
 	`);
 	});
+
+	test(`Correctly merge chunks referencing external modules via relative paths`, async function () {
+		const entry = "entry.js";
+		const entry2 = "entry2.js";
+		const chunk1 = "chunk1.js";
+		const externalRelative = "external_relative";
+		const externalAbsolute = path.posix.resolve("external/absolute.js"); // Always use forward slash
+		const chunkAllocation = MultiMap.fromObject({
+			[entry]: [chunk1, entry],
+			[entry2]: [entry2],
+		});
+		const bundle: rollup.OutputBundle = {
+			[entry]: mockChunk({
+				fileName: entry,
+				code:
+					`import { C } from "${externalRelative}";` +
+					`import { D } from "${externalAbsolute}";` +
+					`export const c = C + D;`,
+				exports: ["c"],
+				name: "entry",
+			}),
+			[entry2]: mockChunk({
+				fileName: entry2,
+				code:
+					`import { a } from "${externalRelative}";` +
+					`import { e } from "${chunk1}";` +
+					`export const d = a;` +
+					`export const f = e;`,
+				exports: ["d"],
+				name: "entry2",
+			}),
+			[chunk1]: mockChunk({
+				fileName: chunk1,
+				code:
+					`import { A } from "${externalAbsolute}";` +
+					`import { B } from "${externalRelative}";` +
+					`export const e = A + B;`,
+				exports: ["e"],
+				name: "chunk1",
+			}),
+		};
+		const globals = {
+			[externalRelative]: "ExternalRelative",
+			[externalAbsolute]: "ExternalAbsolute",
+		};
+
+		const [mergedChunk, mergedChunk2] = await Promise.all([
+			mergeIIFE(entry, chunkAllocation, bundle, globals),
+			mergeIIFE(entry2, chunkAllocation, bundle, globals),
+		]);
+		expect(mergedChunk.code).toMatchInlineSnapshot(`
+		"var entry = (function (exports, absolute_js, external_relative) {
+			'use strict';
+
+			const e = absolute_js.A + external_relative.B;
+
+			var chunk1 = {
+				__proto__: null,
+				e: e
+			};
+
+			const c = external_relative.C + absolute_js.D;
+
+			exports.$0 = chunk1;
+			exports.c = c;
+
+			return exports;
+
+		})({}, ExternalAbsolute, ExternalRelative);
+		"
+	`);
+		expect(mergedChunk2.code).toMatchInlineSnapshot(`
+		"var entry2 = (function (exports, external_relative, chunk1_js) {
+			'use strict';
+
+			const d = external_relative.a;const f = chunk1_js.e;
+
+			exports.d = d;
+			exports.f = f;
+
+			return exports;
+
+		})({}, ExternalRelative, entry.$0);
+		"
+	`);
+	});
+
+	test(`merges chunk without external modules in ES6 modules format`, async function () {
+		const entry = "entry.js";
+		const entry2 = "entry2.js";
+		const chunk1 = "chunk1.js";
+		const chunkAllocation = MultiMap.fromObject({
+			[entry]: [chunk1, entry],
+			[entry2]: [entry2],
+		});
+		const bundle: rollup.OutputBundle = {
+			[entry]: mockChunk({
+				fileName: entry,
+				code:
+					`import { a, sum } from '${chunk1}'; ` +
+					`export const c = sum(a, 1); ` +
+					`console.log(sum(c, -1)); `,
+				exports: ["c"],
+			}),
+			[entry2]: mockChunk({
+				fileName: entry2,
+				code:
+					`import { b, sum } from "${chunk1}"; ` +
+					`export const d = b + 2; ` +
+					`export function add3(a, b, c) { return sum(sum(a, b), c); } ` +
+					`console.log(add3(1, 2, 3)); `,
+				exports: ["d"],
+			}),
+			[chunk1]: mockChunk({
+				fileName: chunk1,
+				code:
+					`export const a = 3; ` +
+					`export const b = 4; ` +
+					`export function sum(a, b) { return a + b; } `,
+				exports: ["a", "b"],
+			}),
+		};
+		const [mergedESModuleChunk, mergedESModuleChunk2] = await mergeES(
+			chunkAllocation,
+			bundle,
+			{}
+		);
+		expect(mergedESModuleChunk.code).toMatchInlineSnapshot(`
+		"const a = 3; function sum(a, b) { return a + b; }
+
+		const c = sum(a, 1); console.log(sum(c, -1));
+
+		export { sum as s };
+		"
+	`);
+		expect(mergedESModuleChunk2.code).toMatchInlineSnapshot(`
+		"import { s as sum } from './entry.js';
+
+		function add3(a, b, c) { return sum(sum(a, b), c); } console.log(add3(1, 2, 3));
+		"
+	`);
+	});
+	test(`merges chunk containing external modules in ES6 module format`, async function () {
+		const entry = "entry.js";
+		const entry2 = "entry2.js";
+		const chunk1 = "chunk1.js";
+		const externalNonAbsolute = "external";
+		const chunkAllocation = MultiMap.fromObject({
+			[entry]: [chunk1, entry],
+			[entry2]: [entry2],
+		});
+		const bundle: rollup.OutputBundle = {
+			[entry]: mockChunk({
+				fileName: entry,
+				code: `import { sum } from "${externalNonAbsolute}";` + `console.log(sum(1, 2));`,
+				exports: ["c"],
+			}),
+			[entry2]: mockChunk({
+				fileName: entry2,
+				code:
+					`import { multiply } from "${externalNonAbsolute}";` +
+					`import { sum3 } from "${chunk1}";` +
+					`console.log(sum3(1, 2, multiply(3, 4)));`,
+				exports: ["d"],
+			}),
+			[chunk1]: mockChunk({
+				fileName: chunk1,
+				code:
+					`import { sum } from "${externalNonAbsolute}";` +
+					`export function sum3(a, b, c) {
+						return sum(a, sum(b, c));
+					};`,
+				exports: ["e"],
+			}),
+		};
+		const globals = {
+			[externalNonAbsolute]: "ExternalNonAbsolute",
+		};
+		const [mergedESModuleChunk, mergedESModuleChunk2] = await mergeES(
+			chunkAllocation,
+			bundle,
+			globals
+		);
+		expect(mergedESModuleChunk.code).toMatchInlineSnapshot(`
+		"import { sum } from 'external';
+
+		console.log(sum(1, 2));
+
+		function sum3(a, b, c) {
+								return sum(a, sum(b, c));
+							}
+
+		export { sum3 as s };
+		"
+	`);
+		expect(mergedESModuleChunk2.code).toMatchInlineSnapshot(`
+		"import { multiply } from 'external';
+		import { s as sum3 } from './entry.js';
+
+		console.log(sum3(1, 2, multiply(3, 4)));
+		"
+	`);
+	});
+	test.todo(
+		`merges chunk containing external modules referenced via relative path in ES6 module format`
+	);
 });
 
 function mockChunk(chunk: Partial<rollup.OutputChunk>): rollup.OutputChunk {

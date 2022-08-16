@@ -122,7 +122,7 @@ The first argument is either a string representing the path of the spec file or 
 ```js
 tscc({
     /* Contents of spec JSON */
-    specFile: "path_to_spec_file"
+    specFile: "path_to_spec_file.json"
 })
 // To load spec file from the path and override it.
 ```
@@ -148,7 +148,7 @@ module.exports = {
         tscc({
             /* Contents of spec JSON */
             // or,
-            specFile: "path_to_spec_file"
+            specFile: "path_to_spec_file.json"
         })
     ]
 };
@@ -166,6 +166,7 @@ Tscc spec file is a single source of truth of your bundling information. It desc
     modules, /* required */
     external,
     prefix,
+    chunkFormat,
     compilerFlags,
     jsFiles,
     debug
@@ -215,6 +216,13 @@ CLI equivalent is `--external <module_name>:<global_variable_name>`.
 It is a name that will be prepended to the output chunk's name. It is prepended _as is_, which means that if no trailing path separator was provided, it will modify the output file's name. If it is a relative path starting from the current directory ("."), it will be resolved relative to the spec file's location. Otherwise, any relative path will be resolved relative to the current working directory, and absolute paths are used as is.
 
 CLI equivalent is `--prefix dist/` (or `--prefix.rollup dev/ --prefix.cc dist/`).
+
+### `chunkFormat`
+
+```jsonc
+    "chunkFormat": "global" /* default */ | "module"
+```
+It is a value of `"global"` or `"module"` designating the output chunks' format. In case of `"global"`, which is the default behavior if this key isn't specified, output chunks will be plain Javascript that is suitable for `<script src="">` HTML tag, and cross-chunk references will be done by exposing them to the global scope. In case of `"module"`, output chunks will be [Javascript modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules) which has to be included via `<script type="module" src="">` tags, and cross-chunk references will be done by `import` and `export` statements. Currently, when `"module"` option is used, `external` option cannot be used.
 
 ### `compilerFlags`
 

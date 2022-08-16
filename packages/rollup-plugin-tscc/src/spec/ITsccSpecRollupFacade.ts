@@ -1,5 +1,6 @@
 import {ITsccSpec} from '@tscc/tscc-spec'
 import MultiMap from '../MultiMap';
+import {ModuleFormat} from 'rollup';
 
 export default interface ITsccSpecRollupFacade extends ITsccSpec {
 	resolveRollupExternalDeps(id: string): string
@@ -18,5 +19,9 @@ export default interface ITsccSpecRollupFacade extends ITsccSpec {
 	 * Returns a key-value pair that can be directly used to rollup output.globals option.
 	 */
 	getRollupExternalModuleNamesToGlobalMap(): {[moduleName: string]: string}
+	/**
+	 * Returns a module format that final bundles will use, based on spec.chunkFormat.
+	 */
+	getRollupOutputModuleFormat(): ModuleFormat
 }
 

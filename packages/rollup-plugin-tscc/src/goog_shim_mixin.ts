@@ -17,6 +17,7 @@ const moduleNameToShim = new Map([
 // Rollup convention, see https://rollupjs.org/guide/en/#conventions
 const PREFIX = "\0tscc\0";
 
+// Interlaces a plugin loading shim files with an existing plugin.
 export function googShimMixin<T extends {resolveId: FunctionPluginHooks["resolveId"], load: FunctionPluginHooks["load"]}>(plugin: T): T {
 	const {resolveId, load} = plugin;
 	plugin.resolveId = function (id, importer) {

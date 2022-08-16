@@ -1,0 +1,9 @@
+{
+	"modules": {
+		"out": "index.ts"
+	},
+	"external": {
+		"vendor": "vendor"
+	},
+	"chunkFormat": "module"
+}

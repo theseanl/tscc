@@ -94,7 +94,6 @@ export function unescapeGoogAdmissibleName(escapedName: string): string {
 					out += String.fromCodePoint(base32Codes);
 					i += 5;
 				} catch (e) {
-					console.log(escapedName);
 					throw new RangeError(`Invalid characters between position ${i + 1} and ${i + 4}`);
 				}
 			}

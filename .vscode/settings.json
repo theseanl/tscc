@@ -6,5 +6,6 @@
 	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
 	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
 	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"jest.jestCommandLine": "jest"
 }

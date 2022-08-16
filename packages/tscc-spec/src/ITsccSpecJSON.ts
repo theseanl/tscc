@@ -58,6 +58,13 @@ declare interface ITsccSpecJSON {
 	 */
 	prefix?: string | {readonly rollup: string, readonly cc: string}
 	/**
+	 * Indicates what format should the output chunks be in. In `global`, chunks will reference
+	 * other chunks' values via global scope. In `module`, chunks will use ES6 import and export
+	 * statements to reference other chunk's values. This mirrors --chunk_output_type option of
+	 * closure compiler. Default is `global`.
+	 */
+	chunkFormat?: 'global' | 'module'
+	/**
 	 * Compiler flags to be passed to closure compiler. Tscc treats it as an opaque data.
 	 * "js", "chunk", "entry_point": computed from <modules>
 	 * "chunk_output_path_prefix": computed from <prefix>

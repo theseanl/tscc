@@ -1,6 +1,7 @@
 ///<reference types="jest"/>
 import tscc, {TEMP_DIR} from '../../src/tscc';
 import path = require('path');
+import upath = require('upath');
 import fs = require('fs');
 
 const fsp = fs.promises;
@@ -24,10 +25,18 @@ describe(`tscc e2e`, function () {
 			.map(dirent => dirent.name)
 			.sort();
 
-		expect(generatedFiles.sort()).toMatchSnapshot(dirName);
+		expect(generatedFiles).toMatchSnapshot(dirName);
 		await Promise.all(generatedFiles.map(async (fileName) => {
-			expect(await fsp.readFile(path.join(TEMP_DIR, dirName, fileName), 'utf8'))
-				.toMatchSnapshot(dirName + '/' + fileName);
+			let content = await fsp.readFile(path.join(TEMP_DIR, dirName, fileName), 'utf8')
+			// Apparently Closure Compiler is emitting OS-style paths in output sourcemap. Here we
+			// pick up sourcemaps, and normalize path in its `file` property to make snapshots
+			// indepent of the OS.
+			if (path.extname(fileName) === '.map') {
+				let sourceMap = JSON.parse(content);
+				sourceMap.file = upath.toUnix(sourceMap.file);
+				content = JSON.stringify(sourceMap);
+			}
+			expect(content).toMatchSnapshot(dirName + '/' + fileName);
 		}))
 	}, TIMEOUT)
 })

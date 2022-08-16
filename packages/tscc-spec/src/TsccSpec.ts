@@ -6,6 +6,7 @@ import fs = require('fs');
 import process = require('process');
 import {readJsonSync} from 'fs-extra';
 import fg = require('fast-glob');
+import upath = require('upath');
 
 // "modules" key is no longer required
 interface IInputTsccSpecJSONWithSpecFile extends Partial<ITsccSpecJSON> {
@@ -140,6 +141,23 @@ export default class TsccSpec implements ITsccSpec {
 	) {
 		this.computeOrderedModuleSpecs();
 		this.resolveRelativeExternalModuleNames();
+		this.validateSpec();
+	}
+	private validateSpec() {
+		// Validates chunkFormat field.
+		const {chunkFormat} = this.tsccSpec;
+		if (typeof chunkFormat === 'string') {
+			if (chunkFormat !== 'global' && chunkFormat !== 'module') {
+				throw new TsccSpecError(`Invalid value of "chunkFormat": ${chunkFormat}, only "global" or "module" is allowed.`);
+			}
+			/**
+			 * {@link https://github.com/theseanl/tscc/issues/724} External module support for
+			 * "chunkFormat": "module" is incomplete. TODO: implement it and remove the validation here.
+			 */
+			if (chunkFormat === 'module' && this.tsccSpec.external) {
+				throw new TsccSpecError(`External modules support is not implemented for "chunkFormat": "module".`);
+			}
+		}
 	}
 	private orderedModuleSpecs!: Required<INamedModuleSpecs>[];
 	private computeOrderedModuleSpecs() {
@@ -248,8 +266,12 @@ export default class TsccSpec implements ITsccSpec {
 		if (typeof jsFiles === 'string') {
 			jsFiles = [jsFiles];
 		}
-		// resolve globs according to TSCC's convention
-		jsFiles = jsFiles.map(this.absolute, this);
+		/**
+		 * Resolve globs following TSCC's convention of using the spec file's path as a base path.
+		 * fast-glob expects Unix-style paths. See:
+		 * {@link https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows}
+		 */
+		jsFiles = jsFiles.map(jsFile => upath.toUnix(this.absolute(jsFile)));
 		return <string[]>fg.sync(jsFiles)
 	}
 	debug(): Readonly<IDebugOptions> {
