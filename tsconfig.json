@@ -9,6 +9,7 @@
 		"target": "es2017",
 		"module": "commonjs",
 		"strict": true,
+		"newLine": "lf",
 		"declaration": true,
 		"stripInternal": true,
 		"experimentalDecorators": true,
