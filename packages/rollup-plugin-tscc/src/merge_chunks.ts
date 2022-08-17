@@ -199,6 +199,15 @@ export class ChunkMerger {
 		if (output.length > this.chunkAllocation.size) {
 			ChunkMerger.throwUnexpectedChunkInSecondaryBundleError(output);
 		}
+		for (let outputChunk of output) {
+			// These chunks are treated as non-entry chunks, which are subject to different naming
+			// convention. This in particular removes all the paths components and retains only the
+			// basename part. This is undesirable, so we restore the fileName from facadeModuleId
+			// here.
+			let {facadeModuleId} = outputChunk as rollup.OutputChunk;
+			if (!facadeModuleId) throw new ChunkMergeError(`Output file name in unrecoverable for a module ${outputChunk.fileName}`);
+			outputChunk.fileName = facadeModuleId;
+		}
 		return output as rollup.OutputChunk[];
 	}
 	private static readonly baseOutputOption: rollup.OutputOptions = {

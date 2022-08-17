@@ -115,7 +115,7 @@ exports[`Golden Tests: goog-shim/tscc.spec.json: packages/rollup-plugin-tscc/tes
 "
 `;
 
-exports[`Golden Tests: goog-shim/tscc.spec.module.json module: generated_dependent.js 1`] = `
+exports[`Golden Tests: goog-shim/tscc.spec.module.json module: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_dependent.js 1`] = `
 "import { g as global } from './generated_entry.js';
 
 /**
@@ -137,7 +137,7 @@ if (global.name === objectProperty(\\"key\\")) {
 "
 `;
 
-exports[`Golden Tests: goog-shim/tscc.spec.module.json module: generated_entry.js 1`] = `
+exports[`Golden Tests: goog-shim/tscc.spec.module.json module: packages/rollup-plugin-tscc/test/sample/goog-shim/golden/generated_entry.js 1`] = `
 "/**
  * @fileoverview Hand-modified shim file for Closure Library \`goog/goog.js\`. References to the
  * global \`goog\` variables have been removed.
@@ -194,14 +194,14 @@ exports[`Golden Tests: many-module-build/tscc.spec.json: packages/rollup-plugin-
 "
 `;
 
-exports[`Golden Tests: many-module-build/tscc.spec.module.json module: generated_dependent.js 1`] = `
+exports[`Golden Tests: many-module-build/tscc.spec.module.json module: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_dependent.js 1`] = `
 "import { s as sort, b } from './generated_entry.js';
 
 console.log(sort([1, b]));
 "
 `;
 
-exports[`Golden Tests: many-module-build/tscc.spec.module.json module: generated_entry.js 1`] = `
+exports[`Golden Tests: many-module-build/tscc.spec.module.json module: packages/rollup-plugin-tscc/test/sample/many-module-build/golden/generated_entry.js 1`] = `
 "function swap([a, b]) {
 	return [b, a];
 }
