@@ -205,7 +205,7 @@ export default class TsccSpecWithTS extends TsccSpec implements ITsccSpecWithTS 
 		[ts.ScriptTarget.ESNext]: "ECMASCRIPT_NEXT"
 	}
 	private static readonly chunkFormatToCcType = {
-		['global']: "GLOBAL_NAMEESPACE",
+		['global']: "GLOBAL_NAMESPACE",
 		['module']: "ES_MODULES"
 	}
 	getOutputFileNames(): string[] {

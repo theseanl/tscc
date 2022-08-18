@@ -164,3 +164,49 @@ exports[`tscc e2e case_12_using_jsFiles: case_12_using_jsFiles/entry.js 1`] = `
 "console.log(1);
 "
 `;
+
+exports[`tscc e2e case_13_chunk_format_global: case_13_chunk_format_global 1`] = `
+Array [
+  "a.js",
+  "b.js",
+  "c.js",
+]
+`;
+
+exports[`tscc e2e case_13_chunk_format_global: case_13_chunk_format_global/a.js 1`] = `
+"var b=new (function(){function a(){}a.prototype.g=function(){console.log(\\"methodUsedByA\\")};a.prototype.h=function(){console.log(\\"methodUsedByB\\")};return a}());b.g();console.log(\\"ac\\");
+"
+`;
+
+exports[`tscc e2e case_13_chunk_format_global: case_13_chunk_format_global/b.js 1`] = `
+"b.h();console.log(\\"bba\\");console.log(\\"bc\\");
+"
+`;
+
+exports[`tscc e2e case_13_chunk_format_global: case_13_chunk_format_global/c.js 1`] = `
+"console.log(\\"ac\\");console.log(\\"bc\\");console.log(\\"cc\\");
+"
+`;
+
+exports[`tscc e2e case_14_chunk_format_module: case_14_chunk_format_module 1`] = `
+Array [
+  "a.js",
+  "b.js",
+  "c.js",
+]
+`;
+
+exports[`tscc e2e case_14_chunk_format_module: case_14_chunk_format_module/a.js 1`] = `
+"var b=new (function(){function a(){}a.prototype.g=function(){console.log(\\"methodUsedByA\\")};a.prototype.h=function(){console.log(\\"methodUsedByB\\")};return a}());b.g();console.log(\\"ac\\");export{b};
+"
+`;
+
+exports[`tscc e2e case_14_chunk_format_module: case_14_chunk_format_module/b.js 1`] = `
+"import{b}from\\"./a.js\\";b.h();console.log(\\"bba\\");console.log(\\"bc\\");
+"
+`;
+
+exports[`tscc e2e case_14_chunk_format_module: case_14_chunk_format_module/c.js 1`] = `
+"import\\"./a.js\\";console.log(\\"ac\\");console.log(\\"bc\\");console.log(\\"cc\\");
+"
+`;

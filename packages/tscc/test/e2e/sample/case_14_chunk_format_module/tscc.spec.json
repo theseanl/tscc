@@ -1,0 +1,19 @@
+{
+	"modules": {
+		"a": "../case_1/a.ts",
+		"b": {
+			"entry": "../case_1/b.ts",
+			"dependencies": [
+				"a"
+			]
+		},
+		"c": {
+			"entry": "../case_1/c.ts",
+			"dependencies": [
+				"a"
+			]
+		}
+	},
+	"prefix": ".tscc_temp/case_14_chunk_format_module/",
+	"chunkFormat": "module"
+}
