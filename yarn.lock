@@ -3076,10 +3076,10 @@ globby@^11.0.2:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
-google-closure-compiler-java@^20220803.0.0:
-  version "20220803.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20220803.0.0.tgz#387c114195510ebed04cd43e70ac50794491b1b6"
-  integrity sha512-Oevg580k6iRqOSgWe/TfmUCFHvCpXNzSslKt638mX+TkGA2E2oczzXJ9STo9OS6w9fBaqcUc/db9ZbNPdVdwnQ==
+google-closure-compiler-java@^20221004.0.0:
+  version "20221004.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler-java/-/google-closure-compiler-java-20221004.0.0.tgz#ba1049987bd91ebdcc2aebe184bf839bcaa0017e"
+  integrity sha512-CygLEB40HxtK0VtP6klv2Xm08w4HQNYX/DTgLV7CP74r8LiQMUByRFleaG/Hv5xQG1JzPNiW0GOAiAubDSdr5A==
 
 google-closure-compiler-linux@^20220803.0.0:
   version "20220803.0.0"
