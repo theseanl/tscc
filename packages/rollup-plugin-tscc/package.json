@@ -1,37 +1,37 @@
 {
-	"name": "@tscc/rollup-plugin-tscc",
-	"author": "theseanl",
-	"description": "A rollup plugin to use tscc module specification",
-	"keywords": [
-		"typescript",
-		"closure-compiler",
-		"tree-shaking",
-		"minify-javascript"
-	],
-	"version": "0.9.2",
-	"license": "MIT",
-	"homepage": "https://github.com/theseanl/tscc",
-	"repository": {
-		"type": "url",
-		"url": "https://github.com/theseanl/tscc.git"
-	},
-	"bugs": {
-		"url": "https://github.com/theseanl/tscc"
-	},
-	"main": "./dist/index.js",
-	"scripts": {
-		"clean": "rm -rf dist"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
-	"dependencies": {
-		"@tscc/tscc-spec": "^0.9.2",
-		"rollup": "^2.78.0",
-		"upath": "^2.0.1"
-	},
-	"devDependencies": {
-		"@types/node": "^18.11.2"
-	}
+  "name": "@tscc/rollup-plugin-tscc",
+  "author": "theseanl",
+  "description": "A rollup plugin to use tscc module specification",
+  "keywords": [
+    "typescript",
+    "closure-compiler",
+    "tree-shaking",
+    "minify-javascript"
+  ],
+  "version": "0.9.4",
+  "license": "MIT",
+  "homepage": "https://github.com/theseanl/tscc",
+  "repository": {
+    "type": "url",
+    "url": "https://github.com/theseanl/tscc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/theseanl/tscc"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "clean": "rm -rf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
+  "dependencies": {
+    "@tscc/tscc-spec": "^0.9.4",
+    "rollup": "^2.78.0",
+    "upath": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.2"
+  }
 }
