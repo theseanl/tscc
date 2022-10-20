@@ -88,6 +88,17 @@ describe(`TsccSpecWithTS`, () => {
 				TsccSpecWithTS.pruneCompilerOptions(options2, noop);
 				expect(options2.target).toBeDefined();
 			}
+		});
+		test(`Unsets declaration and declarationMap`, () => {
+			{
+				const options: ts.CompilerOptions = {
+					declaration: true,
+					declarationMap: true
+				};
+				TsccSpecWithTS.pruneCompilerOptions(options, noop);
+				expect(options.declaration).toBeFalsy();
+				expect(options.declarationMap).toBeFalsy();
+			}
 		})
 	})
 });
