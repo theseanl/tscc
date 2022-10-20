@@ -11,5 +11,9 @@ module.exports = {
 		'ts-jest': {
 			tsconfig: compilerOptions
 		}
+	},
+	snapshotFormat: {
+		escapeString: true,
+		printBasicPrototype: true
 	}
 };
