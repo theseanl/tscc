@@ -45,84 +45,89 @@ import path = require('path');
 
 
 interface SourceFileWithInternalAPIs extends ts.SourceFile {
-	// Internal fields which exists, but not declared in .d.ts. See SourceFile interface declaration
-	// at Microsoft/Typescript/src/compiler/types.ts.
-	resolvedModules?: ts.ModeAwareCache<ts.ResolvedModuleFull | undefined>;
-	resolvedTypeReferenceDirectiveNames: ts.ModeAwareCache<ts.ResolvedTypeReferenceDirective | undefined>;
+    // Internal fields which exists, but not declared in .d.ts. See SourceFile interface declaration
+    // at Microsoft/Typescript/src/compiler/types.ts.
+    resolvedModules?: ts.ModeAwareCache<ts.ResolvedModuleFull | undefined>;
+    resolvedTypeReferenceDirectiveNames: ts.ModeAwareCache<ts.ResolvedTypeReferenceDirective | undefined>;
 }
 
 export default class TypescriptDependencyGraph {
-	constructor(
-		private host: ts.ScriptReferenceHost
-	) {}
-	private visited: Set<string> = new Set();
-	private defaultLibDir = path.normalize(path.dirname(
-		ts.getDefaultLibFilePath(this.host.getCompilerOptions())
-	));
-	private isDefaultLib(fileName: string) {
-		return fileName.startsWith(this.defaultLibDir);
-	}
-	private isTslib(fileName: string) {
-		return getPackageBoundary(fileName).endsWith(path.sep + 'tslib' + path.sep);
-	}
-	private isTsccAsset(fileName: string) {
-		return getPackageBoundary(fileName).endsWith(path.sep + '@tscc' + path.sep + 'tscc' + path.sep)
-	}
-	private walk(fileName: string | undefined | null) {
-		if (typeof fileName !== 'string') return;
-		// Typescript may use unix-style path separators in internal APIs even on Windows environment.
-		// We should normalize it because we use string === match on file names, for example in
-		// shouldSkipTsickleProcessing.
-		fileName = path.normalize(fileName);
-		// Default libraries (lib.*.d.ts) files and tslib.d.ts are not processed by tsickle.
-		if (this.isDefaultLib(fileName) || this.isTslib(fileName) || this.isTsccAsset(fileName)) return;
-		// add file to visited set
-		if (this.visited.has(fileName)) return;
-		this.visited.add(fileName);
-		const sf = <SourceFileWithInternalAPIs>this.host.getSourceFile(fileName);
-		/**
-		 * Files imported to the current file are available in `resolvedModules` property.
-		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processImportedModules`
-		 * function. It calls `setResolvedModule` function for all external module references -->
-		 * This is the (only, presumably) place where all the external module references are available.
-		 */
-		if (sf.resolvedModules) {
-			sf.resolvedModules.forEach(this.walkModeAwareResolvedFileCache);
-		}
-		/**
-		 * Files referenced from the current file via /// <reference path="...." /> are available in
-		 * `referencedFiles` property. Unlike the previous `resolvedModules`, this is a public API.
-		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processReferencedFiles`
-		 * These are always initialized, so no if check is needed: see ts.Parser.parseSourceFile
-		 */
-		for (let ref of sf.referencedFiles) {
-			// Unlike the above API, this is not a resolved path, so we have to call TS API
-			// to resolve it first. See the function body of `processReferencedFiles`.
-			const resolvedReferencedFileName = ts.resolveTripleslashReference(ref?.fileName, fileName);
-			this.walk(resolvedReferencedFileName);
-		}
-		/**
-		 * Files referenced from the current file via /// <reference type="..." /> are available in
-		 * `resolvedTypeReferenceDirectiveNames` internal API. This is also available in `typeReferencedFile`,
-		 * but it does not contain information about the file path a type reference is resolved to.
-		 * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processTypeReferenceDirectives`
-		 * see how this function calls `setResolvedTypeReferenceDirective` to mutate `sf.resolvedTypeRefernceDirectiveNames`.
-		 */
-		if (sf.resolvedTypeReferenceDirectiveNames) {
-			sf.resolvedTypeReferenceDirectiveNames.forEach(this.walkModeAwareResolvedFileCache);
-		}
-	}
-	private walkModeAwareResolvedFileCache = (elem: {resolvedFileName?: string} | undefined) => {
-		this.walk(elem?.resolvedFileName);
-	};
-	addRootFile(fileName: string | undefined | null) {
-		this.walk(fileName);
-	}
-	hasFile(fileName: string) {
-		return this.visited.has(fileName);
-	}
-	// Currently this is only used in tests.
-	iterateFiles() {
-		return this.visited.values();
-	}
+    constructor(
+        private host: ts.ScriptReferenceHost
+    ) {}
+    private visited: Set<string> = new Set();
+    private defaultLibDir = path.normalize(path.dirname(
+        ts.getDefaultLibFilePath(this.host.getCompilerOptions())
+    ));
+    private isDefaultLib(fileName: string) {
+        return fileName.startsWith(this.defaultLibDir);
+    }
+    private isTslib(fileName: string) {
+        return getPackageBoundary(fileName).endsWith(path.sep + 'tslib' + path.sep);
+    }
+    private isTsccAsset(fileName: string) {
+        return getPackageBoundary(fileName).endsWith(path.sep + '@tscc' + path.sep + 'tscc' + path.sep)
+    }
+    private walk(fileName: string | undefined | null) {
+        if (typeof fileName !== 'string') return;
+        // Typescript may use unix-style path separators in internal APIs even on Windows environment.
+        // We should normalize it because we use string === match on file names, for example in
+        // shouldSkipTsickleProcessing.
+        fileName = path.normalize(fileName);
+        // Default libraries (lib.*.d.ts) files and tslib.d.ts are not processed by tsickle.
+        if (this.isDefaultLib(fileName) || this.isTslib(fileName) || this.isTsccAsset(fileName)) return;
+        // add file to visited set
+        if (this.visited.has(fileName)) return;
+        this.visited.add(fileName);
+        const sf = <SourceFileWithInternalAPIs>this.host.getSourceFile(fileName);
+        if (!sf) {
+            console.error('source file failed to get:', fileName);
+        }
+        /**
+         * Files imported to the current file are available in `resolvedModules` property.
+         * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processImportedModules`
+         * function. It calls `setResolvedModule` function for all external module references -->
+         * This is the (only, presumably) place where all the external module references are available.
+         */
+        if (sf?.resolvedModules) {
+            sf.resolvedModules.forEach(this.walkModeAwareResolvedFileCache);
+        }
+        /**
+         * Files referenced from the current file via /// <reference path="...." /> are available in
+         * `referencedFiles` property. Unlike the previous `resolvedModules`, this is a public API.
+         * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processReferencedFiles`
+         * These are always initialized, so no if check is needed: see ts.Parser.parseSourceFile
+         */
+        if (sf?.referencedFiles) {
+            for (let ref of sf.referencedFiles) {
+                // Unlike the above API, this is not a resolved path, so we have to call TS API
+                // to resolve it first. See the function body of `processReferencedFiles`.
+                const resolvedReferencedFileName = ts.resolveTripleslashReference(ref?.fileName, fileName);
+                this.walk(resolvedReferencedFileName);
+            }
+        }
+        /**
+         * Files referenced from the current file via /// <reference type="..." /> are available in
+         * `resolvedTypeReferenceDirectiveNames` internal API. This is also available in `typeReferencedFile`,
+         * but it does not contain information about the file path a type reference is resolved to.
+         * See: Microsoft/Typescript/src/compiler/programs.ts `ts.createProgram > processTypeReferenceDirectives`
+         * see how this function calls `setResolvedTypeReferenceDirective` to mutate `sf.resolvedTypeRefernceDirectiveNames`.
+         */
+        if (sf?.resolvedTypeReferenceDirectiveNames) {
+            sf.resolvedTypeReferenceDirectiveNames.forEach(this.walkModeAwareResolvedFileCache);
+        }
+    }
+    private walkModeAwareResolvedFileCache = (elem: {resolvedFileName?: string} | undefined) => {
+        this.walk(elem?.resolvedFileName);
+    };
+    addRootFile(fileName: string | undefined | null) {
+        this.walk(fileName);
+    }
+    hasFile(fileName: string) {
+        return this.visited.has(fileName);
+    }
+    // Currently this is only used in tests.
+    iterateFiles() {
+        return this.visited.values();
+    }
 }
