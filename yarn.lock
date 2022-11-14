@@ -1687,12 +1687,7 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
-"@types/node@*":
-  version "18.7.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.3.tgz#432c89796eab539b7a30b7b8801a727b585238a4"
-  integrity sha512-LJgzOEwWuMTBxHzgBR/fhhBOWrvBjvO+zPteUgbbuQi80rYIZHrk1mNbRUqPZqSLP2H7Rwt1EFLL/tNLD1Xx/w==
-
-"@types/node@^18.11.2":
+"@types/node@*", "@types/node@^18.11.2":
   version "18.11.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.2.tgz#c59b7641832531264fda3f1ba610362dc9a7dfc8"
   integrity sha512-BWN3M23gLO2jVG8g/XHIRFWiiV4/GckeFIqbU/C4V3xpoBBWSMk4OZomouN0wCkfQFPqgZikyLr7DOYDysIkkw==
@@ -1742,9 +1737,9 @@
     "@types/vinyl" "*"
 
 "@types/vinyl@*", "@types/vinyl@^2.0.6":
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/@types/vinyl/-/vinyl-2.0.6.tgz#b2d134603557a7c3d2b5d3dc23863ea2b5eb29b0"
-  integrity sha512-ayJ0iOCDNHnKpKTgBG6Q6JOnHTj9zFta+3j2b8Ejza0e4cvRyMn0ZoLEmbPrTHe5YYRlDYPvPWVdV4cTaRyH7g==
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@types/vinyl/-/vinyl-2.0.7.tgz#9739a9a2afaf9af32761c54a0e82c735279f726c"
+  integrity sha512-4UqPv+2567NhMQuMLdKAyK4yzrfCqwaTt6bLhHEs8PFcxbHILsrxaY63n4wgE/BRLDWDQeI+WcTmkXKExh9hQg==
   dependencies:
     "@types/expect" "^1.20.4"
     "@types/node" "*"
