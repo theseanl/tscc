@@ -28,7 +28,7 @@
   "gitHead": "cb605b055c7947989d64daeb3d95c123c27c70c0",
   "dependencies": {
     "@tscc/tscc-spec": "^0.9.4",
-    "rollup": "^2.78.0",
+    "rollup": "^3.7.5",
     "upath": "^2.0.1"
   },
   "devDependencies": {
