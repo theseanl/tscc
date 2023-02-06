@@ -1687,12 +1687,7 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
-"@types/node@*":
-  version "18.7.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.7.3.tgz#432c89796eab539b7a30b7b8801a727b585238a4"
-  integrity sha512-LJgzOEwWuMTBxHzgBR/fhhBOWrvBjvO+zPteUgbbuQi80rYIZHrk1mNbRUqPZqSLP2H7Rwt1EFLL/tNLD1Xx/w==
-
-"@types/node@^18.11.2":
+"@types/node@*", "@types/node@^18.11.2":
   version "18.11.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.2.tgz#c59b7641832531264fda3f1ba610362dc9a7dfc8"
   integrity sha512-BWN3M23gLO2jVG8g/XHIRFWiiV4/GckeFIqbU/C4V3xpoBBWSMk4OZomouN0wCkfQFPqgZikyLr7DOYDysIkkw==
@@ -1711,6 +1706,14 @@
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.7.0.tgz#ea03e9f0376a4446f44797ca19d9c46c36e352dc"
   integrity sha512-RI1L7N4JnW5gQw2spvL7Sllfuf1SaHdrZpCHiBlCXjIlufi1SMNnbu2teze3/QE67Fg2tBlH7W+mi4hVNk4p0A==
+
+"@types/rimraf@^2.0.3":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@types/rimraf/-/rimraf-2.0.5.tgz#368fb04d59630b727fc05a74d2ca557f64a8ef98"
+  integrity sha512-YyP+VfeaqAyFmXoTh3HChxOQMyjByRMsHU7kc5KOJkSlXudhMhQIALbYV7rHh/l8d2lX3VUQzprrcAgWdRuU8g==
+  dependencies:
+    "@types/glob" "*"
+    "@types/node" "*"
 
 "@types/stack-utils@^2.0.0":
   version "2.0.1"
@@ -1732,13 +1735,14 @@
     "@types/node" "*"
     "@types/stream-chain" "*"
 
-"@types/vinyl-fs@^2.4.12":
-  version "2.4.12"
-  resolved "https://registry.yarnpkg.com/@types/vinyl-fs/-/vinyl-fs-2.4.12.tgz#7b4673d9b4d5a874c8652d10f0f0265479014c8e"
-  integrity sha512-LgBpYIWuuGsihnlF+OOWWz4ovwCYlT03gd3DuLwex50cYZLmX3yrW+sFF9ndtmh7zcZpS6Ri47PrIu+fV+sbXw==
+"@types/vinyl-fs@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/vinyl-fs/-/vinyl-fs-3.0.1.tgz#af674f25f408f9ac35ef1643c2400e31922b8ac6"
+  integrity sha512-me2Gcxw23pZp62oqPoiTDDMz/txEmtEZzXM/D/VTr+xUX4LiNA+nQPs38SSPu5KHnsaEER4HEtzWU5qJRXigfA==
   dependencies:
     "@types/glob-stream" "*"
     "@types/node" "*"
+    "@types/rimraf" "^2.0.3"
     "@types/vinyl" "*"
 
 "@types/vinyl@*", "@types/vinyl@^2.0.6":
