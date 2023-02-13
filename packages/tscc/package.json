@@ -35,7 +35,7 @@
     "@types/vinyl": "^2.0.6",
     "@types/vinyl-fs": "^2.4.12",
     "@types/yargs": "^17.0.13",
-    "magic-string": "^0.26.7"
+    "magic-string": "^0.29.0"
   },
   "optionalDependencies": {
     "google-closure-compiler-linux": "^20221004.0.0",
